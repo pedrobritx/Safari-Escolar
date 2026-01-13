@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Painel do professor | Safari Escolar{% endblock %}
+{% block content %}
+  <div class="card">
+    <h1>Painel do professor</h1>
+    <p><strong>Chamada hoje:</strong> {{ attendance_count }} registros</p>
+    <p><strong>Pontos totais da turma:</strong> {{ total_points }}</p>
+  </div>
+  <div class="card">
+    <h2>Turmas</h2>
+    {% for classroom in classes %}
+      <div>
+        <strong>{{ classroom.name }}</strong>
+        <a class="btn" href="{% url 'classes:detail' school_id=school_id class_id=classroom.id %}">Abrir</a>
+      </div>
+    {% empty %}
+      <p>Sem turmas atribuídas.</p>
+    {% endfor %}
+  </div>
+  <div class="card">
+    <h2>Eventos recentes</h2>
+    <table>
+      <tr><th>Aluno</th><th>Pontos</th><th>Tipo</th></tr>
+      {% for event in events %}
+        <tr><td>{{ event.student.name }}</td><td>{{ event.points }}</td><td>{{ event.get_event_type_display }}</td></tr>
+      {% empty %}
+        <tr><td colspan="3">Nenhum evento registrado.</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Turmas | Safari Escolar{% endblock %}
+{% block content %}
+  <div class="card">
+    <h1>Turmas</h1>
+    {% if role == "coordinator" %}
+      <a class="btn" href="{% url 'classes:create' school_id=school_id %}">Nova turma</a>
+      <a class="btn" href="{% url 'classes:add_student' school_id=school_id %}">Novo estudante</a>
+    {% endif %}
+  </div>
+  {% for classroom in classes %}
+    <div class="card">
+      <strong>{{ classroom.name }}</strong> — {{ classroom.grade }} ({{ classroom.year }})
+      <div>
+        <a class="btn" href="{% url 'classes:detail' school_id=school_id class_id=classroom.id %}">Abrir</a>
+      </div>
+    </div>
+  {% empty %}
+    <div class="card">Nenhuma turma cadastrada.</div>
+  {% endfor %}
+{% endblock %}

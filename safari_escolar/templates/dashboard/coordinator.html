@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Painel da coordenação | Safari Escolar{% endblock %}
+{% block content %}
+  <div class="card">
+    <h1>Painel da coordenação</h1>
+    <p><strong>Turmas:</strong> {{ classes|length }}</p>
+    <p><strong>Alunos:</strong> {{ students|length }}</p>
+    <p><strong>Chamada hoje:</strong> {{ attendance_count }} registros</p>
+    <p><strong>Pontos totais da escola:</strong> {{ total_points }}</p>
+  </div>
+  <div class="card">
+    <h2>Turmas</h2>
+    <a class="btn" href="{% url 'classes:create' school_id=school_id %}">Nova turma</a>
+    <a class="btn" href="{% url 'classes:add_student' school_id=school_id %}">Novo estudante</a>
+    {% for classroom in classes %}
+      <div>
+        <strong>{{ classroom.name }}</strong>
+        <a class="btn" href="{% url 'classes:detail' school_id=school_id class_id=classroom.id %}">Abrir</a>
+      </div>
+    {% empty %}
+      <p>Sem turmas cadastradas.</p>
+    {% endfor %}
+  </div>
+{% endblock %}

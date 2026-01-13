@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Safari Escolar{% endblock %}</title>
+  <style>
+    :root {
+      --khaki: #d7c9a6;
+      --green: #3b6b4c;
+      --orange: #f59f2f;
+      --text: #2b2b2b;
+      --bg: #f8f4eb;
+    }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    header {
+      background: var(--khaki);
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .logo {
+      width: 36px;
+      height: 24px;
+      border: 2px solid var(--green);
+      border-radius: 12px;
+      position: relative;
+    }
+    .logo:before, .logo:after {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border: 2px solid var(--green);
+      border-radius: 50%;
+      position: absolute;
+      top: 4px;
+    }
+    .logo:before { left: 4px; }
+    .logo:after { right: 4px; }
+    .btn {
+      background: var(--green);
+      color: white;
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    main {
+      padding: 1rem;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    .accent { color: var(--orange); }
+    input, select {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.25rem;
+      margin-bottom: 0.75rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 0.5rem;
+      border-bottom: 1px solid #e6e6e6;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo" aria-hidden="true"></div>
+      <div>
+        <strong>Safari Escolar</strong><br>
+        <small>Gestão simples para professores</small>
+      </div>
+    </div>
+    {% if user.is_authenticated %}
+      <a class="btn" href="{% url 'logout' %}">Sair</a>
+    {% endif %}
+  </header>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
