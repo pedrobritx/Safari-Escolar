@@ -20,10 +20,18 @@ Safari Escolar é um sistema MVP para gestão escolar, focado em escolas públic
 
 ## 🛠️ Tecnologias
 
-- **Backend**: Node.js, Express, TypeScript
-- **Database**: PostgreSQL com Prisma ORM
-- **Autenticação**: JWT
-- **Segurança**: bcryptjs para hash de senhas
+**Backend:**
+- Node.js, Express, TypeScript
+- PostgreSQL com Prisma ORM
+- JWT para autenticação
+- bcryptjs para hash de senhas
+
+**Frontend:**
+- Next.js 15 com App Router
+- React 19
+- TypeScript
+- Tailwind CSS
+- Mobile-first design
 
 ## 📋 Pré-requisitos
 
@@ -83,13 +91,25 @@ npm run prisma:migrate
 npm run prisma:seed
 ```
 
-### 7. Inicie o servidor
+### 7. Inicie o backend
 
 ```bash
 npm run dev
 ```
 
-O servidor estará rodando em `http://localhost:3000`
+O backend estará rodando em `http://localhost:3000`
+
+### 8. Inicie o frontend (em outro terminal)
+
+```bash
+cd frontend
+npm install  # se ainda não instalou
+npm run dev
+```
+
+O frontend estará rodando em `http://localhost:3001`
+
+Acesse `http://localhost:3001` no navegador para usar o sistema!
 
 ## 👥 Dados de Teste (Seed)
 
