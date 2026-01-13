@@ -61,7 +61,7 @@ export const deleteBehaviorEvent = async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
 
     await prisma.behaviorEvent.delete({
-      where: { id },
+      where: { id: id as string },
     });
 
     res.status(204).send();

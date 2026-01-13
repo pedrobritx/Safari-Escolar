@@ -95,7 +95,7 @@ export const getClass = async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
 
     const classData = await prisma.class.findUnique({
-      where: { id },
+      where: { id: id as string },
       include: {
         school: true,
         teacher: {

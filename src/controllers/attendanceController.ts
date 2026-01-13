@@ -45,7 +45,7 @@ export const getTodayAttendance = async (req: AuthRequest, res: Response) => {
     today.setHours(0, 0, 0, 0);
 
     const students = await prisma.student.findMany({
-      where: { classId },
+      where: { classId: classId as string },
       include: {
         attendances: {
           where: { date: today },
