@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Chamada | Safari Escolar{% endblock %}
+{% block content %}
+  <div class="card">
+    <h1>Chamada - {{ classroom.name }}</h1>
+    <form method="post">
+      {% csrf_token %}
+      <label>Data</label>
+      <input type="date" name="date" value="{{ attendance_date|date:'Y-m-d' }}">
+      <table>
+        <tr><th>Aluno</th><th>Status</th></tr>
+        {% for entry in entries %}
+          <tr>
+            <td>{{ entry.student.name }}</td>
+            <td>
+              <select name="status_{{ entry.student.id }}">
+                <option value="present" {% if entry.status == "present" %}selected{% endif %}>Presente</option>
+                <option value="absent" {% if entry.status == "absent" %}selected{% endif %}>Ausente</option>
+                <option value="late" {% if entry.status == "late" %}selected{% endif %}>Atraso</option>
+              </select>
+            </td>
+          </tr>
+        {% endfor %}
+      </table>
+      <button class="btn" type="submit">Salvar chamada</button>
+    </form>
+  </div>
+{% endblock %}

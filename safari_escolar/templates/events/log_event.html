@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Eventos | Safari Escolar{% endblock %}
+{% block content %}
+  <div class="card">
+    <h1>Registrar evento - {{ classroom.name }}</h1>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button class="btn" type="submit">Salvar evento</button>
+    </form>
+  </div>
+  <div class="card">
+    <h2>Eventos recentes</h2>
+    <table>
+      <tr><th>Aluno</th><th>Pontos</th><th>Tipo</th><th>Nota</th></tr>
+      {% for event in recent %}
+        <tr><td>{{ event.student.name }}</td><td>{{ event.points }}</td><td>{{ event.get_event_type_display }}</td><td>{{ event.note }}</td></tr>
+      {% empty %}
+        <tr><td colspan="4">Nenhum evento recente.</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+{% endblock %}

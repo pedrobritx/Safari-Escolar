@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Família | Safari Escolar{% endblock %}
+{% block content %}
+  <div class="card">
+    <h1>{{ student.name }}</h1>
+    <p>Avatar: {{ student.avatar }}</p>
+    <p><strong>Pontos:</strong> {{ points_sum }}</p>
+    <p><strong>Última chamada:</strong> {% if attendance_today %}{{ attendance_today.date }} - {{ attendance_today.get_status_display }}{% else %}Sem registros{% endif %}</p>
+  </div>
+  <div class="card">
+    <h2>Eventos recentes</h2>
+    <table>
+      <tr><th>Tipo</th><th>Pontos</th><th>Nota</th></tr>
+      {% for event in recent_events %}
+        <tr><td>{{ event.get_event_type_display }}</td><td>{{ event.points }}</td><td>{{ event.note }}</td></tr>
+      {% empty %}
+        <tr><td colspan="3">Nenhum evento recente.</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+{% endblock %}
