@@ -1,0 +1,102 @@
+// Safari Escolar - Prisma Schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  COORDINATOR
+  TEACHER
+  FAMILY
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations based on role
+  coordinatorSchool School?      @relation("CoordinatorSchool")
+  teacherClasses    Class[]      @relation("TeacherClasses")
+  family            Family?
+}
+
+model School {
+  id            String   @id @default(uuid())
+  name          String
+  coordinatorId String   @unique
+  coordinator   User     @relation("CoordinatorSchool", fields: [coordinatorId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  classes       Class[]
+}
+
+model Class {
+  id        String   @id @default(uuid())
+  name      String
+  schoolId  String
+  school    School   @relation(fields: [schoolId], references: [id])
+  teacherId String
+  teacher   User     @relation("TeacherClasses", fields: [teacherId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  students  Student[]
+}
+
+model Student {
+  id            String   @id @default(uuid())
+  name          String
+  animalAvatar  String   // Animal avatar name
+  classId       String
+  class         Class    @relation(fields: [classId], references: [id])
+  familyId      String?
+  family        Family?  @relation(fields: [familyId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  attendances      Attendance[]
+  behaviorEvents   BehaviorEvent[]
+}
+
+model Family {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  students  Student[]
+}
+
+model Attendance {
+  id        String   @id @default(uuid())
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id])
+  date      DateTime @default(now())
+  present   Boolean
+  createdAt DateTime @default(now())
+
+  @@unique([studentId, date])
+}
+
+model BehaviorEvent {
+  id          String   @id @default(uuid())
+  studentId   String
+  student     Student  @relation(fields: [studentId], references: [id])
+  type        String   // "positive" or "negative"
+  description String
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+}
