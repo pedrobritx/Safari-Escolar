@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}{{ classroom.name }} | Safari Escolar{% endblock %}
+{% block content %}
+  <div class="card">
+    <h1>{{ classroom.name }}</h1>
+    <p>{{ classroom.grade }} · {{ classroom.year }}</p>
+    <a class="btn" href="{% url 'attendance:take' school_id=school_id class_id=classroom.id %}">Fazer chamada</a>
+    <a class="btn" href="{% url 'events:log' school_id=school_id class_id=classroom.id %}">Registrar evento</a>
+    {% if role == "coordinator" %}
+      <a class="btn" href="{% url 'classes:enroll' school_id=school_id class_id=classroom.id %}">Adicionar aluno</a>
+    {% endif %}
+  </div>
+  <div class="card">
+    <h2>Alunos</h2>
+    <table>
+      <tr><th>Nome</th><th>Avatar</th></tr>
+      {% for enrollment in enrollments %}
+        <tr><td>{{ enrollment.student.name }}</td><td>{{ enrollment.student.avatar }}</td></tr>
+      {% empty %}
+        <tr><td colspan="2">Sem alunos matriculados.</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+{% endblock %}

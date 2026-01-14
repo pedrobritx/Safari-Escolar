@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Matricular aluno | Safari Escolar{% endblock %}
+{% block content %}
+  <div class="card">
+    <h1>Matricular aluno em {{ classroom.name }}</h1>
+    <form method="post">
+      {% csrf_token %}
+      <label>Aluno</label>
+      <select name="student_id" required>
+        {% for student in students %}
+          <option value="{{ student.id }}">{{ student.name }} ({{ student.avatar }})</option>
+        {% endfor %}
+      </select>
+      <button class="btn" type="submit">Matricular</button>
+    </form>
+  </div>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Novo aluno | Safari Escolar{% endblock %}
+{% block content %}
+  <div class="card">
+    <h1>Novo aluno</h1>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button class="btn" type="submit">Salvar</button>
+    </form>
+  </div>
+{% endblock %}
