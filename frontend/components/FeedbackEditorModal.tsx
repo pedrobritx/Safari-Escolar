@@ -25,6 +25,7 @@ export default function FeedbackEditorModal({
 }: FeedbackEditorModalProps) {
   const [activeTab, setActiveTab] = useState<'positive' | 'negative'>('positive');
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [editLabel, setEditLabel] = useState('');
   const [editIcon, setEditIcon] = useState('');
   const [editScore, setEditScore] = useState(1);
@@ -36,6 +37,7 @@ export default function FeedbackEditorModal({
 
   const handleStartEdit = (item: Behavior) => {
     setEditingId(item.id);
+    setDeletingId(null);
     setEditLabel(item.label);
     setEditIcon(item.icon);
     setEditScore(Math.abs(item.points)); // Store as positive magnitude for editing
@@ -44,6 +46,7 @@ export default function FeedbackEditorModal({
 
   const handleStartCreate = () => {
     setEditingId('new');
+    setDeletingId(null);
     setEditLabel('');
     setEditIcon(activeTab === 'positive' ? '👍' : '👎');
     setEditScore(1);
@@ -74,11 +77,15 @@ export default function FeedbackEditorModal({
     setIsCreating(false);
   };
 
-  const handleDelete = (id: string) => {
-    if (confirm('Tem certeza que deseja excluir este feedback?')) {
-      const updatedList = currentList.filter(item => item.id !== id);
-      onUpdateBehaviors(activeTab, updatedList);
-    }
+  const handleInitiateDelete = (id: string) => {
+    setDeletingId(id);
+    setEditingId(null);
+  }
+
+  const handleConfirmDelete = (id: string) => {
+    const updatedList = currentList.filter(item => item.id !== id);
+    onUpdateBehaviors(activeTab, updatedList);
+    setDeletingId(null);
   };
 
   return (
@@ -99,13 +106,13 @@ export default function FeedbackEditorModal({
         {/* Tabs */}
         <div className="flex border-b-2 border-[var(--color-border)]">
           <button
-            onClick={() => { setActiveTab('positive'); setEditingId(null); }}
+            onClick={() => { setActiveTab('positive'); setEditingId(null); setDeletingId(null); }}
             className={`flex-1 p-3 font-bold text-center transition-colors ${activeTab === 'positive' ? 'bg-green-100 text-green-800 border-b-4 border-green-500' : 'bg-gray-50 text-gray-500 hover:bg-gray-100'}`}
           >
             Positivos (+1)
           </button>
           <button
-            onClick={() => { setActiveTab('negative'); setEditingId(null); }}
+            onClick={() => { setActiveTab('negative'); setEditingId(null); setDeletingId(null); }}
             className={`flex-1 p-3 font-bold text-center transition-colors ${activeTab === 'negative' ? 'bg-red-100 text-red-800 border-b-4 border-red-500' : 'bg-gray-50 text-gray-500 hover:bg-gray-100'}`}
           >
             Negativos (-1)
@@ -118,25 +125,51 @@ export default function FeedbackEditorModal({
           {/* List */}
           <div className="space-y-3 mb-6">
             {currentList.map((item) => (
-              <div key={item.id} className="flex items-center justify-between bg-white p-3 rounded-xl border-2 border-[var(--color-border)] shadow-sm">
+              <div key={item.id} className={`flex items-center justify-between bg-white p-3 rounded-xl border-2 shadow-sm transition-all ${deletingId === item.id ? 'border-red-500 bg-red-50' : 'border-[var(--color-border)]'}`}>
                 <div className="flex items-center gap-3">
                   <span className="text-2xl bg-gray-100 w-10 h-10 flex items-center justify-center rounded-full">{item.icon}</span>
                   <span className="font-bold text-primary">{item.label}</span>
+                  <span className={`text-xs font-bold px-2 py-1 rounded bg-gray-100 ${item.points > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {item.points > 0 ? '+' : ''}{item.points}
+                  </span>
                 </div>
+                
                 <div className="flex gap-2">
-                  <button onClick={() => handleStartEdit(item)} className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors" title="Editar">
-                    <Pencil size={18} />
-                  </button>
-                  <button onClick={() => handleDelete(item.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Excluir">
-                    <Trash2 size={18} />
-                  </button>
+                  {deletingId === item.id ? (
+                    <>
+                      <span className="text-xs font-bold text-red-500 flex items-center mr-2">Confirmar?</span>
+                      <button 
+                        onClick={() => handleConfirmDelete(item.id)} 
+                        className="p-2 bg-red-500 text-white hover:bg-red-600 rounded-lg transition-colors shadow-sm" 
+                        title="Confirmar Exclusão"
+                      >
+                        <Check size={18} />
+                      </button>
+                      <button 
+                        onClick={() => setDeletingId(null)} 
+                        className="p-2 bg-gray-200 text-gray-600 hover:bg-gray-300 rounded-lg transition-colors" 
+                        title="Cancelar"
+                      >
+                        <X size={18} />
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button onClick={() => handleStartEdit(item)} className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors" title="Editar">
+                        <Pencil size={18} />
+                      </button>
+                      <button onClick={() => handleInitiateDelete(item.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors" title="Excluir">
+                        <Trash2 size={18} />
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             ))}
           </div>
 
           {/* Add Button */}
-          {!editingId && (
+          {!editingId && !deletingId && (
             <button
               onClick={handleStartCreate}
               className="w-full py-3 border-2 border-dashed border-gray-400 rounded-xl text-gray-500 font-bold hover:bg-white hover:border-[var(--color-secondary)] hover:text-[var(--color-secondary)] transition-all flex items-center justify-center gap-2"
@@ -147,7 +180,7 @@ export default function FeedbackEditorModal({
 
           {/* Edit Form */}
           {editingId && (
-            <div className="bg-white p-4 rounded-xl border-2 border-blue-200 shadow-md">
+            <div className="bg-white p-4 rounded-xl border-2 border-blue-200 shadow-md animate-in fade-in slide-in-from-bottom-2">
               <h4 className="font-bold text-primary mb-3">{isCreating ? 'Criar Novo' : 'Editar'} Feedback</h4>
               
               <div className="grid grid-cols-1 sm:grid-cols-[auto_1fr] gap-4">
