@@ -273,6 +273,50 @@ export default function DashboardPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Class Selection */}
+        {classes.length > 0 && (
+          <div className="mb-6 flex gap-4 items-end">
+            <div className="flex-1 max-w-md">
+              <label className="block text-sm font-bold text-primary mb-2 ml-1">MAPA (SELECIONE A TURMA):</label>
+              <select
+                value={selectedClass?.id || ''}
+                onChange={(e) => {
+                  const cls = classes.find((c) => c.id === e.target.value);
+                  setSelectedClass(cls || null);
+                }}
+                className="w-full h-[52px] mb-[2px] px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-600 font-bold bg-[#F3F4F6] focus:ring-4 focus:ring-[var(--color-secondary)] focus:border-primary outline-none hover:bg-white hover:border-primary hover:text-primary transition-all shadow-sm cursor-pointer"
+              >
+                {classes.map((cls) => (
+                  <option key={cls.id} value={cls.id}>
+                    {cls.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  setStudentFormMode('create');
+                  setEditingStudentData(null);
+                  setStudentFormOpen(true);
+                }}
+                className="mb-[2px] px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-600 font-bold hover:bg-white hover:border-primary hover:text-primary transition-all shadow-sm flex items-center gap-2 bg-[#F3F4F6]"
+              >
+                <Plus size={20} />
+                Adicionar Aluno
+              </button>
+              <button
+                 onClick={() => setFeedbackEditorOpen(true)}
+                 className="mb-[2px] px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-600 font-bold hover:bg-white hover:border-primary hover:text-primary transition-all shadow-sm flex items-center gap-2 bg-[#F3F4F6]"
+              >
+                <Settings size={20} />
+                Feedback
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Dashboard Cards & Calendar */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
            {/* Summary Card (Takes 1 column) */}
@@ -318,49 +362,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Class Selection */}
-        {classes.length > 0 && (
-          <div className="mb-6 flex gap-4 items-end">
-            <div className="flex-1 max-w-md">
-              <label className="block text-sm font-bold text-primary mb-2 ml-1">MAPA (SELECIONE A TURMA):</label>
-              <select
-                value={selectedClass?.id || ''}
-                onChange={(e) => {
-                  const cls = classes.find((c) => c.id === e.target.value);
-                  setSelectedClass(cls || null);
-                }}
-                className="w-full h-[52px] mb-[2px] px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-600 font-bold bg-[#F3F4F6] focus:ring-4 focus:ring-[var(--color-secondary)] focus:border-primary outline-none hover:bg-white hover:border-primary hover:text-primary transition-all shadow-sm cursor-pointer"
-              >
-                {classes.map((cls) => (
-                  <option key={cls.id} value={cls.id}>
-                    {cls.name}
-                  </option>
-                ))}
-              </select>
-            </div>
 
-            <div className="flex gap-2">
-              <button
-                onClick={() => {
-                  setStudentFormMode('create');
-                  setEditingStudentData(null);
-                  setStudentFormOpen(true);
-                }}
-                className="mb-[2px] px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-600 font-bold hover:bg-white hover:border-primary hover:text-primary transition-all shadow-sm flex items-center gap-2 bg-[#F3F4F6]"
-              >
-                <Plus size={20} />
-                Adicionar Aluno
-              </button>
-              <button
-                 onClick={() => setFeedbackEditorOpen(true)}
-                 className="mb-[2px] px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-600 font-bold hover:bg-white hover:border-primary hover:text-primary transition-all shadow-sm flex items-center gap-2 bg-[#F3F4F6]"
-              >
-                <Settings size={20} />
-                Feedback
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* Students List */}
         {selectedClass && (
