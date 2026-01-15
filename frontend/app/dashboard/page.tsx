@@ -228,7 +228,7 @@ export default function DashboardPage() {
                   key={student.id} 
                   className={viewMode === 'list' 
                     ? "px-6 py-4 hover:bg-white transition-colors"
-                    : "bg-white border-2 border-[var(--color-border)] rounded-xl p-4 flex flex-col items-center text-center hover:shadow-md transition-all relative overflow-hidden group"
+                    : `bg-white border-2 border-[var(--color-border)] rounded-xl p-4 flex flex-col items-center text-center hover:shadow-md transition-all relative group ${editingStudentId === student.id ? 'z-20' : ''}`
                   }
                 >
                   <div className={viewMode === 'list' ? "flex flex-col sm:flex-row items-center justify-between gap-4" : "w-full"}>
