@@ -85,7 +85,24 @@ export const api = {
     return response.json();
   },
 
-  async updateStudent(token: string, studentId: string, data: { animalAvatar?: string; avatarColor?: string }) {
+  async createStudent(token: string, data: { name: string; classId: string; animalAvatar?: string; avatarColor?: string }) {
+    const response = await fetch(`${API_URL}/api/students`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create student');
+    }
+
+    return response.json();
+  },
+
+  async updateStudent(token: string, studentId: string, data: { name?: string; animalAvatar?: string; avatarColor?: string }) {
     const response = await fetch(`${API_URL}/api/students/${studentId}`, {
       method: 'PUT',
       headers: {
@@ -100,5 +117,20 @@ export const api = {
     }
 
     return response.json();
+  },
+
+  async deleteStudent(token: string, studentId: string) {
+    const response = await fetch(`${API_URL}/api/students/${studentId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete student');
+    }
+
+    return true;
   },
 };

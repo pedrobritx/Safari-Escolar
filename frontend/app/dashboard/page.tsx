@@ -7,7 +7,8 @@ import { DashboardData, User, Class, Student } from '@/lib/types';
 import EmojiPicker from '@/components/EmojiPicker';
 import BehaviorModal, { Behavior } from '@/components/BehaviorModal';
 import FeedbackEditorModal from '@/components/FeedbackEditorModal';
-import { LayoutGrid, List, Pencil, Settings } from 'lucide-react';
+import StudentFormModal from '@/components/StudentFormModal';
+import { LayoutGrid, List, Pencil, Settings, Plus } from 'lucide-react';
 
 const DEFAULT_POSITIVE_BEHAVIORS: Behavior[] = [
   { id: 'task_ok', label: 'Tarefa em Dia', icon: '📝', points: 1 },
@@ -43,6 +44,11 @@ export default function DashboardPage() {
   const [feedbackEditorOpen, setFeedbackEditorOpen] = useState(false);
   const [positiveBehaviors, setPositiveBehaviors] = useState<Behavior[]>(DEFAULT_POSITIVE_BEHAVIORS);
   const [negativeBehaviors, setNegativeBehaviors] = useState<Behavior[]>(DEFAULT_NEGATIVE_BEHAVIORS);
+
+  // Student Form State
+  const [studentFormOpen, setStudentFormOpen] = useState(false);
+  const [studentFormMode, setStudentFormMode] = useState<'create' | 'edit'>('create');
+  const [editingStudentData, setEditingStudentData] = useState<Student | null>(null);
 
   useEffect(() => {
     // Load custom behaviors from local storage if available
@@ -148,6 +154,33 @@ export default function DashboardPage() {
     }
   };
 
+  const handleCreateStudent = async (data: { name: string; animalAvatar?: string; avatarColor?: string }) => {
+    const token = localStorage.getItem('token');
+    if (!token || !selectedClass) return;
+
+    try {
+      await api.createStudent(token, { ...data, classId: selectedClass.id });
+      setStudentFormOpen(false);
+      loadData(token);
+    } catch (error) {
+      console.error('Error creating student:', error);
+    }
+  };
+
+  const handleDeleteStudent = async () => {
+    const token = localStorage.getItem('token');
+    if (!token || !editingStudentData) return;
+
+    try {
+      await api.deleteStudent(token, editingStudentData.id);
+      setStudentFormOpen(false);
+      setEditingStudentData(null);
+      loadData(token);
+    } catch (error) {
+      console.error('Error deleting student:', error);
+    }
+  };
+
   const openBehaviorModal = (studentId: string, studentName: string, type: 'positive' | 'negative') => {
     setCurrentBehaviorStudent({ id: studentId, name: studentName });
     setBehaviorModalType(type);
@@ -175,12 +208,14 @@ export default function DashboardPage() {
     }
   };
 
-  const handleUpdateStudent = async (studentId: string, data: { animalAvatar?: string; avatarColor?: string }) => {
+  const handleUpdateStudent = async (data: { name: string; animalAvatar?: string; avatarColor?: string }) => {
     const token = localStorage.getItem('token');
-    if (!token) return;
+    if (!token || !editingStudentData) return;
 
     try {
-      await api.updateStudent(token, studentId, data);
+      await api.updateStudent(token, editingStudentData.id, data);
+      setStudentFormOpen(false);
+      setEditingStudentData(null);
       await loadData(token);
     } catch (error) {
       console.error('Error updating student:', error);
@@ -270,7 +305,7 @@ export default function DashboardPage() {
                   const cls = classes.find((c) => c.id === e.target.value);
                   setSelectedClass(cls || null);
                 }}
-                className="w-full mb-[2px] px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-600 font-bold bg-[#F3F4F6] focus:ring-4 focus:ring-[var(--color-secondary)] focus:border-primary outline-none hover:bg-white hover:border-primary hover:text-primary transition-all shadow-sm cursor-pointer"
+                className="w-full h-[52px] mb-[2px] px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-600 font-bold bg-[#F3F4F6] focus:ring-4 focus:ring-[var(--color-secondary)] focus:border-primary outline-none hover:bg-white hover:border-primary hover:text-primary transition-all shadow-sm cursor-pointer"
               >
                 {classes.map((cls) => (
                   <option key={cls.id} value={cls.id}>
@@ -279,13 +314,27 @@ export default function DashboardPage() {
                 ))}
               </select>
             </div>
-            <button
-               onClick={() => setFeedbackEditorOpen(true)}
-               className="mb-[2px] px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-600 font-bold hover:bg-white hover:border-primary hover:text-primary transition-all shadow-sm flex items-center gap-2 bg-[#F3F4F6]"
-            >
-              <Settings size={20} />
-              Feedback
-            </button>
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  setStudentFormMode('create');
+                  setEditingStudentData(null);
+                  setStudentFormOpen(true);
+                }}
+                className="mb-[2px] px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-600 font-bold hover:bg-white hover:border-primary hover:text-primary transition-all shadow-sm flex items-center gap-2 bg-[#F3F4F6]"
+              >
+                <Plus size={20} />
+                Adicionar Aluno
+              </button>
+              <button
+                 onClick={() => setFeedbackEditorOpen(true)}
+                 className="mb-[2px] px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-600 font-bold hover:bg-white hover:border-primary hover:text-primary transition-all shadow-sm flex items-center gap-2 bg-[#F3F4F6]"
+              >
+                <Settings size={20} />
+                Feedback
+              </button>
+            </div>
           </div>
         )}
 
@@ -343,23 +392,17 @@ export default function DashboardPage() {
                         
                         {/* Edit Overlay */}
                         <button
-                          onClick={() => setEditingStudentId(student.id)}
+                          onClick={() => {
+                            setEditingStudentData(student);
+                            setStudentFormMode('edit');
+                            setStudentFormOpen(true);
+                          }}
                           className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover/avatar:opacity-100 transition-opacity"
                         >
                           <div className="bg-white text-primary text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-md">
                             <Pencil size={12} /> Editar
                           </div>
                         </button>
-
-                        {/* Emoji Picker */}
-                        {editingStudentId === student.id && (
-                          <EmojiPicker 
-                            onSelectEmoji={(emoji) => handleUpdateStudent(student.id, { animalAvatar: emoji })}
-                            onSelectColor={(color) => handleUpdateStudent(student.id, { avatarColor: color })}
-                            onClose={() => setEditingStudentId(null)}
-                            currentColor={student.avatarColor}
-                          />
-                        )}
                       </div>
 
                       <span className={`font-bold text-primary ${viewMode === 'list' ? 'text-lg' : 'text-xl'}`}>{student.name}</span>
@@ -431,6 +474,18 @@ export default function DashboardPage() {
         positiveBehaviors={positiveBehaviors}
         negativeBehaviors={negativeBehaviors}
         onUpdateBehaviors={handleUpdateBehaviors}
+      />
+
+      <StudentFormModal
+        isOpen={studentFormOpen}
+        onClose={() => {
+          setStudentFormOpen(false);
+          setEditingStudentData(null);
+        }}
+        onSave={studentFormMode === 'create' ? handleCreateStudent : handleUpdateStudent}
+        onDelete={studentFormMode === 'edit' ? handleDeleteStudent : undefined}
+        initialData={editingStudentData}
+        mode={studentFormMode}
       />
     </div>
   );

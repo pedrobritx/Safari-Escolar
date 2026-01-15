@@ -90,7 +90,7 @@ enum AttendanceStatus {
 model Attendance {
   id        String           @id @default(uuid())
   studentId String
-  student   Student          @relation(fields: [studentId], references: [id])
+  student   Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
   date      DateTime         @default(now())
   status    AttendanceStatus
   createdAt DateTime         @default(now())
@@ -101,7 +101,7 @@ model Attendance {
 model BehaviorEvent {
   id          String   @id @default(uuid())
   studentId   String
-  student     Student  @relation(fields: [studentId], references: [id])
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
   type        String   // "positive" or "negative"
   description String
   date        DateTime @default(now())
