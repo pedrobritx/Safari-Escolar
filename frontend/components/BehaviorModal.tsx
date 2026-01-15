@@ -23,7 +23,7 @@ export default function BehaviorModal({ isOpen, onClose, onSelectBehavior, stude
   const themeColor = type === 'positive' ? 'green' : 'red';
   const borderColor = type === 'positive' ? 'border-green-500' : 'border-red-500';
   const bgColor = type === 'positive' ? 'bg-green-50' : 'bg-red-50';
-  const title = type === 'positive' ? '🎉 Feedback Positivo' : '⚠️ Feedback Negativo';
+  const title = type === 'positive' ? '🎉 Feedback Positivo' : '⚠️ Feedback Construtivo';
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">

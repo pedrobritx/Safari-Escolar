@@ -106,7 +106,7 @@ export default function FamilyPage() {
                   </div>
                   <div>
                     <div className="text-2xl font-bold text-red-600">-{student.negativeEvents}</div>
-                    <div className="text-xs text-gray-600">Negativos</div>
+                    <div className="text-xs text-gray-600">Construtivos</div>
                   </div>
                 </div>
               </div>
@@ -133,7 +133,7 @@ export default function FamilyPage() {
 
               {/* Recent Behavior Events */}
               <div className="px-6 py-4">
-                <h4 className="font-semibold text-gray-900 mb-2">Eventos Recentes</h4>
+                <h4 className="font-semibold text-gray-900 mb-2">Feedbacks Recentes</h4>
                 <div className="space-y-2">
                   {student.recentBehaviorEvents.slice(0, 5).map((event) => (
                     <div

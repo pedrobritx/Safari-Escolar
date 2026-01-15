@@ -115,7 +115,7 @@ export default function FeedbackEditorModal({
             onClick={() => { setActiveTab('negative'); setEditingId(null); setDeletingId(null); }}
             className={`flex-1 p-3 font-bold text-center transition-colors ${activeTab === 'negative' ? 'bg-red-100 text-red-800 border-b-4 border-red-500' : 'bg-gray-50 text-gray-500 hover:bg-gray-100'}`}
           >
-            Negativos (-1)
+            Construtivos (-1)
           </button>
         </div>
 

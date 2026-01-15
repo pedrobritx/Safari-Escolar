@@ -296,11 +296,11 @@ export default function DashboardPage() {
                   <span className="font-bold text-primary">{data.attendanceRate.toFixed(1)}%</span>
                 </div>
                 <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
-                  <span className="text-[#57534E]">Eventos Positivos:</span>
+                  <span className="text-[#57534E]">Feedbacks Positivos:</span>
                   <span className="font-bold text-green-600">+{data.todayPositiveEvents}</span>
                 </div>
                 <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
-                  <span className="text-[#57534E]">Eventos Negativos:</span>
+                  <span className="text-[#57534E]">Feedbacks Construtivos:</span>
                   <span className="font-bold text-red-600">-{data.todayNegativeEvents}</span>
                 </div>
               </div>
@@ -463,7 +463,7 @@ export default function DashboardPage() {
                           onClick={() => openBehaviorModal(student.id, student.name, 'negative')}
                           className={`bg-[#EA580C] text-white rounded-lg border-b-4 border-[#9A3412] active:border-b-0 active:translate-y-1 hover:bg-[#C2410C] font-bold transition-all ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'}`}
                         >
-                          - Negativo
+                          Construtivo
                         </button>
                       </div>
                     </div>
