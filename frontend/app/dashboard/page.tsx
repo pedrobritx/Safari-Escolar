@@ -5,8 +5,24 @@ import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { DashboardData, User, Class } from '@/lib/types';
 import EmojiPicker from '@/components/EmojiPicker';
-import BehaviorModal from '@/components/BehaviorModal';
-import { LayoutGrid, List, Pencil } from 'lucide-react';
+import BehaviorModal, { Behavior } from '@/components/BehaviorModal';
+import FeedbackEditorModal from '@/components/FeedbackEditorModal';
+import { LayoutGrid, List, Pencil, Settings } from 'lucide-react';
+
+const DEFAULT_POSITIVE_BEHAVIORS: Behavior[] = [
+  { id: 'helping', label: 'Ajudando Outros', icon: '🤝', points: 1 },
+  { id: 'ontask', label: 'Na Tarefa', icon: '🎯', points: 1 },
+  { id: 'participating', label: 'Participando', icon: '🙋', points: 1 },
+  { id: 'persistence', label: 'Persistência', icon: '💪', points: 1 },
+  { id: 'teamwork', label: 'Trabalho em Equipe', icon: '🧩', points: 1 },
+  { id: 'workinghard', label: 'Trabalhando Duro', icon: '🚀', points: 1 },
+];
+
+const DEFAULT_NEGATIVE_BEHAVIORS: Behavior[] = [
+  { id: 'no_collab', label: 'Não Colabora', icon: '🚫', points: -1 },
+  { id: 'late_task', label: 'Tarefa Atrasada', icon: '⏰', points: -1 },
+  { id: 'interrupting', label: 'Interrompendo Aula', icon: '🗣️', points: -1 },
+];
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -23,6 +39,30 @@ export default function DashboardPage() {
   const [behaviorModalOpen, setBehaviorModalOpen] = useState(false);
   const [behaviorModalType, setBehaviorModalType] = useState<'positive' | 'negative'>('positive');
   const [currentBehaviorStudent, setCurrentBehaviorStudent] = useState<{id: string, name: string} | null>(null);
+
+  // Feedback Editor State
+  const [feedbackEditorOpen, setFeedbackEditorOpen] = useState(false);
+  const [positiveBehaviors, setPositiveBehaviors] = useState<Behavior[]>(DEFAULT_POSITIVE_BEHAVIORS);
+  const [negativeBehaviors, setNegativeBehaviors] = useState<Behavior[]>(DEFAULT_NEGATIVE_BEHAVIORS);
+
+  useEffect(() => {
+    // Load custom behaviors from local storage if available
+    const savedPositive = localStorage.getItem('safari_positive_behaviors');
+    const savedNegative = localStorage.getItem('safari_negative_behaviors');
+
+    if (savedPositive) setPositiveBehaviors(JSON.parse(savedPositive));
+    if (savedNegative) setNegativeBehaviors(JSON.parse(savedNegative));
+  }, []);
+
+  const handleUpdateBehaviors = (type: 'positive' | 'negative', updatedList: Behavior[]) => {
+    if (type === 'positive') {
+      setPositiveBehaviors(updatedList);
+      localStorage.setItem('safari_positive_behaviors', JSON.stringify(updatedList));
+    } else {
+      setNegativeBehaviors(updatedList);
+      localStorage.setItem('safari_negative_behaviors', JSON.stringify(updatedList));
+    }
+  };
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -222,22 +262,31 @@ export default function DashboardPage() {
 
         {/* Class Selection */}
         {classes.length > 0 && (
-          <div className="mb-6">
-            <label className="block text-sm font-bold text-primary mb-2 ml-1">MAPA (SELECIONE A TURMA):</label>
-            <select
-              value={selectedClass?.id || ''}
-              onChange={(e) => {
-                const cls = classes.find((c) => c.id === e.target.value);
-                setSelectedClass(cls || null);
-              }}
-              className="w-full max-w-md px-4 py-3 border-2 border-[var(--color-border)] rounded-xl focus:ring-4 focus:ring-[var(--color-secondary)] focus:border-primary outline-none bg-white font-medium text-lg text-primary cursor-pointer"
+          <div className="mb-6 flex gap-4 items-end">
+            <div className="flex-1 max-w-md">
+              <label className="block text-sm font-bold text-primary mb-2 ml-1">MAPA (SELECIONE A TURMA):</label>
+              <select
+                value={selectedClass?.id || ''}
+                onChange={(e) => {
+                  const cls = classes.find((c) => c.id === e.target.value);
+                  setSelectedClass(cls || null);
+                }}
+                className="w-full px-4 py-3 border-2 border-[var(--color-border)] rounded-xl focus:ring-4 focus:ring-[var(--color-secondary)] focus:border-primary outline-none bg-white font-medium text-lg text-primary cursor-pointer"
+              >
+                {classes.map((cls) => (
+                  <option key={cls.id} value={cls.id}>
+                    {cls.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <button
+               onClick={() => setFeedbackEditorOpen(true)}
+               className="mb-[2px] px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-600 font-bold hover:bg-white hover:border-primary hover:text-primary transition-all shadow-sm flex items-center gap-2 bg-[#F3F4F6]"
             >
-              {classes.map((cls) => (
-                <option key={cls.id} value={cls.id}>
-                  {cls.name}
-                </option>
-              ))}
-            </select>
+              <Settings size={20} />
+              Feedback
+            </button>
           </div>
         )}
 
@@ -374,6 +423,15 @@ export default function DashboardPage() {
         }}
         studentName={currentBehaviorStudent?.name || ''}
         type={behaviorModalType}
+        behaviors={behaviorModalType === 'positive' ? positiveBehaviors : negativeBehaviors}
+      />
+
+      <FeedbackEditorModal
+        isOpen={feedbackEditorOpen}
+        onClose={() => setFeedbackEditorOpen(false)}
+        positiveBehaviors={positiveBehaviors}
+        negativeBehaviors={negativeBehaviors}
+        onUpdateBehaviors={handleUpdateBehaviors}
       />
     </div>
   );

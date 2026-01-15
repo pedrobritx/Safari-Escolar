@@ -1,33 +1,25 @@
 import React from 'react';
 import { X } from 'lucide-react';
 
+export interface Behavior {
+  id: string;
+  label: string;
+  icon: string;
+  points: number;
+}
+
 interface BehaviorModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectBehavior: (behavior: string) => void;
   studentName: string;
   type: 'positive' | 'negative';
+  behaviors: Behavior[];
 }
 
-const POSITIVE_BEHAVIORS = [
-  { id: 'helping', label: 'Ajudando Outros', icon: '🤝', points: 1 },
-  { id: 'ontask', label: 'Na Tarefa', icon: '🎯', points: 1 },
-  { id: 'participating', label: 'Participando', icon: '🙋', points: 1 },
-  { id: 'persistence', label: 'Persistência', icon: '💪', points: 1 },
-  { id: 'teamwork', label: 'Trabalho em Equipe', icon: '🧩', points: 1 },
-  { id: 'workinghard', label: 'Trabalhando Duro', icon: '🚀', points: 1 },
-];
-
-const NEGATIVE_BEHAVIORS = [
-  { id: 'no_collab', label: 'Não Colabora', icon: '🚫', points: -1 },
-  { id: 'late_task', label: 'Tarefa Atrasada', icon: '⏰', points: -1 },
-  { id: 'interrupting', label: 'Interrompendo Aula', icon: '🗣️', points: -1 },
-];
-
-export default function BehaviorModal({ isOpen, onClose, onSelectBehavior, studentName, type }: BehaviorModalProps) {
+export default function BehaviorModal({ isOpen, onClose, onSelectBehavior, studentName, type, behaviors }: BehaviorModalProps) {
   if (!isOpen) return null;
 
-  const behaviors = type === 'positive' ? POSITIVE_BEHAVIORS : NEGATIVE_BEHAVIORS;
   const themeColor = type === 'positive' ? 'green' : 'red';
   const borderColor = type === 'positive' ? 'border-green-500' : 'border-red-500';
   const bgColor = type === 'positive' ? 'bg-green-50' : 'bg-red-50';
@@ -55,7 +47,7 @@ export default function BehaviorModal({ isOpen, onClose, onSelectBehavior, stude
         <div className="p-6 bg-[#FAF9F6]">
           <h4 className="text-center text-primary font-bold mb-6 text-lg">Selecione uma habilidade:</h4>
           
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 max-h-[60vh] overflow-y-auto custom-scrollbar p-1">
             {behaviors.map((behavior) => (
               <button
                 key={behavior.id}
