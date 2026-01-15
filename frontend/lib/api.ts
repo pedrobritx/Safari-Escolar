@@ -15,9 +15,12 @@ export const api = {
     return response.json();
   },
 
-  async getClasses(token: string) {
-    const response = await fetch(`${API_URL}/api/classes`, {
-      headers: { 'Authorization': `Bearer ${token}` },
+  async getClasses(token: string, date?: string) {
+    const query = date ? `?date=${encodeURIComponent(date)}` : '';
+    const response = await fetch(`${API_URL}/api/classes${query}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
     });
 
     if (!response.ok) {

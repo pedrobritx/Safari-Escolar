@@ -36,18 +36,48 @@ export const getClasses = async (req: AuthRequest, res: Response) => {
   try {
     const userRole = req.user!.role;
     const userId = req.user!.id;
+    const dateQuery = req.query.date as string;
+
+    // Use provided date or default to start of today in UTC to match how we store/search
+    // For simplicity, we'll assume the date passed is YYYY-MM-DD or use simple JS date matching
+    // Ideally use a library like date-fns, but native JS works for simple cases
+    let targetDateStart: Date;
+    let targetDateEnd: Date;
+
+    if (dateQuery) {
+      const d = new Date(dateQuery);
+      targetDateStart = new Date(d.setHours(0, 0, 0, 0));
+      targetDateEnd = new Date(d.setHours(23, 59, 59, 999));
+    } else {
+      const now = new Date();
+      targetDateStart = new Date(now.setHours(0, 0, 0, 0));
+      targetDateEnd = new Date(now.setHours(23, 59, 59, 999));
+    }
 
     let classes;
 
+    const includeOptions = {
+      school: true,
+      teacher: {
+        select: { id: true, name: true, email: true },
+      },
+      students: {
+        include: {
+          attendances: {
+            where: {
+              date: {
+                gte: targetDateStart,
+                lte: targetDateEnd,
+              },
+            },
+          },
+        },
+      },
+    };
+
     if (userRole === 'ADMIN') {
       classes = await prisma.class.findMany({
-        include: {
-          school: true,
-          teacher: {
-            select: { id: true, name: true, email: true },
-          },
-          students: true,
-        },
+        include: includeOptions,
       });
     } else if (userRole === 'COORDINATOR') {
       const school = await prisma.school.findUnique({
@@ -60,30 +90,30 @@ export const getClasses = async (req: AuthRequest, res: Response) => {
 
       classes = await prisma.class.findMany({
         where: { schoolId: school.id },
-        include: {
-          school: true,
-          teacher: {
-            select: { id: true, name: true, email: true },
-          },
-          students: true,
-        },
+        include: includeOptions,
       });
     } else if (userRole === 'TEACHER') {
       classes = await prisma.class.findMany({
         where: { teacherId: userId },
-        include: {
-          school: true,
-          teacher: {
-            select: { id: true, name: true, email: true },
-          },
-          students: true,
-        },
+        include: includeOptions,
       });
     } else {
       return res.status(403).json({ error: 'Not authorized' });
     }
 
-    res.json(classes);
+    // Process classes to attach 'todayStatus' simplified field for frontend
+    const classesWithStatus = classes.map((cls: any) => ({
+      ...cls,
+      students: cls.students.map((student: any) => {
+        const attendance = student.attendances[0]; // Should be only 1 or 0 due to date filter
+        return {
+          ...student,
+          todayStatus: attendance ? attendance.status : null,
+        };
+      }),
+    }));
+
+    res.json(classesWithStatus);
   } catch (error) {
     console.error('Get classes error:', error);
     res.status(500).json({ error: 'Internal server error' });

@@ -8,6 +8,7 @@ import EmojiPicker from '@/components/EmojiPicker';
 import BehaviorModal, { Behavior } from '@/components/BehaviorModal';
 import FeedbackEditorModal from '@/components/FeedbackEditorModal';
 import StudentFormModal from '@/components/StudentFormModal';
+import Calendar from '@/components/Calendar';
 import { LayoutGrid, List, Pencil, Settings, Plus } from 'lucide-react';
 
 const DEFAULT_POSITIVE_BEHAVIORS: Behavior[] = [
@@ -50,6 +51,9 @@ export default function DashboardPage() {
   const [studentFormMode, setStudentFormMode] = useState<'create' | 'edit'>('create');
   const [editingStudentData, setEditingStudentData] = useState<Student | null>(null);
 
+  // Calendar State
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+
   useEffect(() => {
     // Load custom behaviors from local storage if available
     const savedPositive = localStorage.getItem('safari_positive_behaviors');
@@ -85,14 +89,21 @@ export default function DashboardPage() {
     }
 
     setUser(parsedUser);
-    loadData(token);
   }, [router]);
+
+  useEffect(() => {
+    if (user) {
+      const token = localStorage.getItem('token');
+      if (token) loadData(token);
+    }
+  }, [user, selectedDate]);
 
   const loadData = async (token: string) => {
     try {
+      const formattedDate = selectedDate.toISOString().split('T')[0];
       const [dashboard, classesData] = await Promise.all([
-        api.getDashboard(token),
-        api.getClasses(token),
+        api.getDashboard(token), // Dashboard metrics might need date too eventually, but keeping simple for now
+        api.getClasses(token, formattedDate),
       ]);
 
       setDashboardData(dashboard);
@@ -261,10 +272,12 @@ export default function DashboardPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Dashboard Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        {/* Dashboard Cards & Calendar */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+           {/* Summary Card (Takes 1 column) */}
+          <div className="lg:col-span-1">
           {dashboardData.map((data) => (
-            <div key={data.classId} className="bg-[#FAF9F6] border-2 border-[var(--color-border)] rounded-2xl shadow-[4px_4px_0px_var(--color-border)] p-6">
+            <div key={data.classId} className="bg-[#FAF9F6] border-2 border-[var(--color-border)] rounded-2xl shadow-[4px_4px_0px_var(--color-border)] p-6 h-full">
               <h3 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">
                 🏕️ {data.className}
               </h3>
@@ -274,7 +287,7 @@ export default function DashboardPage() {
                   <span className="font-bold text-primary">{data.totalStudents}</span>
                 </div>
                 <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
-                  <span className="text-[#57534E]">Presentes Hoje:</span>
+                  <span className="text-[#57534E]">Presentes:</span>
                   <span className="font-bold text-green-600">{data.todayAttendance}</span>
                 </div>
                 <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
@@ -292,6 +305,12 @@ export default function DashboardPage() {
               </div>
             </div>
           ))}
+          </div>
+
+          {/* Calendar (Takes 2 columns) */}
+          <div className="lg:col-span-2">
+             <Calendar selectedDate={selectedDate} onDateChange={setSelectedDate} />
+          </div>
         </div>
 
         {/* Class Selection */}
@@ -412,21 +431,21 @@ export default function DashboardPage() {
                       <div className="grid grid-cols-3 gap-2 w-full">
                         <button
                           onClick={() => handleMarkAttendance(student.id, 'PRESENT')}
-                          className={`bg-[#4D7C0F] text-white rounded-lg border-b-4 border-[#365314] active:border-b-0 active:translate-y-1 hover:bg-[#3F6212] font-bold transition-all ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'}`}
+                          className={`bg-[#4D7C0F] text-white rounded-lg border-b-4 border-[#365314] active:border-b-0 active:translate-y-1 hover:bg-[#3F6212] font-bold transition-all ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'} ${student.todayStatus && student.todayStatus !== 'PRESENT' ? 'opacity-30' : ''}`}
                           title="Presente"
                         >
                            Presente
                         </button>
                         <button
                           onClick={() => handleMarkAttendance(student.id, 'LATE')}
-                          className={`bg-yellow-500 text-white rounded-lg border-b-4 border-yellow-700 active:border-b-0 active:translate-y-1 hover:bg-yellow-600 font-bold transition-all ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'}`}
+                          className={`bg-yellow-500 text-white rounded-lg border-b-4 border-yellow-700 active:border-b-0 active:translate-y-1 hover:bg-yellow-600 font-bold transition-all ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'} ${student.todayStatus && student.todayStatus !== 'LATE' ? 'opacity-30' : ''}`}
                           title="Atrasado"
                         >
                           Atrasado
                         </button>
                         <button
                           onClick={() => handleMarkAttendance(student.id, 'ABSENT')}
-                          className={`bg-red-500 text-white rounded-lg border-b-4 border-red-700 active:border-b-0 active:translate-y-1 hover:bg-red-600 font-bold transition-all ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'}`}
+                          className={`bg-red-500 text-white rounded-lg border-b-4 border-red-700 active:border-b-0 active:translate-y-1 hover:bg-red-600 font-bold transition-all ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'} ${student.todayStatus && student.todayStatus !== 'ABSENT' ? 'opacity-30' : ''}`}
                           title="Ausente"
                         >
                            Ausente
