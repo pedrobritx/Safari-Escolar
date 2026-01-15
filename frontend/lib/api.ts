@@ -30,8 +30,9 @@ export const api = {
     return response.json();
   },
 
-  async getDashboard(token: string) {
-    const response = await fetch(`${API_URL}/api/dashboard`, {
+  async getDashboard(token: string, date?: string) {
+    const query = date ? `?date=${encodeURIComponent(date)}` : '';
+    const response = await fetch(`${API_URL}/api/dashboard${query}`, {
       headers: { 'Authorization': `Bearer ${token}` },
     });
 

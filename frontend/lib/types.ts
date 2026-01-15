@@ -44,6 +44,7 @@ export interface DashboardData {
   className: string;
   totalStudents: number;
   todayAttendance: number;
+  todayLate: number;
   attendanceRate: number;
   todayPositiveEvents: number;
   todayNegativeEvents: number;

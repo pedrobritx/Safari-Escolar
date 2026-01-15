@@ -102,7 +102,7 @@ export default function DashboardPage() {
     try {
       const formattedDate = selectedDate.toISOString().split('T')[0];
       const [dashboard, classesData] = await Promise.all([
-        api.getDashboard(token), // Dashboard metrics might need date too eventually, but keeping simple for now
+        api.getDashboard(token, formattedDate), 
         api.getClasses(token, formattedDate),
       ]);
 
@@ -290,6 +290,10 @@ export default function DashboardPage() {
                 <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
                   <span className="text-[#57534E]">Presentes:</span>
                   <span className="font-bold text-green-600">{data.todayAttendance}</span>
+                </div>
+                <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
+                  <span className="text-[#57534E]">Atrasados:</span>
+                  <span className="font-bold text-yellow-600">{data.todayLate}</span>
                 </div>
                 <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
                   <span className="text-[#57534E]">Taxa de Presença:</span>
