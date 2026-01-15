@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { DashboardData, User, Class } from '@/lib/types';
 import EmojiPicker from '@/components/EmojiPicker';
+import BehaviorModal from '@/components/BehaviorModal';
 import { LayoutGrid, List, Pencil } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -17,6 +18,11 @@ export default function DashboardPage() {
   const [sortOption, setSortOption] = useState<'firstNameAsc' | 'firstNameDesc' | 'lastNameAsc' | 'lastNameDesc'>('firstNameAsc');
   const [loading, setLoading] = useState(true);
   const [editingStudentId, setEditingStudentId] = useState<string | null>(null);
+  
+  // Behavior Modal State
+  const [behaviorModalOpen, setBehaviorModalOpen] = useState(false);
+  const [behaviorModalType, setBehaviorModalType] = useState<'positive' | 'negative'>('positive');
+  const [currentBehaviorStudent, setCurrentBehaviorStudent] = useState<{id: string, name: string} | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -103,15 +109,27 @@ export default function DashboardPage() {
     }
   };
 
-  const handleAddBehavior = async (studentId: string, type: 'positive' | 'negative') => {
+  const openBehaviorModal = (studentId: string, studentName: string, type: 'positive' | 'negative') => {
+    setCurrentBehaviorStudent({ id: studentId, name: studentName });
+    setBehaviorModalType(type);
+    setBehaviorModalOpen(true);
+  };
+
+  const handleAddBehavior = async (studentId: string, type: 'positive' | 'negative', description?: string) => {
     const token = localStorage.getItem('token');
     if (!token) return;
 
-    const description = prompt(`Descreva o comportamento ${type === 'positive' ? 'positivo' : 'negativo'}:`);
-    if (!description) return;
+    // If description is provided (from modal) or if it's negative (using prompt for now)
+    let finalDescription = description;
+
+    if (!finalDescription) {
+       // Should be handled by modal now for both positive and negative
+       return;
+    }
 
     try {
-      await api.addBehaviorEvent(token, studentId, type, description);
+      await api.addBehaviorEvent(token, studentId, type, finalDescription);
+      setBehaviorModalOpen(false); // Close modal if open
       loadData(token);
     } catch (error) {
       console.error('Error adding behavior:', error);
@@ -325,13 +343,13 @@ export default function DashboardPage() {
                       </div>
                       <div className="grid grid-cols-2 gap-2 w-full mt-1">
                         <button
-                          onClick={() => handleAddBehavior(student.id, 'positive')}
+                          onClick={() => openBehaviorModal(student.id, student.name, 'positive')}
                           className={`bg-blue-500 text-white rounded-lg border-b-4 border-blue-700 active:border-b-0 active:translate-y-1 hover:bg-blue-600 font-bold transition-all ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'}`}
                         >
                           + Positivo
                         </button>
                         <button
-                          onClick={() => handleAddBehavior(student.id, 'negative')}
+                          onClick={() => openBehaviorModal(student.id, student.name, 'negative')}
                           className={`bg-[#EA580C] text-white rounded-lg border-b-4 border-[#9A3412] active:border-b-0 active:translate-y-1 hover:bg-[#C2410C] font-bold transition-all ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'}`}
                         >
                           - Negativo
@@ -345,6 +363,18 @@ export default function DashboardPage() {
           </div>
         )}
       </main>
+
+      <BehaviorModal 
+        isOpen={behaviorModalOpen}
+        onClose={() => setBehaviorModalOpen(false)}
+        onSelectBehavior={(behavior) => {
+          if (currentBehaviorStudent) {
+            handleAddBehavior(currentBehaviorStudent.id, behaviorModalType, behavior);
+          }
+        }}
+        studentName={currentBehaviorStudent?.name || ''}
+        type={behaviorModalType}
+      />
     </div>
   );
 }
