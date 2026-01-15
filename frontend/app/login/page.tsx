@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
+import { Binoculars } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -37,61 +38,64 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
-        <h1 className="text-3xl font-bold text-center mb-2 text-gray-800">🦁 Safari Escolar</h1>
-        <p className="text-center text-gray-600 mb-8">Sistema de Gestão Escolar</p>
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="bg-[#FAF9F6] border-2 border-[var(--color-border)] rounded-3xl shadow-[8px_8px_0px_var(--color-border)] p-8 w-full max-w-md transition-all">
+        <div className="flex justify-center mb-6">
+           <Binoculars size={64} className="text-primary stroke-2" />
+        </div>
+        <h1 className="text-4xl font-bold text-center mb-2 text-primary font-heading">Safari Escolar</h1>
+        <p className="text-center text-[#57534E] mb-8 font-medium">A aventura de aprender começa aqui!</p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-              Email
+            <label htmlFor="email" className="block text-sm font-bold text-primary mb-2 ml-1">
+              EXPLORADOR (EMAIL)
             </label>
             <input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+              className="w-full px-4 py-3 border-2 border-[var(--color-border)] rounded-xl focus:ring-4 focus:ring-[var(--color-secondary)] focus:border-primary outline-none bg-white font-medium text-lg placeholder:text-gray-400 text-foreground"
               placeholder="seu@email.com"
               required
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-              Senha
+            <label htmlFor="password" className="block text-sm font-bold text-primary mb-2 ml-1">
+              CÓDIGO SECRETO (SENHA)
             </label>
             <input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+              className="w-full px-4 py-3 border-2 border-[var(--color-border)] rounded-xl focus:ring-4 focus:ring-[var(--color-secondary)] focus:border-primary outline-none bg-white font-medium text-lg placeholder:text-gray-400 text-foreground"
               placeholder="••••••••"
               required
             />
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-              {error}
+            <div className="bg-red-50 border-2 border-red-200 text-red-700 px-4 py-3 rounded-xl font-bold flex items-center gap-2">
+              🚨 {error}
             </div>
           )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-accent text-white font-bold text-xl py-4 rounded-xl hover:bg-[#c2410c] transition-all shadow-[0_4px_0_#9a3412] active:translate-y-[4px] active:shadow-none disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Entrando...' : 'Entrar'}
+            {loading ? 'Entrando na Aventura...' : 'Começar Aventura'}
           </button>
         </form>
 
-        <div className="mt-8 p-4 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-600 font-semibold mb-2">Credenciais de Teste:</p>
-          <p className="text-xs text-gray-600">Professor: joao.professor@escola.com / password123</p>
-          <p className="text-xs text-gray-600">Família: familia.silva@email.com / password123</p>
+        <div className="mt-10 p-5 bg-[var(--color-secondary)] rounded-2xl border-2 border-[var(--color-border)]">
+          <p className="text-sm text-primary font-bold mb-3 uppercase tracking-wider text-center">🗺️ Acesso Rápido</p>
+          <p className="text-xs text-primary/80 font-medium mb-1">🦁 Professor: joao.professor@escola.com / password123</p>
+          <p className="text-xs text-primary/80 font-medium">🐘 Família: familia.silva@email.com / password123</p>
         </div>
       </div>
     </div>

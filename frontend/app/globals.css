@@ -1,21 +1,41 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Safari Escolar Palette */
+  /* 60% Khaki - Backgrounds */
+  --safari-khaki: #F0EAD6;
+  --safari-khaki-dark: #D4CFA3;
+  
+  /* 30% Green - Nature/Affirmative */
+  --safari-green: #4D7C0F;
+  --safari-green-light: #ECFCCB;
+  
+  /* 10% Orange - Attention */
+  --safari-orange: #EA580C;
+
+  /* Standard mappings */
+  --background: var(--safari-khaki);
+  --foreground: #1C1917; /* Stone 900 */
 }
 
 @theme inline {
-  --color-background: var(--background);
+  --color-background: var(--safari-khaki);
   --color-foreground: var(--foreground);
+  --color-primary: var(--safari-green);
+  --color-primary-foreground: #ffffff;
+  --color-secondary: var(--safari-green-light);
+  --color-accent: var(--safari-orange);
+  --color-border: var(--safari-khaki-dark);
+  
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #1C1917;
+    --foreground: #F0EAD6;
+    /* In dark mode, maybe invert or adjust? For now keeping simple but mapped */
   }
 }
 
