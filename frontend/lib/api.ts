@@ -54,14 +54,14 @@ export const api = {
     return response.json();
   },
 
-  async markAttendance(token: string, studentId: string, status: 'PRESENT' | 'ABSENT' | 'LATE') {
+  async markAttendance(token: string, studentId: string, status: 'PRESENT' | 'ABSENT' | 'LATE', date?: string) {
     const response = await fetch(`${API_URL}/api/attendance`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
       },
-      body: JSON.stringify({ studentId, status }),
+      body: JSON.stringify({ studentId, status, date }),
     });
 
     if (!response.ok) {

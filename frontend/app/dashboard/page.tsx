@@ -158,7 +158,8 @@ export default function DashboardPage() {
     if (!token) return;
 
     try {
-      await api.markAttendance(token, studentId, status);
+      const formattedDate = selectedDate.toISOString().split('T')[0];
+      await api.markAttendance(token, studentId, status, formattedDate);
       loadData(token);
     } catch (error) {
       console.error('Error marking attendance:', error);
