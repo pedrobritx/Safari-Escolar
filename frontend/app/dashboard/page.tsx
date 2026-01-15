@@ -14,6 +14,7 @@ export default function DashboardPage() {
   const [classes, setClasses] = useState<Class[]>([]);
   const [selectedClass, setSelectedClass] = useState<Class | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [sortOption, setSortOption] = useState<'firstNameAsc' | 'firstNameDesc' | 'lastNameAsc' | 'lastNameDesc'>('firstNameAsc');
   const [loading, setLoading] = useState(true);
   const [editingStudentId, setEditingStudentId] = useState<string | null>(null);
 
@@ -60,6 +61,30 @@ export default function DashboardPage() {
     }
   };
 
+  const sortStudents = (students: User['students'] | undefined) => {
+    if (!students) return [];
+    
+    return [...students].sort((a, b) => {
+      const getLastName = (name: string) => {
+        const parts = name.trim().split(' ');
+        return parts.length > 1 ? parts[parts.length - 1] : parts[0];
+      };
+
+      switch (sortOption) {
+        case 'firstNameAsc':
+          return a.name.localeCompare(b.name);
+        case 'firstNameDesc':
+          return b.name.localeCompare(a.name);
+        case 'lastNameAsc':
+          return getLastName(a.name).localeCompare(getLastName(b.name));
+        case 'lastNameDesc':
+          return getLastName(b.name).localeCompare(getLastName(a.name));
+        default:
+          return 0;
+      }
+    });
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -99,14 +124,6 @@ export default function DashboardPage() {
 
     try {
       await api.updateStudent(token, studentId, data);
-      // Don't close immediately if changing color, only if changing emoji? Or let user close manually?
-      // For now, keep it open to allow multiple changes, or close? 
-      // Let's keep it open for color, maybe auto-close for emoji? 
-      // The previous behavior was closing on emoji select. 
-      // Let's keep modal open and let user close it, or close on emoji select but not color.
-      // User request implied picking a color, so maybe keep open.
-      // For simplicity and better UX when customizing, let's NOT close automatically on color change.
-      // But we will reload data to reflect changes.
       await loadData(token);
     } catch (error) {
       console.error('Error updating student:', error);
@@ -212,6 +229,16 @@ export default function DashboardPage() {
             <div className="px-6 py-4 border-b-2 border-[var(--color-border)] bg-[var(--color-secondary)] flex justify-between items-center rounded-t-2xl">
               <h2 className="text-xl font-bold text-primary">{selectedClass.name} - Exploradores</h2>
               <div className="flex gap-2">
+                <select
+                  value={sortOption}
+                  onChange={(e) => setSortOption(e.target.value as any)}
+                  className="px-3 py-2 rounded-lg border-2 border-[var(--color-border)] bg-white text-sm font-bold text-primary outline-none focus:border-primary cursor-pointer mr-2"
+                >
+                  <option value="firstNameAsc">Nome (A-Z)</option>
+                  <option value="firstNameDesc">Nome (Z-A)</option>
+                  <option value="lastNameAsc">Sobrenome (A-Z)</option>
+                  <option value="lastNameDesc">Sobrenome (Z-A)</option>
+                </select>
                 <button 
                   onClick={() => setViewMode('grid')}
                   className={`p-2 rounded-lg border-2 transition-all ${viewMode === 'grid' ? 'bg-[#EA580C] text-white border-[#9A3412]' : 'bg-white text-primary border-[var(--color-border)] hover:bg-gray-50'}`}
@@ -230,7 +257,7 @@ export default function DashboardPage() {
             </div>
             
             <div className={viewMode === 'list' ? "divide-y-2 divide-[var(--color-border)]" : "p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"}>
-              {selectedClass.students.map((student) => (
+              {sortStudents(selectedClass.students).map((student) => (
                 <div 
                   key={student.id} 
                   className={viewMode === 'list' 
