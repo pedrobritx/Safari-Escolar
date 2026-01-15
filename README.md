@@ -1,203 +1,243 @@
-# Safari Escolar
+# Safari Escolar 🔍
 
-Safari Escolar é um sistema MVP para gestão escolar, focado em escolas públicas brasileiras. O sistema oferece controle de presença, acompanhamento de comportamento e painéis específicos para professores e famílias.
+## Visão Geral
 
-## 🎯 Funcionalidades
+**Safari Escolar** é um web app de gestão de sala de aula inspirado no ClassDojo, criado para **auxiliar professores e professoras do ensino público** no acompanhamento de frequência, comportamento, atividades e comunicação com famílias. O projeto foi desenvolvido como **MVP de hackathon**, com foco em impacto real, simplicidade operacional e demonstração ponta a ponta.
 
-### Autenticação e Autorização (RBAC)
-- **Admin**: Acesso total ao sistema
-- **Coordenador**: Gerencia escola e visualiza turmas
-- **Professor**: Gerencia turmas, alunos, presença e comportamento
-- **Família**: Visualização apenas dos dados dos filhos vinculados
+O aplicativo parte de um princípio simples: **menos burocracia, mais tempo para ensinar**.
 
-### Recursos Principais
-- ✅ Criação de turmas
-- ✅ Cadastro de alunos com avatar de animal
-- ✅ Registro de presença diária
-- ✅ Registro de eventos de comportamento (+/-)
-- ✅ Dashboard do professor
-- ✅ Visualização read-only para famílias
+---
 
-## 🛠️ Tecnologias
+## Problema
 
-**Backend:**
-- Node.js, Express, TypeScript
-- PostgreSQL com Prisma ORM
-- JWT para autenticação
-- bcryptjs para hash de senhas
+Professores da rede pública enfrentam:
 
-**Frontend:**
-- Next.js 15 com App Router
-- React 19
-- TypeScript
-- Tailwind CSS
-- Mobile-first design
+* Sobrecarga administrativa
+* Falta de ferramentas digitais integradas
+* Dificuldade de engajar alunos
+* Comunicação fragmentada com famílias
+* Pouca visibilidade de dados para coordenação
 
-## 📋 Pré-requisitos
+Esses fatores consomem tempo, energia e afetam diretamente a qualidade do ensino.
 
-- Node.js (v18+)
-- PostgreSQL (v15+) ou Docker
-- npm ou yarn
+---
 
-## 🚀 Instalação
+## A Solução
 
-### 1. Clone o repositório
+O Safari Escolar centraliza, em um único sistema:
+
+* Controle de presença
+* Registro de comportamento e atividades
+* Gamificação leve (pontuação + avatar animal)
+* Comunicação estruturada com famílias
+* Visão estratégica para coordenação
+
+Tudo com uma interface simples, amigável e pensada para a realidade da escola pública.
+
+---
+
+## Público-Alvo
+
+* **Professor(a)**: usuário principal
+* **Coordenação**: visão macro e acompanhamento
+* **Família/Responsável**: acesso às informações do próprio aluno
+* **Administrador**: gestão do sistema
+
+---
+
+## Funcionalidades do MVP
+
+### 👩‍🏫 Professor(a)
+
+* Login seguro
+* Criação e seleção de turmas
+* Cadastro de alunos
+* Atribuição de avatar animal por aluno
+* Lista de presença (Presente / Atrasado / Ausente)
+* Registro de eventos de comportamento (+ / − pontos + motivo)
+* Histórico por aluno e por turma
+* Envio de mensagens para famílias
+* Visualização de histórico de mensagens
+
+### 👨‍👩‍👧 Família
+
+* Acesso apenas ao(s) aluno(s) vinculado(s)
+* Visualização de:
+
+  * Presença
+  * Pontuação
+  * Histórico de mensagens
+
+### 🧑‍💼 Coordenação
+
+* Visualização de turmas e professores
+* Acompanhamento de frequência e comportamento
+* Identificação de padrões (ex.: faltas recorrentes)
+* Envio de mensagens para professores
+
+### 👩‍💻 Administrador
+
+* CRUD de usuários (professor, aluno, coordenação, admin)
+* Configurações gerais do sistema
+
+---
+
+## Gamificação
+
+Cada aluno é representado por:
+
+* 🐯 Um **animal-avatar**
+* 🎯 Um sistema simples de **pontuação positiva ou negativa**
+
+O objetivo não é punição, mas **engajamento e feedback visual rápido**.
+
+---
+
+## Fluxo Principal (Golden Path)
+
+1. Professor faz login
+2. Seleciona ou cria uma turma
+3. Visualiza lista de alunos
+4. Registra presença do dia
+5. Registra eventos de comportamento/atividade
+6. Envia mensagem para a família
+7. Família visualiza informações
+8. Coordenação acompanha indicadores
+
+---
+
+## Tecnologias
+
+> O projeto não impõe stack específica. A escolha prioriza rapidez, clareza e viabilidade de MVP.
+
+Exemplos possíveis:
+
+* Frontend: React / Vue / Svelte
+* Backend: Node.js / Django / Firebase
+* Banco de dados: PostgreSQL / SQLite / Firestore
+* Design: Figma
+* Deploy: Vercel / Render / Railway
+
+---
+
+## Manual de Instalação (Ambiente de Desenvolvimento)
+
+Este repositório já contém um *scaffold funcional* dividido em **frontend** e **backend**, pensado para facilitar testes, demonstrações e evolução do MVP.
+
+### Pré-requisitos
+
+* Node.js 18+
+* npm ou yarn
+* Git
+
+---
+
+### Backend
 
 ```bash
-git clone https://github.com/pedrobritx/Safari-Escolar.git
-cd Safari-Escolar
-```
-
-### 2. Instale as dependências
-
-```bash
-npm install
-```
-
-### 3. Configure o banco de dados
-
-#### Opção A: Usando Docker (Recomendado)
-
-```bash
-docker-compose up -d
-```
-
-#### Opção B: PostgreSQL Local
-
-Certifique-se de que o PostgreSQL está rodando e crie o banco de dados:
-
-```bash
-createdb safari_escolar
-```
-
-### 4. Configure as variáveis de ambiente
-
-Copie o arquivo `.env.example` para `.env` e ajuste conforme necessário:
-
-```bash
+cd backend
 cp .env.example .env
-```
-
-### 5. Execute as migrations
-
-```bash
-npm run prisma:generate
-npm run prisma:migrate
-```
-
-### 6. Popule o banco com dados de teste
-
-```bash
-npm run prisma:seed
-```
-
-### 7. Inicie o backend
-
-```bash
+npm install
+npx prisma generate
 npm run dev
 ```
 
-O backend estará rodando em `http://localhost:3000`
+* **Health check:** `GET http://localhost:4000/health`
+* **Base da API:** `http://localhost:4000/api`
+* As rotas de demonstração utilizam dados em memória (ideal para o MVP).
 
-### 8. Inicie o frontend (em outro terminal)
+#### Banco de dados (opcional para MVP)
+
+Quando desejar usar banco real (SQLite em desenvolvimento):
+
+```bash
+npx prisma migrate dev --name init
+npx prisma db seed
+```
+
+---
+
+### Credenciais de Demonstração
+
+* **Senha padrão:** `demo123` (ou variável `DEMO_PASSWORD` no `.env`)
+* **Professor:** `marina@safari-escolar.demo`
+* **Coordenação:** `coordenacao@safari-escolar.demo`
+* **Família:** `familia.joao@safari-escolar.demo`
+* **Administrador:** `admin@safari-escolar.demo`
+
+Endpoint auxiliar:
+
+```
+GET /api/auth/demo-credentials
+```
+
+---
+
+### Frontend
 
 ```bash
 cd frontend
-npm install  # se ainda não instalou
+npm install
 npm run dev
 ```
 
-O frontend estará rodando em `http://localhost:3001`
+* Aplicação disponível em: `http://localhost:3000`
+* Arquivo inicial: `frontend/src/app/page.tsx`
 
-Acesse `http://localhost:3001` no navegador para usar o sistema!
+---
 
-## 👥 Dados de Teste (Seed)
+### Observação Importante
 
-Após executar o seed, os seguintes usuários estarão disponíveis:
+O foco do MVP é **demonstração funcional**. Caso o backend não esteja ativo, o frontend pode utilizar *stubs* ou dados mockados, desde que o fluxo principal esteja claro no vídeo de apresentação.
 
-| Email | Senha | Papel |
-|-------|-------|-------|
-| admin@safariescolar.com | password123 | Admin |
-| coordenador@escola.com | password123 | Coordenador |
-| joao.professor@escola.com | password123 | Professor |
-| ana.professora@escola.com | password123 | Professor |
-| familia.silva@email.com | password123 | Família |
-| familia.santos@email.com | password123 | Família |
-| familia.oliveira@email.com | password123 | Família |
-| familia.costa@email.com | password123 | Família |
+---
 
-**Dados criados:**
-- 1 Escola
-- 2 Turmas
-- 12 Alunos (com avatares de animais)
-- 4 Famílias vinculadas
-- Exemplos de presença e eventos de comportamento
-
-## 📚 API Endpoints
-
-### Autenticação
-- `POST /api/auth/login` - Login de usuário
-
-### Turmas
-- `POST /api/classes` - Criar turma (Professor/Coordenador)
-- `GET /api/classes` - Listar turmas
-- `GET /api/classes/:id` - Detalhes da turma
-
-### Alunos
-- `POST /api/students` - Adicionar aluno (Professor/Coordenador)
-- `GET /api/students` - Listar alunos
-
-### Presença
-- `POST /api/attendance` - Registrar presença (Professor)
-- `GET /api/attendance/today/:classId` - Presença do dia
-
-### Comportamento
-- `POST /api/behavior` - Adicionar evento (Professor)
-- `GET /api/behavior` - Listar eventos
-- `DELETE /api/behavior/:id` - Remover evento (Professor)
-
-### Dashboard
-- `GET /api/dashboard` - Dashboard do professor (Professor)
-
-### Família
-- `GET /api/family` - Visualização da família (Família)
-
-## 🔐 Autenticação
-
-Todas as rotas (exceto login) requerem um token JWT no header:
+## Estrutura do Repositório 
 
 ```
-Authorization: Bearer <token>
+/safari-escolar
+│
+├── frontend/
+├── backend/
+├── docs/
+│   ├── report.md
+│   ├── pitch-script.md
+│   └── mvp-demo-script.md
+│
+├── README.md
+└── .env.example
 ```
 
-## 📱 Design
+---
 
-O sistema foi projetado com foco em:
-- **Mobile-first**: Interface otimizada para dispositivos móveis
-- **Baixa largura de banda**: Minimal payload nas requisições
-- **LGPD compliant**: Coleta mínima de dados pessoais
+## Documentação do Hackathon
 
-## 🧪 Comandos Úteis
+O projeto atende aos requisitos do hackathon **“Auxílio aos professores e professoras no ensino público”**, incluindo:
 
-```bash
-# Desenvolvimento
-npm run dev
+* Problema claramente definido
+* MVP funcional
+* Demonstração em vídeo
+* Documentação técnica e conceitual
+* Proposta de impacto social
 
-# Build para produção
-npm run build
-npm start
+---
 
-# Prisma Studio (GUI do banco)
-npm run prisma:studio
+## Impacto Esperado
 
-# Resetar banco e recriar seed
-npm run prisma:migrate reset
-```
+* Redução de tempo gasto com controle manual
+* Melhor acompanhamento individual de alunos
+* Comunicação mais clara com famílias
+* Mais dados para decisões pedagógicas
+* Maior engajamento em sala de aula
 
-## 📄 Licença
+---
 
-ISC
+## Licença
 
-## 👨‍💻 Autor
+Licença de Uso Educacional Público Restrito (Brasil).
 
-Desenvolvido para escolas públicas brasileiras
+É **permitido o uso, a cópia e a reprodução** do Safari Escolar **exclusivamente por escolas públicas e repartições da educação pública no território brasileiro**, desde que haja **menção explícita ao projeto original e aos criadores**.
+
+É **vedada a reprodução, modificação, redistribuição ou uso** do software em **instituições privadas, projetos comerciais ou qualquer outro contexto fora da educação pública**, sem **acordo** com os criadores.
+
+**Criadores:** Pedro Brito, Rubens Cruz.
