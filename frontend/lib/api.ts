@@ -84,4 +84,21 @@ export const api = {
 
     return response.json();
   },
+
+  async updateStudent(token: string, studentId: string, data: { animalAvatar: string }) {
+    const response = await fetch(`${API_URL}/api/students/${studentId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update student');
+    }
+
+    return response.json();
+  },
 };

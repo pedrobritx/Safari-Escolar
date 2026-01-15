@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { DashboardData, User, Class } from '@/lib/types';
-import { LayoutGrid, List } from 'lucide-react';
+import EmojiPicker from '@/components/EmojiPicker';
+import { LayoutGrid, List, Pencil } from 'lucide-react';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -14,6 +15,7 @@ export default function DashboardPage() {
   const [selectedClass, setSelectedClass] = useState<Class | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [loading, setLoading] = useState(true);
+  const [editingStudentId, setEditingStudentId] = useState<string | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -43,7 +45,12 @@ export default function DashboardPage() {
 
       setDashboardData(dashboard);
       setClasses(classesData);
-      if (classesData.length > 0) {
+      
+      // Persist selection if refreshing data
+      if (selectedClass) {
+        const updatedClass = classesData.find(c => c.id === selectedClass.id);
+        if (updatedClass) setSelectedClass(updatedClass);
+      } else if (classesData.length > 0) {
         setSelectedClass(classesData[0]);
       }
     } catch (error) {
@@ -84,6 +91,29 @@ export default function DashboardPage() {
     } catch (error) {
       console.error('Error adding behavior:', error);
     }
+  };
+
+  const handleUpdateAvatar = async (studentId: string, emoji: string) => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    try {
+      await api.updateStudent(token, studentId, { animalAvatar: emoji });
+      setEditingStudentId(null);
+      loadData(token);
+    } catch (error) {
+      console.error('Error updating avatar:', error);
+    }
+  };
+
+  const getAvatarEmoji = (avatar: string) => {
+    // Map legacy names to emojis
+    const map: Record<string, string> = {
+      'Leão': '🦁', 'Tigre': '🐯', 'Elefante': '🐘', 'Girafa': '🦒', 'Zebra': '🦓', 
+      'Macaco': '🐒', 'Urso': '🐻', 'Lobo': '🐺', 'Raposa': '🦊', 'Coelho': '🐰', 
+      'Panda': '🐼', 'Koala': '🐨'
+    };
+    return map[avatar] || avatar; // Return mapped emoji or raw string (if already emoji)
   };
 
   if (loading) {
@@ -202,14 +232,31 @@ export default function DashboardPage() {
                   }
                 >
                   <div className={viewMode === 'list' ? "flex flex-col sm:flex-row items-center justify-between gap-4" : "w-full"}>
-                    <div className={viewMode === 'list' ? "flex items-center space-x-4" : "flex flex-col items-center gap-2 mb-4"}>
-                      <div className={`flex items-center justify-center bg-white border-2 border-[var(--color-border)] rounded-full shadow-sm ${viewMode === 'list' ? 'w-12 h-12 text-2xl' : 'w-20 h-20 text-4xl mb-1'}`}>
-                        {student.animalAvatar === 'Leão' ? '🦁' : 
-                         student.animalAvatar === 'Elefante' ? '🐘' : 
-                         student.animalAvatar === 'Girafa' ? '🦒' : 
-                         student.animalAvatar === 'Zebra' ? '🦓' : 
-                         student.animalAvatar === 'Tigre' ? '🐯' : '🐾'}
+                    <div className={viewMode === 'list' ? "flex items-center space-x-4" : "flex flex-col items-center gap-2 mb-4 relative"}>
+                      <div className="relative group/avatar">
+                        <div className={`flex items-center justify-center bg-white border-2 border-[var(--color-border)] rounded-full shadow-sm cursor-pointer ${viewMode === 'list' ? 'w-12 h-12 text-2xl' : 'w-24 h-24 text-5xl mb-1'}`}>
+                          {getAvatarEmoji(student.animalAvatar)}
+                        </div>
+                        
+                        {/* Edit Overlay */}
+                        <button
+                          onClick={() => setEditingStudentId(student.id)}
+                          className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover/avatar:opacity-100 transition-opacity"
+                        >
+                          <div className="bg-white text-primary text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-md">
+                            <Pencil size={12} /> Editar
+                          </div>
+                        </button>
+
+                        {/* Emoji Picker */}
+                        {editingStudentId === student.id && (
+                          <EmojiPicker 
+                            onSelect={(emoji) => handleUpdateAvatar(student.id, emoji)}
+                            onClose={() => setEditingStudentId(null)}
+                          />
+                        )}
                       </div>
+
                       <span className={`font-bold text-primary ${viewMode === 'list' ? 'text-lg' : 'text-xl'}`}>{student.name}</span>
                     </div>
                     

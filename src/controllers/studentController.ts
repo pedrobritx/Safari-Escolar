@@ -65,3 +65,26 @@ export const getStudents = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+export const updateStudent = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { animalAvatar } = req.body;
+
+    if (!animalAvatar) {
+      return res.status(400).json({ error: 'animalAvatar is required' });
+    }
+
+    const student = await prisma.student.update({
+      where: { id: id as string },
+      data: {
+        animalAvatar,
+      },
+    });
+
+    res.json(student);
+  } catch (error) {
+    console.error('Update student error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
