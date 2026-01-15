@@ -10,18 +10,17 @@ import FeedbackEditorModal from '@/components/FeedbackEditorModal';
 import { LayoutGrid, List, Pencil, Settings } from 'lucide-react';
 
 const DEFAULT_POSITIVE_BEHAVIORS: Behavior[] = [
-  { id: 'helping', label: 'Ajudando Outros', icon: '🤝', points: 1 },
-  { id: 'ontask', label: 'Na Tarefa', icon: '🎯', points: 1 },
+  { id: 'task_ok', label: 'Tarefa em Dia', icon: '📝', points: 1 },
   { id: 'participating', label: 'Participando', icon: '🙋', points: 1 },
-  { id: 'persistence', label: 'Persistência', icon: '💪', points: 1 },
+  { id: 'helping', label: 'Ajudando os Outros', icon: '🤝', points: 1 },
   { id: 'teamwork', label: 'Trabalho em Equipe', icon: '🧩', points: 1 },
-  { id: 'workinghard', label: 'Trabalhando Duro', icon: '🚀', points: 1 },
+  { id: 'effort', label: 'Se Esforçando', icon: '💪', points: 1 },
 ];
 
 const DEFAULT_NEGATIVE_BEHAVIORS: Behavior[] = [
   { id: 'no_collab', label: 'Não Colabora', icon: '🚫', points: -1 },
   { id: 'late_task', label: 'Tarefa Atrasada', icon: '⏰', points: -1 },
-  { id: 'interrupting', label: 'Interrompendo Aula', icon: '🗣️', points: -1 },
+  { id: 'disrupting', label: 'Atrapalhando a Aula', icon: '🗣️', points: -1 },
 ];
 
 export default function DashboardPage() {

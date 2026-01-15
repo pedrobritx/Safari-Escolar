@@ -27,6 +27,7 @@ export default function FeedbackEditorModal({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editLabel, setEditLabel] = useState('');
   const [editIcon, setEditIcon] = useState('');
+  const [editScore, setEditScore] = useState(1);
   const [isCreating, setIsCreating] = useState(false);
 
   if (!isOpen) return null;
@@ -37,6 +38,7 @@ export default function FeedbackEditorModal({
     setEditingId(item.id);
     setEditLabel(item.label);
     setEditIcon(item.icon);
+    setEditScore(Math.abs(item.points)); // Store as positive magnitude for editing
     setIsCreating(false);
   };
 
@@ -44,17 +46,20 @@ export default function FeedbackEditorModal({
     setEditingId('new');
     setEditLabel('');
     setEditIcon(activeTab === 'positive' ? '👍' : '👎');
+    setEditScore(1);
     setIsCreating(true);
   };
 
   const handleSave = () => {
     if (!editLabel.trim()) return;
 
+    const points = activeTab === 'positive' ? editScore : -editScore;
+
     const newItem: Behavior = {
       id: isCreating ? Date.now().toString() : editingId!,
       label: editLabel,
       icon: editIcon,
-      points: activeTab === 'positive' ? 1 : -1
+      points: points
     };
 
     let updatedList;
@@ -163,17 +168,39 @@ export default function FeedbackEditorModal({
                 </div>
 
                 {/* Label Input */}
-                <div className="flex flex-col justify-between">
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Nome do Comportamento</label>
-                    <input
-                      type="text"
-                      value={editLabel}
-                      onChange={(e) => setEditLabel(e.target.value)}
-                      className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-blue-500 outline-none font-medium"
-                      placeholder="Ex: Bom Companheiro"
-                      autoFocus
-                    />
+                <div className="flex flex-col justify-between w-full">
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">Nome do Comportamento</label>
+                      <input
+                        type="text"
+                        value={editLabel}
+                        onChange={(e) => setEditLabel(e.target.value)}
+                        className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-blue-500 outline-none font-medium"
+                        placeholder="Ex: Bom Companheiro"
+                        autoFocus
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-gray-500 mb-1 uppercase">
+                        Pontos ({activeTab === 'positive' ? '0 a 5' : '-5 a 0'})
+                      </label>
+                      <div className="flex items-center gap-4">
+                        <input
+                          type="range"
+                          min="0"
+                          max="5"
+                          step="1"
+                          value={editScore}
+                          onChange={(e) => setEditScore(Number(e.target.value))}
+                          className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                        />
+                        <span className={`text-xl font-bold ${activeTab === 'positive' ? 'text-green-600' : 'text-red-600'} w-12 text-center`}>
+                          {activeTab === 'positive' ? '+' : '-'}{editScore}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                   
                   <div className="flex justify-end gap-2 mt-4">
