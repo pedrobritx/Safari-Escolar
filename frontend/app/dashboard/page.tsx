@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
-import { DashboardData, User, Class } from '@/lib/types';
+import { DashboardData, User, Class, Student } from '@/lib/types';
 import EmojiPicker from '@/components/EmojiPicker';
 import BehaviorModal, { Behavior } from '@/components/BehaviorModal';
 import FeedbackEditorModal from '@/components/FeedbackEditorModal';
@@ -94,7 +94,7 @@ export default function DashboardPage() {
       
       // Persist selection if refreshing data
       if (selectedClass) {
-        const updatedClass = classesData.find(c => c.id === selectedClass.id);
+        const updatedClass = classesData.find((c: Class) => c.id === selectedClass.id);
         if (updatedClass) setSelectedClass(updatedClass);
       } else if (classesData.length > 0) {
         setSelectedClass(classesData[0]);
@@ -106,7 +106,7 @@ export default function DashboardPage() {
     }
   };
 
-  const sortStudents = (students: User['students'] | undefined) => {
+  const sortStudents = (students: Student[] | undefined) => {
     if (!students) return [];
     
     return [...students].sort((a, b) => {
@@ -270,7 +270,7 @@ export default function DashboardPage() {
                   const cls = classes.find((c) => c.id === e.target.value);
                   setSelectedClass(cls || null);
                 }}
-                className="w-full px-4 py-3 border-2 border-[var(--color-border)] rounded-xl focus:ring-4 focus:ring-[var(--color-secondary)] focus:border-primary outline-none bg-white font-medium text-lg text-primary cursor-pointer"
+                className="w-full mb-[2px] px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-600 font-bold bg-[#F3F4F6] focus:ring-4 focus:ring-[var(--color-secondary)] focus:border-primary outline-none hover:bg-white hover:border-primary hover:text-primary transition-all shadow-sm cursor-pointer"
               >
                 {classes.map((cls) => (
                   <option key={cls.id} value={cls.id}>
