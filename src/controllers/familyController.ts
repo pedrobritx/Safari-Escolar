@@ -42,7 +42,7 @@ export const getFamilyView = async (req: AuthRequest, res: Response) => {
 
     const studentsData = family.students.map((student) => {
       const recentAttendances = student.attendances.slice(0, 30);
-      const presentCount = recentAttendances.filter((att) => att.present).length;
+      const presentCount = recentAttendances.filter((att) => att.status === 'PRESENT').length;
       const attendanceRate = recentAttendances.length > 0 
         ? (presentCount / recentAttendances.length) * 100 
         : 0;
@@ -61,7 +61,7 @@ export const getFamilyView = async (req: AuthRequest, res: Response) => {
         negativeEvents,
         recentAttendances: recentAttendances.map((att) => ({
           date: att.date,
-          present: att.present,
+          status: att.status,
         })),
         recentBehaviorEvents: student.behaviorEvents.map((event) => ({
           id: event.id,

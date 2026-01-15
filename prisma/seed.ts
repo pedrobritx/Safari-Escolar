@@ -175,7 +175,7 @@ async function main() {
       data: {
         studentId: createdStudents[i].id,
         date: today,
-        present: i % 3 !== 0, // Some students absent
+        status: i % 3 === 0 ? 'ABSENT' : (i % 3 === 1 ? 'LATE' : 'PRESENT'), // Mix of status
       },
     });
   }

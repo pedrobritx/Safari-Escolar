@@ -21,13 +21,14 @@ export interface Student {
   name: string;
   animalAvatar: string;
   attendances?: Attendance[];
+  todayStatus?: 'PRESENT' | 'ABSENT' | 'LATE' | null;
   behaviorEvents?: BehaviorEvent[];
 }
 
 export interface Attendance {
   id?: string;
   date: string;
-  present: boolean;
+  status: 'PRESENT' | 'ABSENT' | 'LATE';
 }
 
 export interface BehaviorEvent {

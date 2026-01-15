@@ -59,12 +59,12 @@ export default function DashboardPage() {
     router.push('/login');
   };
 
-  const handleMarkAttendance = async (studentId: string, present: boolean) => {
+  const handleMarkAttendance = async (studentId: string, status: 'PRESENT' | 'ABSENT' | 'LATE') => {
     const token = localStorage.getItem('token');
     if (!token) return;
 
     try {
-      await api.markAttendance(token, studentId, present);
+      await api.markAttendance(token, studentId, status);
       loadData(token);
     } catch (error) {
       console.error('Error marking attendance:', error);
@@ -213,31 +213,44 @@ export default function DashboardPage() {
                       <span className={`font-bold text-primary ${viewMode === 'list' ? 'text-lg' : 'text-xl'}`}>{student.name}</span>
                     </div>
                     
-                    <div className={viewMode === 'list' ? "flex flex-wrap justify-center gap-2" : "grid grid-cols-2 gap-2 w-full"}>
-                      <button
-                        onClick={() => handleMarkAttendance(student.id, true)}
-                        className={`bg-[#4D7C0F] text-white rounded-lg border-b-4 border-[#365314] active:border-b-0 active:translate-y-1 hover:bg-[#3F6212] font-bold transition-all ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'}`}
-                      >
-                        ✓ Presente
-                      </button>
-                      <button
-                        onClick={() => handleMarkAttendance(student.id, false)}
-                        className={`bg-red-500 text-white rounded-lg border-b-4 border-red-700 active:border-b-0 active:translate-y-1 hover:bg-red-600 font-bold transition-all ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'}`}
-                      >
-                        ✗ Ausente
-                      </button>
-                      <button
-                        onClick={() => handleAddBehavior(student.id, 'positive')}
-                        className={`bg-blue-500 text-white rounded-lg border-b-4 border-blue-700 active:border-b-0 active:translate-y-1 hover:bg-blue-600 font-bold transition-all ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'}`}
-                      >
-                        + Positivo
-                      </button>
-                      <button
-                        onClick={() => handleAddBehavior(student.id, 'negative')}
-                        className={`bg-[#EA580C] text-white rounded-lg border-b-4 border-[#9A3412] active:border-b-0 active:translate-y-1 hover:bg-[#C2410C] font-bold transition-all ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'}`}
-                      >
-                        - Negativo
-                      </button>
+                    <div className={viewMode === 'list' ? "flex flex-wrap justify-center gap-2" : "flex flex-col gap-2 w-full"}>
+                      <div className="grid grid-cols-3 gap-2 w-full">
+                        <button
+                          onClick={() => handleMarkAttendance(student.id, 'PRESENT')}
+                          className={`bg-[#4D7C0F] text-white rounded-lg border-b-4 border-[#365314] active:border-b-0 active:translate-y-1 hover:bg-[#3F6212] font-bold transition-all ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'}`}
+                          title="Presente"
+                        >
+                           Presente
+                        </button>
+                        <button
+                          onClick={() => handleMarkAttendance(student.id, 'LATE')}
+                          className={`bg-yellow-500 text-white rounded-lg border-b-4 border-yellow-700 active:border-b-0 active:translate-y-1 hover:bg-yellow-600 font-bold transition-all ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'}`}
+                          title="Atrasado"
+                        >
+                          Atrasado
+                        </button>
+                        <button
+                          onClick={() => handleMarkAttendance(student.id, 'ABSENT')}
+                          className={`bg-red-500 text-white rounded-lg border-b-4 border-red-700 active:border-b-0 active:translate-y-1 hover:bg-red-600 font-bold transition-all ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'}`}
+                          title="Ausente"
+                        >
+                           Ausente
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-2 gap-2 w-full mt-1">
+                        <button
+                          onClick={() => handleAddBehavior(student.id, 'positive')}
+                          className={`bg-blue-500 text-white rounded-lg border-b-4 border-blue-700 active:border-b-0 active:translate-y-1 hover:bg-blue-600 font-bold transition-all ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'}`}
+                        >
+                          + Positivo
+                        </button>
+                        <button
+                          onClick={() => handleAddBehavior(student.id, 'negative')}
+                          className={`bg-[#EA580C] text-white rounded-lg border-b-4 border-[#9A3412] active:border-b-0 active:translate-y-1 hover:bg-[#C2410C] font-bold transition-all ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'}`}
+                        >
+                          - Negativo
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>

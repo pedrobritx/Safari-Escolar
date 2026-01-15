@@ -36,7 +36,7 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
       const totalStudents = cls.students.length;
       const todayAttendance = cls.students.filter((student) =>
         student.attendances.some(
-          (att) => att.date.toDateString() === today.toDateString() && att.present
+          (att) => att.date.toDateString() === today.toDateString() && att.status === 'PRESENT'
         )
       ).length;
 

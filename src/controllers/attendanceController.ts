@@ -4,10 +4,10 @@ import prisma from '../utils/prisma';
 
 export const markAttendance = async (req: AuthRequest, res: Response) => {
   try {
-    const { studentId, present, date } = req.body;
+    const { studentId, status, date } = req.body;
 
-    if (!studentId || present === undefined) {
-      return res.status(400).json({ error: 'studentId and present are required' });
+    if (!studentId || !status) {
+      return res.status(400).json({ error: 'studentId and status are required' });
     }
 
     const attendanceDate = date ? new Date(date) : new Date();
@@ -21,11 +21,11 @@ export const markAttendance = async (req: AuthRequest, res: Response) => {
         },
       },
       update: {
-        present,
+        status,
       },
       create: {
         studentId,
-        present,
+        status,
         date: attendanceDate,
       },
     });
@@ -49,11 +49,19 @@ export const getTodayAttendance = async (req: AuthRequest, res: Response) => {
       include: {
         attendances: {
           where: { date: today },
+          select: { status: true }
         },
       },
     });
 
-    res.json(students);
+    // Validating types with current schema
+    const studentsWithAttendance = students.map(s => ({
+      ...s,
+      todayStatus: s.attendances[0]?.status || null,
+      animalAvatar: s.animalAvatar
+    }));
+
+    res.json(studentsWithAttendance);
   } catch (error) {
     console.error('Get today attendance error:', error);
     res.status(500).json({ error: 'Internal server error' });

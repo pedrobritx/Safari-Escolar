@@ -80,13 +80,19 @@ model Family {
   students  Student[]
 }
 
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+}
+
 model Attendance {
-  id        String   @id @default(uuid())
+  id        String           @id @default(uuid())
   studentId String
-  student   Student  @relation(fields: [studentId], references: [id])
-  date      DateTime @default(now())
-  present   Boolean
-  createdAt DateTime @default(now())
+  student   Student          @relation(fields: [studentId], references: [id])
+  date      DateTime         @default(now())
+  status    AttendanceStatus
+  createdAt DateTime         @default(now())
 
   @@unique([studentId, date])
 }
