@@ -85,7 +85,7 @@ export const api = {
     return response.json();
   },
 
-  async updateStudent(token: string, studentId: string, data: { animalAvatar: string }) {
+  async updateStudent(token: string, studentId: string, data: { animalAvatar?: string; avatarColor?: string }) {
     const response = await fetch(`${API_URL}/api/students/${studentId}`, {
       method: 'PUT',
       headers: {

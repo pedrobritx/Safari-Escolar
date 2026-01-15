@@ -59,6 +59,7 @@ model Student {
   id            String   @id @default(uuid())
   name          String
   animalAvatar  String   // Animal avatar name
+  avatarColor   String   @default("#FFFFFF")
   classId       String
   class         Class    @relation(fields: [classId], references: [id])
   familyId      String?

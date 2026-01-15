@@ -69,17 +69,19 @@ export const getStudents = async (req: AuthRequest, res: Response) => {
 export const updateStudent = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const { animalAvatar } = req.body;
+    const { animalAvatar, avatarColor } = req.body;
 
-    if (!animalAvatar) {
-      return res.status(400).json({ error: 'animalAvatar is required' });
+    if (!animalAvatar && !avatarColor) {
+      return res.status(400).json({ error: 'At least one field (animalAvatar or avatarColor) is required' });
     }
+
+    const data: any = {};
+    if (animalAvatar) data.animalAvatar = animalAvatar;
+    if (avatarColor) data.avatarColor = avatarColor;
 
     const student = await prisma.student.update({
       where: { id: id as string },
-      data: {
-        animalAvatar,
-      },
+      data,
     });
 
     res.json(student);

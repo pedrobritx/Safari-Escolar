@@ -20,6 +20,7 @@ export interface Student {
   id: string;
   name: string;
   animalAvatar: string;
+  avatarColor?: string;
   attendances?: Attendance[];
   todayStatus?: 'PRESENT' | 'ABSENT' | 'LATE' | null;
   behaviorEvents?: BehaviorEvent[];

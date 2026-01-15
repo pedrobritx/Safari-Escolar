@@ -93,16 +93,23 @@ export default function DashboardPage() {
     }
   };
 
-  const handleUpdateAvatar = async (studentId: string, emoji: string) => {
+  const handleUpdateStudent = async (studentId: string, data: { animalAvatar?: string; avatarColor?: string }) => {
     const token = localStorage.getItem('token');
     if (!token) return;
 
     try {
-      await api.updateStudent(token, studentId, { animalAvatar: emoji });
-      setEditingStudentId(null);
-      loadData(token);
+      await api.updateStudent(token, studentId, data);
+      // Don't close immediately if changing color, only if changing emoji? Or let user close manually?
+      // For now, keep it open to allow multiple changes, or close? 
+      // Let's keep it open for color, maybe auto-close for emoji? 
+      // The previous behavior was closing on emoji select. 
+      // Let's keep modal open and let user close it, or close on emoji select but not color.
+      // User request implied picking a color, so maybe keep open.
+      // For simplicity and better UX when customizing, let's NOT close automatically on color change.
+      // But we will reload data to reflect changes.
+      await loadData(token);
     } catch (error) {
-      console.error('Error updating avatar:', error);
+      console.error('Error updating student:', error);
     }
   };
 
@@ -201,8 +208,8 @@ export default function DashboardPage() {
 
         {/* Students List */}
         {selectedClass && (
-          <div className="bg-[#FAF9F6] border-2 border-[var(--color-border)] rounded-2xl shadow-[4px_4px_0px_var(--color-border)] overflow-hidden">
-            <div className="px-6 py-4 border-b-2 border-[var(--color-border)] bg-[var(--color-secondary)] flex justify-between items-center">
+          <div className="bg-[#FAF9F6] border-2 border-[var(--color-border)] rounded-2xl shadow-[4px_4px_0px_var(--color-border)]">
+            <div className="px-6 py-4 border-b-2 border-[var(--color-border)] bg-[var(--color-secondary)] flex justify-between items-center rounded-t-2xl">
               <h2 className="text-xl font-bold text-primary">{selectedClass.name} - Exploradores</h2>
               <div className="flex gap-2">
                 <button 
@@ -234,7 +241,10 @@ export default function DashboardPage() {
                   <div className={viewMode === 'list' ? "flex flex-col sm:flex-row items-center justify-between gap-4" : "w-full"}>
                     <div className={viewMode === 'list' ? "flex items-center space-x-4" : "flex flex-col items-center gap-2 mb-4 relative"}>
                       <div className="relative group/avatar">
-                        <div className={`flex items-center justify-center bg-white border-2 border-[var(--color-border)] rounded-full shadow-sm cursor-pointer ${viewMode === 'list' ? 'w-12 h-12 text-2xl' : 'w-24 h-24 text-5xl mb-1'}`}>
+                        <div 
+                          className={`flex items-center justify-center border-2 border-[var(--color-border)] rounded-full shadow-sm cursor-pointer ${viewMode === 'list' ? 'w-12 h-12 text-2xl' : 'w-24 h-24 text-5xl mb-1'}`}
+                          style={{ backgroundColor: student.avatarColor || '#FFFFFF' }}
+                        >
                           {getAvatarEmoji(student.animalAvatar)}
                         </div>
                         
@@ -251,8 +261,10 @@ export default function DashboardPage() {
                         {/* Emoji Picker */}
                         {editingStudentId === student.id && (
                           <EmojiPicker 
-                            onSelect={(emoji) => handleUpdateAvatar(student.id, emoji)}
+                            onSelectEmoji={(emoji) => handleUpdateStudent(student.id, { animalAvatar: emoji })}
+                            onSelectColor={(color) => handleUpdateStudent(student.id, { avatarColor: color })}
                             onClose={() => setEditingStudentId(null)}
+                            currentColor={student.avatarColor}
                           />
                         )}
                       </div>
