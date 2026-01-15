@@ -36,26 +36,26 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [editingStudentId, setEditingStudentId] = useState<string | null>(null);
   
-  // Behavior Modal State
+  // Estado do Modal de Comportamento
   const [behaviorModalOpen, setBehaviorModalOpen] = useState(false);
   const [behaviorModalType, setBehaviorModalType] = useState<'positive' | 'negative'>('positive');
   const [currentBehaviorStudent, setCurrentBehaviorStudent] = useState<{id: string, name: string} | null>(null);
 
-  // Feedback Editor State
+  // Estado do Editor de Feedback
   const [feedbackEditorOpen, setFeedbackEditorOpen] = useState(false);
   const [positiveBehaviors, setPositiveBehaviors] = useState<Behavior[]>(DEFAULT_POSITIVE_BEHAVIORS);
   const [negativeBehaviors, setNegativeBehaviors] = useState<Behavior[]>(DEFAULT_NEGATIVE_BEHAVIORS);
 
-  // Student Form State
+  // Estado do Formulário de Aluno
   const [studentFormOpen, setStudentFormOpen] = useState(false);
   const [studentFormMode, setStudentFormMode] = useState<'create' | 'edit'>('create');
   const [editingStudentData, setEditingStudentData] = useState<Student | null>(null);
 
-  // Calendar State
+  // Estado do Calendário
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
   useEffect(() => {
-    // Load custom behaviors from local storage if available
+    // Carregar comportamentos personalizados do armazenamento local se disponível
     const savedPositive = localStorage.getItem('safari_positive_behaviors');
     const savedNegative = localStorage.getItem('safari_negative_behaviors');
 
@@ -109,7 +109,7 @@ export default function DashboardPage() {
       setDashboardData(dashboard);
       setClasses(classesData);
       
-      // Persist selection if refreshing data
+      // Persistir seleção se atualizando dados
       if (selectedClass) {
         const updatedClass = classesData.find((c: Class) => c.id === selectedClass.id);
         if (updatedClass) setSelectedClass(updatedClass);
@@ -207,7 +207,7 @@ export default function DashboardPage() {
     let finalDescription = description;
 
     if (!finalDescription) {
-       // Should be handled by modal now for both positive and negative
+       // Deve ser tratado pelo modal agora tanto para positivo quanto negativo
        return;
     }
 
@@ -235,13 +235,13 @@ export default function DashboardPage() {
   };
 
   const getAvatarEmoji = (avatar: string) => {
-    // Map legacy names to emojis
+    // Mapear nomes legados para emojis
     const map: Record<string, string> = {
       'Leão': '🦁', 'Tigre': '🐯', 'Elefante': '🐘', 'Girafa': '🦒', 'Zebra': '🦓', 
       'Macaco': '🐒', 'Urso': '🐻', 'Lobo': '🐺', 'Raposa': '🦊', 'Coelho': '🐰', 
       'Panda': '🐼', 'Koala': '🐨'
     };
-    return map[avatar] || avatar; // Return mapped emoji or raw string (if already emoji)
+    return map[avatar] || avatar; // Retornar emoji mapeado ou string bruta (se já for emoji)
   };
 
   if (loading) {
@@ -256,15 +256,15 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="bg-white border-b-2 border-[var(--color-border)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
+        <div className="layout-container py-4">
+          <div className="flex-between">
             <div>
               <h1 className="text-2xl font-heading font-bold text-primary">🦁 Safari Escolar</h1>
               <p className="text-sm font-medium text-[#57534E]">{user?.name} - {user?.role}</p>
             </div>
             <button
               onClick={handleLogout}
-              className="bg-red-500 text-white font-bold px-4 py-2 rounded-xl border-b-4 border-red-700 active:border-b-0 active:translate-y-1 hover:bg-red-600 transition-all"
+              className="btn btn-anger"
             >
               Sair
             </button>
@@ -272,8 +272,8 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Class Selection */}
+      <main className="layout-container py-8">
+        {/* Seleção de Turma */}
         {classes.length > 0 && (
           <div className="mb-6 flex gap-4 items-end">
             <div className="flex-1 max-w-md">
@@ -284,7 +284,7 @@ export default function DashboardPage() {
                   const cls = classes.find((c) => c.id === e.target.value);
                   setSelectedClass(cls || null);
                 }}
-                className="w-full h-[52px] mb-[2px] px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-600 font-bold bg-[#F3F4F6] focus:ring-4 focus:ring-[var(--color-secondary)] focus:border-primary outline-none hover:bg-white hover:border-primary hover:text-primary transition-all shadow-sm cursor-pointer"
+                className="select-field h-[52px] mb-[2px]"
               >
                 {classes.map((cls) => (
                   <option key={cls.id} value={cls.id}>
@@ -301,14 +301,14 @@ export default function DashboardPage() {
                   setEditingStudentData(null);
                   setStudentFormOpen(true);
                 }}
-                className="mb-[2px] px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-600 font-bold hover:bg-white hover:border-primary hover:text-primary transition-all shadow-sm flex items-center gap-2 bg-[#F3F4F6]"
+                className="btn btn-ghost mb-[2px] px-6 py-3"
               >
                 <Plus size={20} />
                 Adicionar Aluno
               </button>
               <button
                  onClick={() => setFeedbackEditorOpen(true)}
-                 className="mb-[2px] px-6 py-3 border-2 border-gray-300 rounded-xl text-gray-600 font-bold hover:bg-white hover:border-primary hover:text-primary transition-all shadow-sm flex items-center gap-2 bg-[#F3F4F6]"
+                 className="btn btn-ghost mb-[2px] px-6 py-3"
               >
                 <Settings size={20} />
                 Feedback
@@ -317,12 +317,12 @@ export default function DashboardPage() {
           </div>
         )}
 
-        {/* Dashboard Cards & Calendar */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-           {/* Summary Card (Takes 1 column) */}
+        {/* Cartões do Dashboard e Calendário */}
+        <div className="grid-dashboard mb-8">
+           {/* Cartão de Resumo (Ocupa 1 coluna) */}
           <div className="lg:col-span-1">
           {dashboardData.map((data) => (
-            <div key={data.classId} className="bg-[#FAF9F6] border-2 border-[var(--color-border)] rounded-2xl shadow-[4px_4px_0px_var(--color-border)] p-6 h-full">
+            <div key={data.classId} className="card h-full p-6">
               <h3 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">
                 🏕️ {data.className}
               </h3>
@@ -356,7 +356,7 @@ export default function DashboardPage() {
           ))}
           </div>
 
-          {/* Calendar (Takes 2 columns) */}
+           {/* Calendário (Ocupa 2 colunas) */}
           <div className="lg:col-span-2">
              <Calendar selectedDate={selectedDate} onDateChange={setSelectedDate} />
           </div>
@@ -364,10 +364,10 @@ export default function DashboardPage() {
 
 
 
-        {/* Students List */}
+        {/* Lista de Alunos */}
         {selectedClass && (
-          <div className="bg-[#FAF9F6] border-2 border-[var(--color-border)] rounded-2xl shadow-[4px_4px_0px_var(--color-border)]">
-            <div className="px-6 py-4 border-b-2 border-[var(--color-border)] bg-[var(--color-secondary)] flex justify-between items-center rounded-t-2xl">
+          <div className="card">
+            <div className="card-header bg-[var(--color-secondary)]">
               <h2 className="text-xl font-bold text-primary">{selectedClass.name} - Exploradores</h2>
               <div className="flex gap-2">
                 <select
@@ -438,21 +438,21 @@ export default function DashboardPage() {
                       <div className="grid grid-cols-3 gap-2 w-full">
                         <button
                           onClick={() => handleMarkAttendance(student.id, 'PRESENT')}
-                          className={`bg-[#4D7C0F] text-white rounded-lg border-b-4 border-[#365314] active:border-b-0 active:translate-y-1 hover:bg-[#3F6212] font-bold transition-all ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'} ${student.todayStatus && student.todayStatus !== 'PRESENT' ? 'opacity-30' : ''}`}
+                          className={`btn btn-primary ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'} ${student.todayStatus && student.todayStatus !== 'PRESENT' ? 'opacity-30' : ''}`}
                           title="Presente"
                         >
                            Presente
                         </button>
                         <button
                           onClick={() => handleMarkAttendance(student.id, 'LATE')}
-                          className={`bg-yellow-500 text-white rounded-lg border-b-4 border-yellow-700 active:border-b-0 active:translate-y-1 hover:bg-yellow-600 font-bold transition-all ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'} ${student.todayStatus && student.todayStatus !== 'LATE' ? 'opacity-30' : ''}`}
+                          className={`btn btn-warning ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'} ${student.todayStatus && student.todayStatus !== 'LATE' ? 'opacity-30' : ''}`}
                           title="Atrasado"
                         >
                           Atrasado
                         </button>
                         <button
                           onClick={() => handleMarkAttendance(student.id, 'ABSENT')}
-                          className={`bg-red-500 text-white rounded-lg border-b-4 border-red-700 active:border-b-0 active:translate-y-1 hover:bg-red-600 font-bold transition-all ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'} ${student.todayStatus && student.todayStatus !== 'ABSENT' ? 'opacity-30' : ''}`}
+                          className={`btn btn-anger ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'} ${student.todayStatus && student.todayStatus !== 'ABSENT' ? 'opacity-30' : ''}`}
                           title="Ausente"
                         >
                            Ausente
@@ -461,13 +461,13 @@ export default function DashboardPage() {
                       <div className="grid grid-cols-2 gap-2 w-full mt-1">
                         <button
                           onClick={() => openBehaviorModal(student.id, student.name, 'positive')}
-                          className={`bg-blue-500 text-white rounded-lg border-b-4 border-blue-700 active:border-b-0 active:translate-y-1 hover:bg-blue-600 font-bold transition-all ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'}`}
+                          className={`btn btn-info ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'}`}
                         >
                           + Positivo
                         </button>
                         <button
                           onClick={() => openBehaviorModal(student.id, student.name, 'negative')}
-                          className={`bg-[#EA580C] text-white rounded-lg border-b-4 border-[#9A3412] active:border-b-0 active:translate-y-1 hover:bg-[#C2410C] font-bold transition-all ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'}`}
+                          className={`btn btn-accent ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'}`}
                         >
                           Construtivo
                         </button>

@@ -29,13 +29,13 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    // Use date from query or default to today
+    // Use a data da query ou o padrão para hoje
     const { date } = req.query;
     const targetDate = date ? new Date(date as string) : new Date();
-    // Reset time part to avoid timezone issues, aligning with how we store dates (usually midnight UTC or similar)
-    // Ideally use a consistent normalization.
-    // However, since we compare toDateString(), time doesn't matter much as long as it's the right day.
-    // But let's keep the existing logic of midnight reset just in case.
+    // Redefinir a parte da hora para evitar problemas de fuso horário, alinhando com como armazenamos datas (geralmente meia-noite UTC ou similar)
+    // Idealmente usar uma normalização consistente.
+    // No entanto, como comparamos toDateString(), a hora não importa muito, desde que seja o dia certo.
+    // Mas vamos manter a lógica existente de redefinição para meia-noite apenas por precaução.
     targetDate.setHours(0, 0, 0, 0);
 
     const dashboardData = classes.map((cls) => {

@@ -1,21 +1,21 @@
 @import "tailwindcss";
 
 :root {
-  /* Safari Escolar Palette */
-  /* 60% Khaki - Backgrounds */
+  /* Paleta Safari Escolar */
+  /* 60% Caqui - Fundos */
   --safari-khaki: #F0EAD6;
   --safari-khaki-dark: #D4CFA3;
   
-  /* 30% Green - Nature/Affirmative */
+  /* 30% Verde - Natureza/Afirmativo */
   --safari-green: #4D7C0F;
   --safari-green-light: #ECFCCB;
   
-  /* 10% Orange - Attention */
+  /* 10% Laranja - Atenção */
   --safari-orange: #EA580C;
 
-  /* Standard mappings */
+  /* Mapeamentos Padrão */
   --background: var(--safari-khaki);
-  --foreground: #1C1917; /* Stone 900 */
+  --foreground: #1C1917; /* Pedra 900 */
 }
 
 @theme inline {
@@ -35,7 +35,7 @@
   :root {
     --background: #1C1917;
     --foreground: #F0EAD6;
-    /* In dark mode, maybe invert or adjust? For now keeping simple but mapped */
+    /* No modo escuro, talvez inverter ou ajustar? Por enquanto mantendo simples mas mapeado */
   }
 }
 
@@ -43,4 +43,113 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* =========================================
+   🦁 SAFARI ESCOLAR - SISTEMA DE DESIGN
+   =========================================
+*/
+
+@layer components {
+  /* --- WRAPPERS DE LAYOUT --- */
+  
+  /* Container Principal */
+  .layout-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Espaçamento de Seção */
+  .section-container {
+    @apply mb-8;
+  }
+
+  /* Atalhos Flexbox */
+  .flex-between {
+    @apply flex justify-between items-center;
+  }
+  
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+
+  .flex-gap {
+    @apply flex items-center gap-2;
+  }
+
+  /* Grades (Grids) */
+  .grid-dashboard {
+    @apply grid grid-cols-1 lg:grid-cols-3 gap-6;
+  }
+
+  /* --- ESTILOS DE COMPONENTES --- */
+
+  /* Cards - As caixas brancas/claras */
+  .card {
+     @apply bg-white border-2 border-[var(--color-border)] rounded-2xl shadow-[4px_4px_0px_var(--color-border)];
+  }
+
+  .card-header {
+    @apply px-6 py-4 border-b-2 border-[var(--color-border)] rounded-t-2xl font-bold text-primary flex justify-between items-center;
+  }
+  
+  .card-body {
+    @apply p-6;
+  }
+  
+  /* Botões - Os elementos interativos */
+  .btn {
+    @apply font-bold rounded-xl border-b-4 active:border-b-0 active:translate-y-1 transition-all py-2 px-4 shadow-sm cursor-pointer flex items-center gap-2 justify-center;
+  }
+
+  /* Verde (Sucesso/Primário) */
+  .btn-primary {
+    @apply bg-green-600 text-white border-green-800 hover:bg-green-700;
+  }
+
+  /* Laranja (Atenção/Negativo/Ação) */
+  .btn-accent {
+    @apply bg-[var(--color-accent)] text-white border-[#9A3412] hover:bg-[#C2410C];
+  }
+
+  /* Vermelho (Perigo/Excluir/Ausente) */
+  .btn-anger {
+    @apply bg-red-500 text-white border-red-700 hover:bg-red-600;
+  }
+  
+  /* Amarelo (Atrasado) */
+  .btn-warning {
+    @apply bg-yellow-500 text-white border-yellow-700 hover:bg-yellow-600;
+  }
+
+  /* Azul (Positivo) */
+  .btn-info {
+    @apply bg-blue-500 text-white border-blue-700 hover:bg-blue-600;
+  }
+
+  /* Fantasma/Secundário (Cinza/Branco) */
+  .btn-ghost {
+    @apply bg-[#F3F4F6] text-gray-600 border-gray-300 hover:bg-white hover:border-[var(--color-primary)] hover:text-[var(--color-primary)];
+  }
+
+  /* Inputs e Seletores */
+  .input-field, .select-field {
+    @apply w-full px-4 py-3 border-2 border-gray-300 rounded-xl text-gray-600 font-bold bg-[#F3F4F6] focus:ring-4 focus:ring-[var(--color-secondary)] focus:border-[var(--color-primary)] outline-none transition-all;
+  }
+
+  .select-field {
+    @apply cursor-pointer hover:bg-white hover:border-[var(--color-primary)] hover:text-[var(--color-primary)];
+  }
+  
+  /* Tipografia */
+  .text-h1 {
+    @apply text-2xl font-bold text-[var(--color-primary)];
+  }
+  
+  .text-h2 {
+    @apply text-xl font-bold text-[var(--color-primary)];
+  }
+  
+  .text-h3 {
+    @apply text-lg font-bold text-[var(--color-primary)];
+  }
 }

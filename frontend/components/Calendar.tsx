@@ -45,12 +45,12 @@ const Calendar: React.FC<CalendarProps> = ({ selectedDate, onDateChange }) => {
   const renderDays = () => {
     const days = [];
     
-    // Empty cells for days before start of month
+    // Células vazias para dias antes do início do mês
     for (let i = 0; i < firstDayOfMonth; i++) {
         days.push(<div key={`empty-${i}`} className="h-8 md:h-10"></div>);
     }
 
-    // Days of the month
+    // Dias do mês
     for (let i = 1; i <= daysInMonth; i++) {
         const dateToCheck = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), i);
         const isSelected = isSameDay(dateToCheck, selectedDate);
