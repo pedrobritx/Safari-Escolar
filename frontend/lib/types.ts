@@ -23,6 +23,7 @@ export interface Student {
   avatarColor?: string;
   attendances?: Attendance[];
   todayStatus?: 'PRESENT' | 'ABSENT' | 'LATE' | null;
+  todayScore?: number;
   behaviorEvents?: BehaviorEvent[];
 }
 

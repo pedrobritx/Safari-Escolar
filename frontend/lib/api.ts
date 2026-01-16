@@ -72,14 +72,14 @@ export const api = {
     return response.json();
   },
 
-  async addBehaviorEvent(token: string, studentId: string, type: 'positive' | 'negative', description: string) {
+  async addBehaviorEvent(token: string, studentId: string, type: 'positive' | 'negative', description: string, date?: string) {
     const response = await fetch(`${API_URL}/api/behavior`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
       },
-      body: JSON.stringify({ studentId, type, description }),
+      body: JSON.stringify({ studentId, type, description, date }),
     });
 
     if (!response.ok) {

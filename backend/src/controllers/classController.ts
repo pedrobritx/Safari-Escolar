@@ -71,6 +71,14 @@ export const getClasses = async (req: AuthRequest, res: Response) => {
               },
             },
           },
+          behaviorEvents: {
+            where: {
+              date: {
+                gte: targetDateStart,
+                lte: targetDateEnd,
+              },
+            },
+          },
         },
       },
     };
@@ -106,9 +114,16 @@ export const getClasses = async (req: AuthRequest, res: Response) => {
       ...cls,
       students: cls.students.map((student: any) => {
         const attendance = student.attendances[0]; // Should be only 1 or 0 due to date filter
+        
+        // Calculate todayScore from fetched behaviorEvents
+        const positives = student.behaviorEvents.filter((e: any) => e.type === 'positive').length;
+        const negatives = student.behaviorEvents.filter((e: any) => e.type === 'negative').length;
+        const todayScore = positives - negatives;
+
         return {
           ...student,
           todayStatus: attendance ? attendance.status : null,
+          todayScore,
         };
       }),
     }));

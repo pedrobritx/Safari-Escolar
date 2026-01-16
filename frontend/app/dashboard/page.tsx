@@ -205,14 +205,19 @@ export default function DashboardPage() {
 
     // If description is provided (from modal) or if it's negative (using prompt for now)
     let finalDescription = description;
+    console.log('handleAddBehavior called:', { studentId, type, description });
 
     if (!finalDescription) {
+       console.log('No description provided, returning');
        // Deve ser tratado pelo modal agora tanto para positivo quanto negativo
        return;
     }
 
     try {
-      await api.addBehaviorEvent(token, studentId, type, finalDescription);
+      console.log('Sending API request...');
+      const formattedDate = selectedDate.toISOString().split('T')[0];
+      await api.addBehaviorEvent(token, studentId, type, finalDescription, formattedDate);
+      console.log('API request success');
       setBehaviorModalOpen(false); // Close modal if open
       loadData(token);
     } catch (error) {
@@ -429,6 +434,15 @@ export default function DashboardPage() {
                             <Pencil size={12} /> Editar
                           </div>
                         </button>
+                        
+                        {/* Pontuação Badge */}
+                        <div 
+                          className={`absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold border-2 border-white shadow-md z-10 ${
+                            (student.todayScore || 0) >= 0 ? 'bg-green-600' : 'bg-red-500'
+                          }`}
+                        >
+                          {student.todayScore || 0}
+                        </div>
                       </div>
 
                       <span className={`font-bold text-primary ${viewMode === 'list' ? 'text-lg' : 'text-xl'}`}>{student.name}</span>

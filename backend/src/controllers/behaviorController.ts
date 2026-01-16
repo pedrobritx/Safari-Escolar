@@ -4,7 +4,7 @@ import prisma from '../utils/prisma';
 
 export const createBehaviorEvent = async (req: AuthRequest, res: Response) => {
   try {
-    const { studentId, type, description } = req.body;
+    const { studentId, type, description, date } = req.body;
 
     if (!studentId || !type || !description) {
       return res.status(400).json({ error: 'studentId, type, and description are required' });
@@ -19,6 +19,7 @@ export const createBehaviorEvent = async (req: AuthRequest, res: Response) => {
         studentId,
         type,
         description,
+        date: date ? new Date(date) : undefined,
       },
       include: {
         student: true,
