@@ -119,13 +119,13 @@ export default function FamilyPage() {
                     <div
                       key={idx}
                       className={`w-8 h-8 rounded flex items-center justify-center text-sm font-medium ${
-                        att.present
+                        att.status === 'PRESENT'
                           ? 'bg-green-100 text-green-700'
                           : 'bg-red-100 text-red-700'
                       }`}
                       title={new Date(att.date).toLocaleDateString('pt-BR')}
                     >
-                      {att.present ? '✓' : '✗'}
+                      {att.status === 'PRESENT' ? '✓' : '✗'}
                     </div>
                   ))}
                 </div>
@@ -135,7 +135,7 @@ export default function FamilyPage() {
               <div className="px-6 py-4">
                 <h4 className="font-semibold text-gray-900 mb-2">Feedbacks Recentes</h4>
                 <div className="space-y-2">
-                  {student.recentBehaviorEvents.slice(0, 5).map((event) => (
+                  {student.recentFeedbackEvents.slice(0, 5).map((event) => (
                     <div
                       key={event.id}
                       className={`p-3 rounded-lg ${
@@ -160,7 +160,7 @@ export default function FamilyPage() {
                       </div>
                     </div>
                   ))}
-                  {student.recentBehaviorEvents.length === 0 && (
+                  {student.recentFeedbackEvents.length === 0 && (
                     <p className="text-sm text-gray-500 italic">Nenhum evento registrado</p>
                   )}
                 </div>

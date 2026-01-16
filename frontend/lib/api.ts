@@ -72,8 +72,8 @@ export const api = {
     return response.json();
   },
 
-  async addBehaviorEvent(token: string, studentId: string, type: 'positive' | 'negative', description: string, date?: string) {
-    const response = await fetch(`${API_URL}/api/behavior`, {
+  async addFeedbackEvent(token: string, studentId: string, type: 'positive' | 'negative', description: string, date?: string) {
+    const response = await fetch(`${API_URL}/api/feedback`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -83,7 +83,7 @@ export const api = {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to add behavior event');
+      throw new Error('Failed to add feedback event');
     }
 
     return response.json();

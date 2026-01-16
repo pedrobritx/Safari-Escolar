@@ -5,13 +5,13 @@ import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { DashboardData, User, Class, Student } from '@/lib/types';
 import EmojiPicker from '@/components/EmojiPicker';
-import BehaviorModal, { Behavior } from '@/components/BehaviorModal';
+import FeedbackModal, { FeedbackItem } from '@/components/FeedbackModal';
 import FeedbackEditorModal from '@/components/FeedbackEditorModal';
 import StudentFormModal from '@/components/StudentFormModal';
 import Calendar from '@/components/Calendar';
 import { LayoutGrid, List, Pencil, Settings, Plus } from 'lucide-react';
 
-const DEFAULT_POSITIVE_BEHAVIORS: Behavior[] = [
+const DEFAULT_POSITIVE_BEHAVIORS: FeedbackItem[] = [
   { id: 'task_ok', label: 'Tarefa em Dia', icon: '📝', points: 1 },
   { id: 'participating', label: 'Participando', icon: '🙋', points: 1 },
   { id: 'helping', label: 'Ajudando os Outros', icon: '🤝', points: 1 },
@@ -19,7 +19,7 @@ const DEFAULT_POSITIVE_BEHAVIORS: Behavior[] = [
   { id: 'effort', label: 'Se Esforçando', icon: '💪', points: 1 },
 ];
 
-const DEFAULT_NEGATIVE_BEHAVIORS: Behavior[] = [
+const DEFAULT_NEGATIVE_BEHAVIORS: FeedbackItem[] = [
   { id: 'no_collab', label: 'Não Colabora', icon: '🚫', points: -1 },
   { id: 'late_task', label: 'Tarefa Atrasada', icon: '⏰', points: -1 },
   { id: 'disrupting', label: 'Atrapalhando a Aula', icon: '🗣️', points: -1 },
@@ -42,8 +42,8 @@ export default function DashboardPage() {
 
   // Estado do Editor de Feedback
   const [feedbackEditorOpen, setFeedbackEditorOpen] = useState(false);
-  const [positiveBehaviors, setPositiveBehaviors] = useState<Behavior[]>(DEFAULT_POSITIVE_BEHAVIORS);
-  const [negativeBehaviors, setNegativeBehaviors] = useState<Behavior[]>(DEFAULT_NEGATIVE_BEHAVIORS);
+  const [positiveBehaviors, setPositiveBehaviors] = useState<FeedbackItem[]>(DEFAULT_POSITIVE_BEHAVIORS);
+  const [negativeBehaviors, setNegativeBehaviors] = useState<FeedbackItem[]>(DEFAULT_NEGATIVE_BEHAVIORS);
 
   // Estado do Formulário de Aluno
   const [studentFormOpen, setStudentFormOpen] = useState(false);
@@ -62,7 +62,7 @@ export default function DashboardPage() {
     if (savedNegative) setNegativeBehaviors(JSON.parse(savedNegative));
   }, []);
 
-  const handleUpdateBehaviors = (type: 'positive' | 'negative', updatedList: Behavior[]) => {
+  const handleUpdateBehaviors = (type: 'positive' | 'negative', updatedList: FeedbackItem[]) => {
     if (type === 'positive') {
       setPositiveBehaviors(updatedList);
       localStorage.setItem('safari_positive_behaviors', JSON.stringify(updatedList));
@@ -214,12 +214,12 @@ export default function DashboardPage() {
     try {
       console.log('Sending API request...');
       const formattedDate = selectedDate.toISOString().split('T')[0];
-      await api.addBehaviorEvent(token, studentId, type, finalDescription, formattedDate);
+      await api.addFeedbackEvent(token, studentId, type, finalDescription, formattedDate);
       console.log('API request success');
       setBehaviorModalOpen(false); // Close modal if open
       loadData(token);
     } catch (error) {
-      console.error('Error adding behavior:', error);
+      console.error('Error adding feedback:', error);
     }
   };
 
@@ -489,10 +489,10 @@ export default function DashboardPage() {
         )}
       </main>
 
-      <BehaviorModal 
+      <FeedbackModal 
         isOpen={behaviorModalOpen}
         onClose={() => setBehaviorModalOpen(false)}
-        onSelectBehavior={(behavior, type) => {
+        onSelectFeedback={(behavior, type) => {
           if (currentBehaviorStudent) {
             handleAddBehavior(currentBehaviorStudent.id, type, behavior);
           }

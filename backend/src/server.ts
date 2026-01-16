@@ -6,7 +6,7 @@ import authRoutes from './routes/authRoutes';
 import classRoutes from './routes/classRoutes';
 import studentRoutes from './routes/studentRoutes';
 import attendanceRoutes from './routes/attendanceRoutes';
-import behaviorRoutes from './routes/behaviorRoutes';
+import feedbackRoutes from './routes/feedbackRoutes';
 import dashboardRoutes from './routes/dashboardRoutes';
 import familyRoutes from './routes/familyRoutes';
 
@@ -24,7 +24,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/classes', classRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/attendance', attendanceRoutes);
-app.use('/api/behavior', behaviorRoutes);
+app.use('/api/feedback', feedbackRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/family', familyRoutes);
 

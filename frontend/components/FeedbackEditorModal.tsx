@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { X, Pencil, Trash2, Plus, Check } from 'lucide-react';
-import { Behavior } from './BehaviorModal';
+import { FeedbackItem } from './FeedbackModal';
 
 interface FeedbackEditorModalProps {
   isOpen: boolean;
   onClose: () => void;
-  positiveBehaviors: Behavior[];
-  negativeBehaviors: Behavior[];
-  onUpdateBehaviors: (type: 'positive' | 'negative', behaviors: Behavior[]) => void;
+  positiveBehaviors: FeedbackItem[];
+  negativeBehaviors: FeedbackItem[];
+  onUpdateBehaviors: (type: 'positive' | 'negative', behaviors: FeedbackItem[]) => void;
 }
 
 const EMOJI_LIST = [
@@ -35,7 +35,7 @@ export default function FeedbackEditorModal({
 
   const currentList = activeTab === 'positive' ? positiveBehaviors : negativeBehaviors;
 
-  const handleStartEdit = (item: Behavior) => {
+  const handleStartEdit = (item: FeedbackItem) => {
     setEditingId(item.id);
     setDeletingId(null);
     setEditLabel(item.label);
@@ -58,7 +58,7 @@ export default function FeedbackEditorModal({
 
     const points = activeTab === 'positive' ? editScore : -editScore;
 
-    const newItem: Behavior = {
+    const newItem: FeedbackItem = {
       id: isCreating ? Date.now().toString() : editingId!,
       label: editLabel,
       icon: editIcon,

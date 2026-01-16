@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 
-export interface Behavior {
+export interface FeedbackItem {
   id: string;
   label: string;
   icon: string;
   points: number;
 }
 
-interface BehaviorModalProps {
+interface FeedbackModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelectBehavior: (behavior: string, type: 'positive' | 'negative') => void;
+  onSelectFeedback: (behavior: string, type: 'positive' | 'negative') => void;
   studentName: string;
-  positiveBehaviors: Behavior[];
-  negativeBehaviors: Behavior[];
+  positiveBehaviors: FeedbackItem[];
+  negativeBehaviors: FeedbackItem[];
 }
 
-export default function BehaviorModal({ isOpen, onClose, onSelectBehavior, studentName, positiveBehaviors, negativeBehaviors }: BehaviorModalProps) {
+export default function FeedbackModal({ isOpen, onClose, onSelectFeedback, studentName, positiveBehaviors, negativeBehaviors }: FeedbackModalProps) {
   const [activeTab, setActiveTab] = useState<'positive' | 'negative'>('positive');
 
   useEffect(() => {
@@ -79,7 +79,7 @@ export default function BehaviorModal({ isOpen, onClose, onSelectBehavior, stude
             {currentBehaviors.map((behavior) => (
               <button
                 key={behavior.id}
-                onClick={() => onSelectBehavior(behavior.label, activeTab)}
+                onClick={() => onSelectFeedback(behavior.label, activeTab)}
                 className={`flex flex-col items-center justify-center bg-white border-2 border-[var(--color-border)] rounded-xl p-4 hover:shadow-lg transition-all group hover:scale-105 ${activeTab === 'positive' ? 'hover:border-green-500 hover:bg-green-50' : 'hover:border-orange-500 hover:bg-orange-50'}`}
               >
                 <div className={`${activeTab === 'positive' ? 'bg-blue-50' : 'bg-orange-50'} w-16 h-16 rounded-full flex items-center justify-center text-3xl mb-3 group-hover:scale-110 transition-transform`}>

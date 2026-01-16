@@ -167,7 +167,7 @@ npx prisma db seed
 
 Endpoint auxiliar:
 
-```
+```text
 GET /api/auth/demo-credentials
 ```
 
@@ -192,9 +192,9 @@ O foco do MVP é **demonstração funcional**. Caso o backend não esteja ativo,
 
 ---
 
-## Estrutura do Repositório 
+## Estrutura do Repositório
 
-```
+```text
 /safari-escolar
 │
 ├── frontend/
