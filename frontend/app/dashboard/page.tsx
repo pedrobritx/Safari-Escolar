@@ -314,7 +314,7 @@ export default function DashboardPage() {
                  className="btn btn-ghost mb-[2px] px-6 py-3"
               >
                 <Settings size={20} />
-                Feedback
+                Editar Feedback
               </button>
             </div>
           </div>
