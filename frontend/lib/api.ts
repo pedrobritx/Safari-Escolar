@@ -15,6 +15,20 @@ export const api = {
     return response.json();
   },
 
+  async get(endpoint: string, token?: string) {
+    const localToken = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const finalToken = token || localToken;
+    
+    const response = await fetch(`${API_URL}/api${endpoint}`, {
+      headers: finalToken ? { 'Authorization': `Bearer ${finalToken}` } : {},
+    });
+
+    if (!response.ok) {
+        throw new Error('API Request Failed');
+    }
+    return response.json();
+  },
+
   async getClasses(token: string, date?: string) {
     const query = date ? `?date=${encodeURIComponent(date)}` : '';
     const response = await fetch(`${API_URL}/api/classes${query}`, {
@@ -90,6 +104,21 @@ export const api = {
     }
 
     return response.json();
+  },
+
+  async deleteFeedbackEvent(token: string, feedbackId: string) {
+    const response = await fetch(`${API_URL}/api/feedback/${feedbackId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete feedback event');
+    }
+
+    return true;
   },
 
   async createStudent(token: string, data: { name: string; classId: string; animalAvatar?: string; avatarColor?: string }) {

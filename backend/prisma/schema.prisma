@@ -60,6 +60,9 @@ model Student {
   name          String
   animalAvatar  String   // Animal avatar name
   avatarColor   String   @default("#FFFFFF")
+  whatsapp      String?
+  email         String?
+  birthday      String?
   classId       String
   class         Class    @relation(fields: [classId], references: [id])
   familyId      String?

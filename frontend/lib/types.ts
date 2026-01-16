@@ -21,6 +21,9 @@ export interface Student {
   name: string;
   animalAvatar: string;
   avatarColor?: string;
+  whatsapp?: string;
+  email?: string;
+  birthday?: string;
   attendances?: Attendance[];
   todayStatus?: 'PRESENT' | 'ABSENT' | 'LATE' | null;
   todayScore?: number;

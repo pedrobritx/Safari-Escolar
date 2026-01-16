@@ -7,6 +7,7 @@ import { DashboardData, User, Class, Student } from '@/lib/types';
 import EmojiPicker from '@/components/EmojiPicker';
 import FeedbackModal, { FeedbackItem } from '@/components/FeedbackModal';
 import FeedbackEditorModal from '@/components/FeedbackEditorModal';
+import StudentDetailModal from '@/components/StudentDetailModal';
 import StudentFormModal from '@/components/StudentFormModal';
 import Calendar from '@/components/Calendar';
 import { LayoutGrid, List, Pencil, Settings, Plus } from 'lucide-react';
@@ -223,7 +224,7 @@ export default function DashboardPage() {
     }
   };
 
-  const handleUpdateStudent = async (data: { name: string; animalAvatar?: string; avatarColor?: string }) => {
+  const handleUpdateStudent = async (data: { name?: string; animalAvatar?: string; avatarColor?: string; whatsapp?: string; email?: string; birthday?: string }) => {
     const token = localStorage.getItem('token');
     if (!token || !editingStudentData) return;
 
@@ -423,15 +424,15 @@ export default function DashboardPage() {
                           className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover/avatar:opacity-100 transition-opacity"
                         >
                           <div className="bg-white text-primary text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-md">
-                            <Pencil size={12} /> Editar
+                            <Pencil size={12} /> Detalhar
                           </div>
                         </button>
                         
                         {/* Pontuação Badge */}
                         {(student.todayScore || 0) !== 0 && (
                           <div 
-                            className={`absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold border-2 border-white shadow-md z-10 ${
-                              (student.todayScore || 0) >= 0 ? 'bg-[var(--safari-green)]' : 'bg-[var(--safari-orange)]'
+                            className={`absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold border-2 border-white shadow-md z-50 ${
+                              (student.todayScore || 0) >= 0 ? 'bg-[#4D7C0F]' : 'bg-[#EA580C]'
                             }`}
                           >
                             {student.todayScore}
@@ -512,17 +513,25 @@ export default function DashboardPage() {
         onUpdateBehaviors={handleUpdateBehaviors}
       />
 
-      <StudentFormModal
-        isOpen={studentFormOpen}
-        onClose={() => {
-          setStudentFormOpen(false);
-          setEditingStudentData(null);
-        }}
-        onSave={studentFormMode === 'create' ? handleCreateStudent : handleUpdateStudent}
-        onDelete={studentFormMode === 'edit' ? handleDeleteStudent : undefined}
-        initialData={editingStudentData}
-        mode={studentFormMode}
-      />
+      {studentFormMode === 'create' ? (
+        <StudentFormModal
+            isOpen={studentFormOpen}
+            onClose={() => setStudentFormOpen(false)}
+            onSave={handleCreateStudent}
+            mode="create"
+        />
+      ) : (
+        <StudentDetailModal
+            isOpen={studentFormOpen}
+            onClose={() => {
+                setStudentFormOpen(false);
+                setEditingStudentData(null);
+            }}
+            student={editingStudentData}
+            onUpdate={(data: any) => handleUpdateStudent(data)}
+            onDelete={handleDeleteStudent}
+        />
+      )}
     </div>
   );
 }

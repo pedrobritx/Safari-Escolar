@@ -46,12 +46,14 @@ export const getClasses = async (req: AuthRequest, res: Response) => {
 
     if (dateQuery) {
       const d = new Date(dateQuery);
-      targetDateStart = new Date(d.setHours(0, 0, 0, 0));
-      targetDateEnd = new Date(d.setHours(23, 59, 59, 999));
+      // Construct UTC date range for the query date
+      targetDateStart = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 0, 0, 0));
+      targetDateEnd = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 23, 59, 59, 999));
     } else {
       const now = new Date();
-      targetDateStart = new Date(now.setHours(0, 0, 0, 0));
-      targetDateEnd = new Date(now.setHours(23, 59, 59, 999));
+      // Construct UTC date range for today
+      targetDateStart = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0));
+      targetDateEnd = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999));
     }
 
     let classes;
@@ -121,6 +123,7 @@ export const getClasses = async (req: AuthRequest, res: Response) => {
         const todayScore = positives - negatives;
 
         return {
+
           ...student,
           todayStatus: attendance ? attendance.status : null,
           todayScore,

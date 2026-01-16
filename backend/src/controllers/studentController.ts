@@ -77,6 +77,9 @@ export const updateStudent = async (req: AuthRequest, res: Response) => {
     if (name) data.name = name;
     if (animalAvatar) data.animalAvatar = animalAvatar;
     if (avatarColor) data.avatarColor = avatarColor;
+    if (req.body.whatsapp !== undefined) data.whatsapp = req.body.whatsapp;
+    if (req.body.email !== undefined) data.email = req.body.email;
+    if (req.body.birthday !== undefined) data.birthday = req.body.birthday;
 
     const student = await prisma.student.update({
       where: { id: id as string },
