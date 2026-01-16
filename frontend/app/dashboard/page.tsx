@@ -309,13 +309,7 @@ export default function DashboardPage() {
                 <Plus size={20} />
                 Adicionar Aluno
               </button>
-              <button
-                 onClick={() => setFeedbackEditorOpen(true)}
-                 className="btn btn-ghost mb-[2px] px-6 py-3"
-              >
-                <Settings size={20} />
-                Editar Feedback
-              </button>
+
             </div>
           </div>
         )}
@@ -497,6 +491,10 @@ export default function DashboardPage() {
             handleAddBehavior(currentBehaviorStudent.id, type, behavior);
           }
         }}
+        onEditFeedback={() => {
+          setBehaviorModalOpen(false);
+          setFeedbackEditorOpen(true);
+        }}
         studentName={currentBehaviorStudent?.name || ''}
         positiveBehaviors={positiveBehaviors}
         negativeBehaviors={negativeBehaviors}
@@ -505,6 +503,10 @@ export default function DashboardPage() {
       <FeedbackEditorModal
         isOpen={feedbackEditorOpen}
         onClose={() => setFeedbackEditorOpen(false)}
+        onBack={() => {
+          setFeedbackEditorOpen(false);
+          setBehaviorModalOpen(true);
+        }}
         positiveBehaviors={positiveBehaviors}
         negativeBehaviors={negativeBehaviors}
         onUpdateBehaviors={handleUpdateBehaviors}

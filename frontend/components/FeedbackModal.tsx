@@ -12,12 +12,13 @@ interface FeedbackModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectFeedback: (behavior: string, type: 'positive' | 'negative') => void;
+  onEditFeedback: () => void;
   studentName: string;
   positiveBehaviors: FeedbackItem[];
   negativeBehaviors: FeedbackItem[];
 }
 
-export default function FeedbackModal({ isOpen, onClose, onSelectFeedback, studentName, positiveBehaviors, negativeBehaviors }: FeedbackModalProps) {
+export default function FeedbackModal({ isOpen, onClose, onSelectFeedback, onEditFeedback, studentName, positiveBehaviors, negativeBehaviors }: FeedbackModalProps) {
   const [activeTab, setActiveTab] = useState<'positive' | 'negative'>('positive');
 
   useEffect(() => {
@@ -74,6 +75,13 @@ export default function FeedbackModal({ isOpen, onClose, onSelectFeedback, stude
             }`}
           >
             Construtivo
+          </button>
+          <button
+            onClick={onEditFeedback}
+            className="btn w-12 flex-none rounded-xl bg-white border-gray-300 text-2xl hover:bg-gray-50 shadow-sm flex items-center justify-center"
+            title="Configurar Feedback"
+          >
+            ⚙️
           </button>
         </div>
 
