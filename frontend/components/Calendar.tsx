@@ -114,9 +114,9 @@ const Calendar: React.FC<CalendarProps> = ({ selectedDate, onDateChange }) => {
 
       <button
         onClick={handleTodayClick}
-        className="mt-4 w-full py-2 bg-white border-2 border-[var(--color-border)] rounded-xl text-sm font-bold text-primary hover:bg-[var(--color-secondary)] transition-all flex items-center justify-center gap-2"
+        className="btn btn-primary w-full mt-4"
       >
-        <CalendarIcon size={16} />
+        <CalendarIcon size={18} />
         Ir para Hoje
       </button>
     </div>

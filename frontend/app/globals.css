@@ -98,7 +98,7 @@ body {
   
   /* Botões - Os elementos interativos */
   .btn {
-    @apply font-bold rounded-xl border-b-4 active:border-b-0 active:translate-y-1 transition-all py-2 px-4 shadow-sm cursor-pointer flex items-center gap-2 justify-center;
+    @apply font-bold rounded-xl border-b-4 active:border-b-transparent active:border-b-4 active:translate-y-1 transition-all py-2 px-4 shadow-sm cursor-pointer flex items-center gap-2 justify-center;
   }
 
   /* Verde (Sucesso/Primário) - Safari Green */
