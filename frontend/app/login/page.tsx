@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { Binoculars } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -24,14 +25,19 @@ export default function LoginPage() {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
 
+      toast.success('Login realizado com sucesso!');
+
       // Redirect based on role
       if (data.user.role === 'FAMILY') {
         router.push('/family');
       } else {
         router.push('/dashboard');
       }
-    } catch (err) {
-      setError('Email ou senha inválidos');
+    } catch (err: any) {
+      console.error(err);
+      const errorMessage = err.message || 'Email ou senha inválidos';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -94,8 +100,11 @@ export default function LoginPage() {
 
         <div className="mt-10 p-5 bg-[var(--color-secondary)] rounded-2xl border-2 border-[var(--color-border)]">
           <p className="text-sm text-primary font-bold mb-3 uppercase tracking-wider text-center">🗺️ Acesso Rápido</p>
-          <p className="text-xs text-primary/80 font-medium mb-1">🦁 Professor: joao.professor@escola.com / password123</p>
-          <p className="text-xs text-primary/80 font-medium">🐘 Família: familia.silva@email.com / password123</p>
+          <p className="text-xs text-primary/80 font-medium mb-1">joao.professor@escola.com</p>
+          <p className="text-xs text-primary/80 font-medium">familia.silva@email.com</p>
+          <p className="text-xs text-primary/80 font-medium">coordenacao@escola.com</p>
+          <p className="text-xs text-primary/80 font-medium">admin@escola.com</p>
+          <p className="text-xs text-primary/80 font-medium">password123</p>
         </div>
       </div>
     </div>

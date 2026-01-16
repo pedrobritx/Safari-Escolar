@@ -24,7 +24,8 @@ export const api = {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to fetch classes');
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to fetch classes');
     }
 
     return response.json();
@@ -37,7 +38,8 @@ export const api = {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to fetch dashboard');
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to fetch dashboard');
     }
 
     return response.json();
@@ -49,7 +51,8 @@ export const api = {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to fetch family view');
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || 'Failed to fetch family view');
     }
 
     return response.json();

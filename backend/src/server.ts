@@ -29,7 +29,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/family', familyRoutes);
 
 // Health check
-app.get('/health', (req, res) => {
+app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
@@ -38,6 +38,30 @@ app.get('/', (req, res) => {
   res.json({ message: 'Safari Escolar API is running 🚀' });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+const validateEnv = () => {
+  const required = ['DATABASE_URL', 'JWT_SECRET', 'PORT'];
+  const missing = required.filter(key => !process.env[key]);
+  
+  if (missing.length > 0) {
+    console.error(`❌ Missing required environment variables: ${missing.join(', ')}`);
+    process.exit(1);
+  }
+};
+
+validateEnv();
+
+const server = app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
 });
+
+// Graceful Shutdown
+const shutdown = () => {
+  console.log('🛑 Received kill signal, shutting down gracefully');
+  server.close(() => {
+    console.log('🔒 Closed out remaining connections');
+    process.exit(0);
+  });
+};
+
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);
