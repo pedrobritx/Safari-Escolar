@@ -126,7 +126,7 @@ export default function StudentFormModal({
                     onDelete();
                   }
                 }}
-                className="px-4 py-3 bg-red-100 text-red-600 rounded-xl font-bold hover:bg-red-200 transition-colors flex items-center justify-center gap-2"
+                className="px-4 py-3 bg-orange-100 text-orange-600 rounded-xl font-bold hover:bg-orange-200 transition-colors flex items-center justify-center gap-2"
                 title="Excluir Aluno"
               >
                 <Trash2 size={20} />

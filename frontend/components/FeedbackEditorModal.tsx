@@ -113,7 +113,7 @@ export default function FeedbackEditorModal({
           </button>
           <button
             onClick={() => { setActiveTab('negative'); setEditingId(null); setDeletingId(null); }}
-            className={`flex-1 p-3 font-bold text-center transition-colors ${activeTab === 'negative' ? 'bg-red-100 text-red-800 border-b-4 border-red-500' : 'bg-gray-50 text-gray-500 hover:bg-gray-100'}`}
+            className={`flex-1 p-3 font-bold text-center transition-colors ${activeTab === 'negative' ? 'bg-orange-100 text-orange-800 border-b-4 border-orange-500' : 'bg-gray-50 text-gray-500 hover:bg-gray-100'}`}
           >
             Construtivos (-1)
           </button>
@@ -125,11 +125,11 @@ export default function FeedbackEditorModal({
           {/* List */}
           <div className="space-y-3 mb-6">
             {currentList.map((item) => (
-              <div key={item.id} className={`flex items-center justify-between bg-white p-3 rounded-xl border-2 shadow-sm transition-all ${deletingId === item.id ? 'border-red-500 bg-red-50' : 'border-[var(--color-border)]'}`}>
+              <div key={item.id} className={`flex items-center justify-between bg-white p-3 rounded-xl border-2 shadow-sm transition-all ${deletingId === item.id ? 'border-orange-500 bg-orange-50' : 'border-[var(--color-border)]'}`}>
                 <div className="flex items-center gap-3">
                   <span className="text-2xl bg-gray-100 w-10 h-10 flex items-center justify-center rounded-full">{item.icon}</span>
                   <span className="font-bold text-primary">{item.label}</span>
-                  <span className={`text-xs font-bold px-2 py-1 rounded bg-gray-100 ${item.points > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  <span className={`text-xs font-bold px-2 py-1 rounded bg-gray-100 ${item.points > 0 ? 'text-[var(--safari-green)]' : 'text-[var(--safari-orange)]'}`}>
                     {item.points > 0 ? '+' : ''}{item.points}
                   </span>
                 </div>
@@ -137,10 +137,10 @@ export default function FeedbackEditorModal({
                 <div className="flex gap-2">
                   {deletingId === item.id ? (
                     <>
-                      <span className="text-xs font-bold text-red-500 flex items-center mr-2">Confirmar?</span>
+                      <span className="text-xs font-bold text-orange-500 flex items-center mr-2">Confirmar?</span>
                       <button 
                         onClick={() => handleConfirmDelete(item.id)} 
-                        className="p-2 bg-red-500 text-white hover:bg-red-600 rounded-lg transition-colors shadow-sm" 
+                        className="p-2 bg-orange-500 text-white hover:bg-orange-600 rounded-lg transition-colors shadow-sm" 
                         title="Confirmar Exclusão"
                       >
                         <Check size={18} />
@@ -229,7 +229,7 @@ export default function FeedbackEditorModal({
                           onChange={(e) => setEditScore(Number(e.target.value))}
                           className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
                         />
-                        <span className={`text-xl font-bold ${activeTab === 'positive' ? 'text-green-600' : 'text-red-600'} w-12 text-center`}>
+                        <span className={`text-xl font-bold ${activeTab === 'positive' ? 'text-[var(--safari-green)]' : 'text-[var(--safari-orange)]'} w-12 text-center`}>
                           {activeTab === 'positive' ? '+' : '-'}{editScore}
                         </span>
                       </div>

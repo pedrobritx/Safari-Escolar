@@ -101,9 +101,9 @@ body {
     @apply font-bold rounded-xl border-b-4 active:border-b-0 active:translate-y-1 transition-all py-2 px-4 shadow-sm cursor-pointer flex items-center gap-2 justify-center;
   }
 
-  /* Verde (Sucesso/Primário) */
+  /* Verde (Sucesso/Primário) - Safari Green */
   .btn-primary {
-    @apply bg-green-600 text-white border-green-800 hover:bg-green-700;
+    @apply bg-[var(--safari-green)] text-white border-[#365314] hover:brightness-110;
   }
 
   /* Laranja (Atenção/Negativo/Ação) */
@@ -111,9 +111,9 @@ body {
     @apply bg-[var(--color-accent)] text-white border-[#9A3412] hover:bg-[#C2410C];
   }
 
-  /* Vermelho (Perigo/Excluir/Ausente) */
+  /* Vermelho agora é Laranja (Consistência) */
   .btn-anger {
-    @apply bg-red-500 text-white border-red-700 hover:bg-red-600;
+    @apply bg-[var(--color-accent)] text-white border-[#9A3412] hover:bg-[#C2410C];
   }
   
   /* Amarelo (Atrasado) */

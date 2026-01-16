@@ -437,7 +437,7 @@ export default function DashboardPage() {
                         {(student.todayScore || 0) !== 0 && (
                           <div 
                             className={`absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold border-2 border-white shadow-md z-10 ${
-                              (student.todayScore || 0) >= 0 ? 'bg-green-600' : 'bg-red-500'
+                              (student.todayScore || 0) >= 0 ? 'bg-[var(--safari-green)]' : 'bg-[var(--safari-orange)]'
                             }`}
                           >
                             {student.todayScore}
