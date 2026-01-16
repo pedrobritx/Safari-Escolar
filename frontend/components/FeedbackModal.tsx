@@ -53,20 +53,20 @@ export default function FeedbackModal({ isOpen, onClose, onSelectFeedback, stude
         <div className="flex p-2 gap-2 bg-[#F3F4F6]">
           <button
             onClick={() => setActiveTab('positive')}
-            className={`flex-1 py-3 font-black text-white rounded-xl border-b-4 transition-all uppercase ${
+            className={`flex-1 btn rounded-xl transition-all uppercase ${
               activeTab === 'positive' 
-                ? 'bg-[#0092FA] border-[#0070C0] shadow-sm' 
-                : 'bg-gray-300 border-gray-400 text-gray-500 hover:bg-gray-400'
+                ? 'bg-[#0284C7] text-white border-[#0369A1] shadow-sm' 
+                : 'bg-gray-100 border-gray-300 text-gray-500 hover:bg-gray-200'
             }`}
           >
             Positivo
           </button>
           <button
             onClick={() => setActiveTab('negative')}
-            className={`flex-1 py-3 font-black text-white rounded-xl border-b-4 transition-all uppercase ${
+            className={`flex-1 btn rounded-xl transition-all uppercase ${
               activeTab === 'negative' 
-                ? 'bg-[#F59E0B] border-[#D97706] shadow-sm' 
-                : 'bg-gray-300 border-gray-400 text-gray-500 hover:bg-gray-400'
+                ? 'bg-[var(--safari-orange)] text-white border-[#9A3412] shadow-sm' 
+                : 'bg-gray-100 border-gray-300 text-gray-500 hover:bg-gray-200'
             }`}
           >
             Construtivo
@@ -80,7 +80,7 @@ export default function FeedbackModal({ isOpen, onClose, onSelectFeedback, stude
               <button
                 key={behavior.id}
                 onClick={() => onSelectFeedback(behavior.label, activeTab)}
-                className={`flex flex-col items-center justify-center bg-white border-2 border-[var(--color-border)] rounded-xl p-4 hover:shadow-lg transition-all group hover:scale-105 ${activeTab === 'positive' ? 'hover:border-green-500 hover:bg-green-50' : 'hover:border-orange-500 hover:bg-orange-50'}`}
+                className={`flex flex-col items-center justify-center bg-white border-2 border-b-4 rounded-xl p-4 transition-all group active:border-b-2 active:translate-y-1 ${activeTab === 'positive' ? 'border-gray-200 hover:border-green-500 hover:bg-green-50' : 'border-gray-200 hover:border-orange-500 hover:bg-orange-50'}`}
               >
                 <div className={`${activeTab === 'positive' ? 'bg-blue-50' : 'bg-orange-50'} w-16 h-16 rounded-full flex items-center justify-center text-3xl mb-3 group-hover:scale-110 transition-transform`}>
                   {behavior.icon}

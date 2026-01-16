@@ -126,7 +126,7 @@ export default function StudentFormModal({
                     onDelete();
                   }
                 }}
-                className="px-4 py-3 bg-orange-100 text-orange-600 rounded-xl font-bold hover:bg-orange-200 transition-colors flex items-center justify-center gap-2"
+                className="btn btn-accent px-4 py-3 rounded-xl flex items-center justify-center gap-2"
                 title="Excluir Aluno"
               >
                 <Trash2 size={20} />
@@ -135,7 +135,7 @@ export default function StudentFormModal({
             
             <button
               type="submit"
-              className="flex-1 px-6 py-3 bg-[var(--color-primary)] text-white rounded-xl font-bold hover:brightness-110 active:translate-y-1 transition-all shadow-[0_4px_0_#365314] active:shadow-none flex items-center justify-center gap-2"
+              className="flex-1 btn btn-primary px-6 py-3 rounded-xl flex items-center justify-center gap-2"
             >
               <Save size={20} />
               {mode === 'create' ? 'Adicionar' : 'Salvar Alterações'}

@@ -475,7 +475,7 @@ export default function DashboardPage() {
                       <div className="w-full mt-1">
                         <button
                           onClick={() => openBehaviorModal(student.id, student.name)}
-                          className={`btn bg-white border-2 border-[var(--color-border)] text-primary hover:bg-gray-50 flex items-center justify-center gap-2 ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs w-full'}`}
+                          className={`btn btn-info flex items-center justify-center gap-2 ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs w-full'}`}
                         >
                           <span className="text-lg">⭐</span> Feedback
                         </button>
