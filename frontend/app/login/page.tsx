@@ -55,29 +55,29 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label htmlFor="email" className="block text-sm font-bold text-primary mb-2 ml-1">
-              EXPLORADOR (EMAIL)
+              EMAIL
             </label>
             <input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border-2 border-[var(--color-border)] rounded-xl focus:ring-4 focus:ring-[var(--color-secondary)] focus:border-primary outline-none bg-white font-medium text-lg placeholder:text-gray-400 text-foreground"
+              className="w-full px-4 py-3 border-2 border-stone-300 rounded-xl focus:ring-4 focus:ring-[var(--color-secondary)] focus:border-primary outline-none bg-white font-medium text-lg placeholder:text-gray-500 text-gray-900"
               placeholder="seu@email.com"
               required
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-bold text-primary mb-2 ml-1">
-              CÓDIGO SECRETO (SENHA)
+            <label htmlFor="password" className="block text-sm font-bold text-green-800 mb-2 ml-1">
+              SENHA
             </label>
             <input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border-2 border-[var(--color-border)] rounded-xl focus:ring-4 focus:ring-[var(--color-secondary)] focus:border-primary outline-none bg-white font-medium text-lg placeholder:text-gray-400 text-foreground"
+              className="w-full px-4 py-3 border-2 border-stone-300 rounded-xl focus:ring-4 focus:ring-[var(--color-secondary)] focus:border-primary outline-none bg-white font-medium text-lg placeholder:text-gray-500 text-gray-900"
               placeholder="••••••••"
               required
             />
@@ -94,17 +94,17 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full bg-accent text-white font-bold text-xl py-4 rounded-xl hover:bg-[#c2410c] transition-all shadow-[0_4px_0_#9a3412] active:translate-y-[4px] active:shadow-none disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Entrando na Aventura...' : 'Começar Aventura'}
+            {loading ? 'Entrando na Aventura...' : 'Entrar'}
           </button>
         </form>
 
         <div className="mt-10 p-5 bg-[var(--color-secondary)] rounded-2xl border-2 border-[var(--color-border)]">
           <p className="text-sm text-primary font-bold mb-3 uppercase tracking-wider text-center">🗺️ Acesso Rápido</p>
           <p className="text-xs text-primary/80 font-medium mb-1">joao.professor@escola.com</p>
-          <p className="text-xs text-primary/80 font-medium">familia.silva@email.com</p>
-          <p className="text-xs text-primary/80 font-medium">coordenacao@escola.com</p>
-          <p className="text-xs text-primary/80 font-medium">admin@escola.com</p>
-          <p className="text-xs text-primary/80 font-medium">password123</p>
+          <p className="text-xs text-primary/80 font-medium mb-1">familia.silva@email.com</p>
+          <p className="text-xs text-primary/80 font-medium mb-1">coordenacao@escola.com</p>
+          <p className="text-xs text-primary/80 font-medium mb-1">admin@escola.com</p>
+          <p className="text-xs text-primary/80 font-medium mb-1">password123</p>
         </div>
       </div>
     </div>

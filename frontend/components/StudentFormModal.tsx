@@ -59,7 +59,7 @@ export default function StudentFormModal({
           </h2>
           <button 
             onClick={onClose}
-            className="bg-white text-red-500 p-1.5 rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
+            className="btn btn-accent p-2 rounded-lg"
           >
             <X size={24} strokeWidth={2.5} />
           </button>
@@ -110,7 +110,7 @@ export default function StudentFormModal({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Ex: João Silva"
-              className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-[var(--color-secondary)] focus:border-primary outline-none font-medium text-lg"
+              className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-[var(--color-secondary)] focus:border-primary outline-none font-medium text-lg text-gray-900 placeholder:text-gray-500"
               autoFocus
               required
             />

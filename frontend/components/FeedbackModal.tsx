@@ -43,7 +43,7 @@ export default function FeedbackModal({ isOpen, onClose, onSelectFeedback, stude
            </div>
            <button 
              onClick={onClose}
-             className="bg-white text-red-500 p-1.5 rounded-lg hover:bg-gray-50 transition-colors shadow-sm absolute right-4"
+             className="btn btn-accent p-2 rounded-lg absolute right-4"
            >
              <X size={24} strokeWidth={2.5} />
            </button>

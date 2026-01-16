@@ -98,7 +98,7 @@ export default function FeedbackEditorModal({
             <h3 className="text-xl font-bold text-primary">⚙️ Editar Feedback</h3>
             <p className="text-sm font-medium text-primary/80">Personalize as habilidades e comportamentos</p>
           </div>
-          <button onClick={onClose} className="bg-white text-red-500 p-1.5 rounded-lg hover:bg-gray-50 transition-colors shadow-sm">
+          <button onClick={onClose} className="btn btn-accent p-2 rounded-lg">
             <X size={24} strokeWidth={2.5} />
           </button>
         </div>

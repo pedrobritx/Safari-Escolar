@@ -267,7 +267,7 @@ export default function DashboardPage() {
             </div>
             <button
               onClick={handleLogout}
-              className="btn btn-anger"
+              className="btn btn-accent"
             >
               Sair
             </button>
@@ -385,14 +385,14 @@ export default function DashboardPage() {
                 </select>
                 <button 
                   onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded-lg border-2 transition-all ${viewMode === 'grid' ? 'bg-[#EA580C] text-white border-[#9A3412]' : 'bg-white text-primary border-[var(--color-border)] hover:bg-gray-50'}`}
+                  className={`btn p-2 transition-all ${viewMode === 'grid' ? 'btn-accent' : 'btn-ghost'}`}
                   title="Visualização em Grade"
                 >
                   <LayoutGrid size={20} />
                 </button>
                 <button 
                   onClick={() => setViewMode('list')}
-                  className={`p-2 rounded-lg border-2 transition-all ${viewMode === 'list' ? 'bg-[#EA580C] text-white border-[#9A3412]' : 'bg-white text-primary border-[var(--color-border)] hover:bg-gray-50'}`}
+                  className={`btn p-2 transition-all ${viewMode === 'list' ? 'btn-accent' : 'btn-ghost'}`}
                   title="Visualização em Lista"
                 >
                   <List size={20} />
