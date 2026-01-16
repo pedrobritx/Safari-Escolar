@@ -385,14 +385,14 @@ export default function DashboardPage() {
                 </select>
                 <button 
                   onClick={() => setViewMode('grid')}
-                  className={`btn p-2 transition-all ${viewMode === 'grid' ? 'btn-accent' : 'btn-ghost'}`}
+                  className={`btn p-2 transition-all ${viewMode === 'grid' ? 'btn-primary' : 'btn-ghost'}`}
                   title="Visualização em Grade"
                 >
                   <LayoutGrid size={20} />
                 </button>
                 <button 
                   onClick={() => setViewMode('list')}
-                  className={`btn p-2 transition-all ${viewMode === 'list' ? 'btn-accent' : 'btn-ghost'}`}
+                  className={`btn p-2 transition-all ${viewMode === 'list' ? 'btn-primary' : 'btn-ghost'}`}
                   title="Visualização em Lista"
                 >
                   <List size={20} />
@@ -448,14 +448,14 @@ export default function DashboardPage() {
                       <span className={`font-bold text-primary ${viewMode === 'list' ? 'text-lg' : 'text-xl'}`}>{student.name}</span>
                     </div>
                     
-                    <div className={viewMode === 'list' ? "flex flex-wrap justify-center gap-2" : "flex flex-col gap-2 w-full"}>
-                      <div className="grid grid-cols-3 gap-2 w-full">
+                    <div className={viewMode === 'list' ? "flex items-center gap-2" : "flex flex-col gap-2 w-full"}>
+                      <div className={viewMode === 'list' ? "flex gap-2" : "grid grid-cols-3 gap-2 w-full"}>
                         <button
                           onClick={() => handleMarkAttendance(student.id, 'PRESENT')}
                           className={`btn btn-primary ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'} ${student.todayStatus && student.todayStatus !== 'PRESENT' ? 'opacity-30' : ''}`}
                           title="Presente"
                         >
-                           Presente
+                          Presente
                         </button>
                         <button
                           onClick={() => handleMarkAttendance(student.id, 'LATE')}
@@ -472,12 +472,12 @@ export default function DashboardPage() {
                            Ausente
                         </button>
                       </div>
-                      <div className="w-full mt-1">
+                      <div className={viewMode === 'list' ? "" : "w-full mt-1"}>
                         <button
                           onClick={() => openBehaviorModal(student.id, student.name)}
                           className={`btn btn-info flex items-center justify-center gap-2 ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs w-full'}`}
                         >
-                          <span className="text-lg">⭐</span> Feedback
+                          Feedback
                         </button>
                       </div>
                     </div>
