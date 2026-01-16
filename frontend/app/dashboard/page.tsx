@@ -38,7 +38,6 @@ export default function DashboardPage() {
   
   // Estado do Modal de Comportamento
   const [behaviorModalOpen, setBehaviorModalOpen] = useState(false);
-  const [behaviorModalType, setBehaviorModalType] = useState<'positive' | 'negative'>('positive');
   const [currentBehaviorStudent, setCurrentBehaviorStudent] = useState<{id: string, name: string} | null>(null);
 
   // Estado do Editor de Feedback
@@ -193,9 +192,8 @@ export default function DashboardPage() {
     }
   };
 
-  const openBehaviorModal = (studentId: string, studentName: string, type: 'positive' | 'negative') => {
+  const openBehaviorModal = (studentId: string, studentName: string) => {
     setCurrentBehaviorStudent({ id: studentId, name: studentName });
-    setBehaviorModalType(type);
     setBehaviorModalOpen(true);
   };
 
@@ -436,13 +434,15 @@ export default function DashboardPage() {
                         </button>
                         
                         {/* Pontuação Badge */}
-                        <div 
-                          className={`absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold border-2 border-white shadow-md z-10 ${
-                            (student.todayScore || 0) >= 0 ? 'bg-green-600' : 'bg-red-500'
-                          }`}
-                        >
-                          {student.todayScore || 0}
-                        </div>
+                        {(student.todayScore || 0) !== 0 && (
+                          <div 
+                            className={`absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold border-2 border-white shadow-md z-10 ${
+                              (student.todayScore || 0) >= 0 ? 'bg-green-600' : 'bg-red-500'
+                            }`}
+                          >
+                            {student.todayScore}
+                          </div>
+                        )}
                       </div>
 
                       <span className={`font-bold text-primary ${viewMode === 'list' ? 'text-lg' : 'text-xl'}`}>{student.name}</span>
@@ -472,18 +472,12 @@ export default function DashboardPage() {
                            Ausente
                         </button>
                       </div>
-                      <div className="grid grid-cols-2 gap-2 w-full mt-1">
+                      <div className="w-full mt-1">
                         <button
-                          onClick={() => openBehaviorModal(student.id, student.name, 'positive')}
-                          className={`btn btn-info ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'}`}
+                          onClick={() => openBehaviorModal(student.id, student.name)}
+                          className={`btn bg-white border-2 border-[var(--color-border)] text-primary hover:bg-gray-50 flex items-center justify-center gap-2 ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs w-full'}`}
                         >
-                          + Positivo
-                        </button>
-                        <button
-                          onClick={() => openBehaviorModal(student.id, student.name, 'negative')}
-                          className={`btn btn-accent ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'}`}
-                        >
-                          Construtivo
+                          <span className="text-lg">⭐</span> Feedback
                         </button>
                       </div>
                     </div>
@@ -498,14 +492,14 @@ export default function DashboardPage() {
       <BehaviorModal 
         isOpen={behaviorModalOpen}
         onClose={() => setBehaviorModalOpen(false)}
-        onSelectBehavior={(behavior) => {
+        onSelectBehavior={(behavior, type) => {
           if (currentBehaviorStudent) {
-            handleAddBehavior(currentBehaviorStudent.id, behaviorModalType, behavior);
+            handleAddBehavior(currentBehaviorStudent.id, type, behavior);
           }
         }}
         studentName={currentBehaviorStudent?.name || ''}
-        type={behaviorModalType}
-        behaviors={behaviorModalType === 'positive' ? positiveBehaviors : negativeBehaviors}
+        positiveBehaviors={positiveBehaviors}
+        negativeBehaviors={negativeBehaviors}
       />
 
       <FeedbackEditorModal
