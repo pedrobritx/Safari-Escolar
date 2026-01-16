@@ -34,8 +34,11 @@ export default function FeedbackModal({ isOpen, onClose, onSelectFeedback, stude
   const currentHeaderColor = activeTab === 'positive' ? 'bg-[#4D7C0F] border-[#365314]' : 'bg-[#EA580C] border-[#9A3412]';
   
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className={`bg-white rounded-2xl shadow-2xl w-full max-w-lg border-4 ${currentBorderColor} overflow-hidden animate-in fade-in zoom-in duration-200 transition-colors`}>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={onClose}>
+      <div 
+        className={`bg-white rounded-2xl shadow-2xl w-full max-w-lg border-4 ${currentBorderColor} overflow-hidden animate-in fade-in zoom-in duration-200 transition-colors`}
+        onClick={(e) => e.stopPropagation()}
+      >
         
         {/* Header - Unified "Feedback" Title */}
         <div className={`${currentHeaderColor} p-4 flex justify-between items-center border-b-2 relative transition-colors`}>
