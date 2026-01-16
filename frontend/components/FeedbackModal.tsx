@@ -86,7 +86,7 @@ export default function FeedbackModal({ isOpen, onClose, onSelectFeedback, stude
                   {behavior.icon}
                 </div>
                 <span className="font-bold text-primary text-sm text-center line-clamp-2">{behavior.label}</span>
-                <span className={`text-xs font-bold mt-1 ${activeTab === 'positive' ? 'text-green-600' : 'text-orange-600'}`}>
+                <span className={`text-xs font-bold mt-1 ${activeTab === 'positive' ? 'text-[var(--safari-green)]' : 'text-[var(--safari-orange)]'}`}>
                   {activeTab === 'positive' ? '+' : ''}{behavior.points}
                 </span>
               </button>

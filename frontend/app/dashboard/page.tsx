@@ -332,27 +332,27 @@ export default function DashboardPage() {
               <div className="space-y-3 text-sm font-medium">
                 <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
                   <span className="text-[#57534E]">Total de Alunos:</span>
-                  <span className="font-bold text-primary">{data.totalStudents}</span>
+                  <span className="font-bold text-[var(--safari-green)]">{data.totalStudents}</span>
                 </div>
                 <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
                   <span className="text-[#57534E]">Presentes:</span>
-                  <span className="font-bold text-green-600">{data.todayAttendance}</span>
+                  <span className="font-bold text-[var(--safari-green)]">{data.todayAttendance}</span>
                 </div>
                 <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
                   <span className="text-[#57534E]">Atrasados:</span>
-                  <span className="font-bold text-yellow-600">{data.todayLate}</span>
+                  <span className="font-bold text-[var(--safari-orange)]">{data.todayLate}</span>
                 </div>
                 <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
                   <span className="text-[#57534E]">Taxa de Presença:</span>
-                  <span className="font-bold text-primary">{data.attendanceRate.toFixed(1)}%</span>
+                  <span className="font-bold text-[var(--safari-green)]">{data.attendanceRate.toFixed(1)}%</span>
                 </div>
                 <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
                   <span className="text-[#57534E]">Feedbacks Positivos:</span>
-                  <span className="font-bold text-green-600">+{data.todayPositiveEvents}</span>
+                  <span className="font-bold text-[var(--safari-green)]">+{data.todayPositiveEvents}</span>
                 </div>
                 <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
                   <span className="text-[#57534E]">Feedbacks Construtivos:</span>
-                  <span className="font-bold text-red-600">-{data.todayNegativeEvents}</span>
+                  <span className="font-bold text-[var(--safari-orange)]">-{data.todayNegativeEvents}</span>
                 </div>
               </div>
             </div>
