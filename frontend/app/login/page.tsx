@@ -33,9 +33,9 @@ export default function LoginPage() {
       } else {
         router.push('/dashboard');
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
-      const errorMessage = err.message || 'Email ou senha inválidos';
+      const errorMessage = err instanceof Error ? err.message : 'Email ou senha inválidos';
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {

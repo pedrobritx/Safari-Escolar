@@ -1,16 +1,17 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { DashboardData, User, Class, Student } from '@/lib/types';
-import EmojiPicker from '@/components/EmojiPicker';
 import FeedbackModal, { FeedbackItem } from '@/components/FeedbackModal';
 import FeedbackEditorModal from '@/components/FeedbackEditorModal';
 import StudentDetailModal from '@/components/StudentDetailModal';
 import StudentFormModal from '@/components/StudentFormModal';
 import Calendar from '@/components/Calendar';
-import { LayoutGrid, List, Pencil, Settings, Plus } from 'lucide-react';
+import { LayoutGrid, List, Pencil, Plus } from 'lucide-react';
+import { Card, CardBody, CardHeader } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
 
 const DEFAULT_POSITIVE_BEHAVIORS: FeedbackItem[] = [
   { id: 'task_ok', label: 'Tarefa em Dia', icon: '📝', points: 1 },
@@ -35,7 +36,7 @@ export default function DashboardPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortOption, setSortOption] = useState<'firstNameAsc' | 'firstNameDesc' | 'lastNameAsc' | 'lastNameDesc'>('firstNameAsc');
   const [loading, setLoading] = useState(true);
-  const [editingStudentId, setEditingStudentId] = useState<string | null>(null);
+  // unused editingStudentId removed
   
   // Estado do Modal de Comportamento
   const [behaviorModalOpen, setBehaviorModalOpen] = useState(false);
@@ -91,14 +92,8 @@ export default function DashboardPage() {
     setUser(parsedUser);
   }, [router]);
 
-  useEffect(() => {
-    if (user) {
-      const token = localStorage.getItem('token');
-      if (token) loadData(token);
-    }
-  }, [user, selectedDate]);
-
-  const loadData = async (token: string) => {
+  // Memoizing loadData via useCallback to avoid dependency warnings
+  const loadData = useCallback(async (token: string) => {
     try {
       const formattedDate = selectedDate.toISOString().split('T')[0];
       const [dashboard, classesData] = await Promise.all([
@@ -121,7 +116,14 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedDate, selectedClass]); 
+
+  useEffect(() => {
+    if (user) {
+      const token = localStorage.getItem('token');
+      if (token) loadData(token);
+    }
+  }, [user, loadData]);
 
   const sortStudents = (students: Student[] | undefined) => {
     if (!students) return [];
@@ -202,21 +204,15 @@ export default function DashboardPage() {
     const token = localStorage.getItem('token');
     if (!token) return;
 
-    // If description is provided (from modal) or if it's negative (using prompt for now)
-    let finalDescription = description;
-    console.log('handleAddBehavior called:', { studentId, type, description });
+    const finalDescription = description;
 
     if (!finalDescription) {
-       console.log('No description provided, returning');
-       // Deve ser tratado pelo modal agora tanto para positivo quanto negativo
        return;
     }
 
     try {
-      console.log('Sending API request...');
       const formattedDate = selectedDate.toISOString().split('T')[0];
       await api.addFeedbackEvent(token, studentId, type, finalDescription, formattedDate);
-      console.log('API request success');
       setBehaviorModalOpen(false); // Close modal if open
       loadData(token);
     } catch (error) {
@@ -245,7 +241,7 @@ export default function DashboardPage() {
       'Macaco': '🐒', 'Urso': '🐻', 'Lobo': '🐺', 'Raposa': '🦊', 'Coelho': '🐰', 
       'Panda': '🐼', 'Koala': '🐨'
     };
-    return map[avatar] || avatar; // Retornar emoji mapeado ou string bruta (se já for emoji)
+    return map[avatar] || avatar; 
   };
 
   if (loading) {
@@ -266,12 +262,12 @@ export default function DashboardPage() {
               <h1 className="text-2xl font-heading font-bold text-primary">🦁 Safari Escolar</h1>
               <p className="text-sm font-medium text-[#57534E]">{user?.name} - {user?.role}</p>
             </div>
-            <button
+            <Button
               onClick={handleLogout}
-              className="btn btn-accent"
+              variant="accent"
             >
               Sair
-            </button>
+            </Button>
           </div>
         </div>
       </header>
@@ -299,78 +295,78 @@ export default function DashboardPage() {
             </div>
 
             <div className="flex gap-2">
-              <button
+              <Button
+                variant="ghost"
                 onClick={() => {
                   setStudentFormMode('create');
                   setEditingStudentData(null);
                   setStudentFormOpen(true);
                 }}
-                className="btn btn-ghost mb-[2px] px-6 py-3"
+                className="mb-[2px] px-6 py-3"
               >
                 <Plus size={20} />
                 Adicionar Aluno
-              </button>
-
+              </Button>
             </div>
           </div>
         )}
 
         {/* Cartões do Dashboard e Calendário */}
         <div className="grid-dashboard mb-8">
-           {/* Cartão de Resumo (Ocupa 1 coluna) */}
+           {/* Cartão de Resumo */}
           <div className="lg:col-span-1">
           {dashboardData.map((data) => (
-            <div key={data.classId} className="card h-full p-6">
-              <h3 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">
-                🏕️ {data.className}
-              </h3>
-              <div className="space-y-3 text-sm font-medium">
-                <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
-                  <span className="text-[#57534E]">Total de Alunos:</span>
-                  <span className="font-bold text-[var(--safari-green)]">{data.totalStudents}</span>
+            <Card key={data.classId} className="h-full">
+              <CardBody>
+                <h3 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">
+                  🏕️ {data.className}
+                </h3>
+                <div className="space-y-3 text-sm font-medium">
+                  <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
+                    <span className="text-[#57534E]">Total de Alunos:</span>
+                    <span className="font-bold text-[var(--safari-green)]">{data.totalStudents}</span>
+                  </div>
+                  <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
+                    <span className="text-[#57534E]">Presentes:</span>
+                    <span className="font-bold text-[var(--safari-green)]">{data.todayAttendance}</span>
+                  </div>
+                  <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
+                    <span className="text-[#57534E]">Atrasados:</span>
+                    <span className="font-bold text-[var(--safari-orange)]">{data.todayLate}</span>
+                  </div>
+                  <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
+                    <span className="text-[#57534E]">Taxa de Presença:</span>
+                    <span className="font-bold text-[var(--safari-green)]">{data.attendanceRate.toFixed(1)}%</span>
+                  </div>
+                  <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
+                    <span className="text-[#57534E]">Feedbacks Positivos:</span>
+                    <span className="font-bold text-[var(--safari-green)]">+{data.todayPositiveEvents}</span>
+                  </div>
+                  <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
+                    <span className="text-[#57534E]">Feedbacks Construtivos:</span>
+                    <span className="font-bold text-[var(--safari-orange)]">-{data.todayNegativeEvents}</span>
+                  </div>
                 </div>
-                <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
-                  <span className="text-[#57534E]">Presentes:</span>
-                  <span className="font-bold text-[var(--safari-green)]">{data.todayAttendance}</span>
-                </div>
-                <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
-                  <span className="text-[#57534E]">Atrasados:</span>
-                  <span className="font-bold text-[var(--safari-orange)]">{data.todayLate}</span>
-                </div>
-                <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
-                  <span className="text-[#57534E]">Taxa de Presença:</span>
-                  <span className="font-bold text-[var(--safari-green)]">{data.attendanceRate.toFixed(1)}%</span>
-                </div>
-                <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
-                  <span className="text-[#57534E]">Feedbacks Positivos:</span>
-                  <span className="font-bold text-[var(--safari-green)]">+{data.todayPositiveEvents}</span>
-                </div>
-                <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
-                  <span className="text-[#57534E]">Feedbacks Construtivos:</span>
-                  <span className="font-bold text-[var(--safari-orange)]">-{data.todayNegativeEvents}</span>
-                </div>
-              </div>
-            </div>
+              </CardBody>
+            </Card>
           ))}
           </div>
 
-           {/* Calendário (Ocupa 2 colunas) */}
+           {/* Calendário */}
           <div className="lg:col-span-2">
              <Calendar selectedDate={selectedDate} onDateChange={setSelectedDate} />
           </div>
         </div>
 
-
-
         {/* Lista de Alunos */}
         {selectedClass && (
-          <div className="card">
-            <div className="card-header bg-[var(--color-secondary)]">
+          <Card>
+            <CardHeader className="bg-[var(--color-secondary)]">
               <h2 className="text-xl font-bold text-primary">{selectedClass.name} - Exploradores</h2>
               <div className="flex gap-2">
                 <select
                   value={sortOption}
-                  onChange={(e) => setSortOption(e.target.value as any)}
+                  onChange={(e) => setSortOption(e.target.value as 'firstNameAsc' | 'firstNameDesc' | 'lastNameAsc' | 'lastNameDesc')}
                   className="px-3 py-2 rounded-lg border-2 border-[var(--color-border)] bg-white text-sm font-bold text-primary outline-none focus:border-primary cursor-pointer mr-2"
                 >
                   <option value="firstNameAsc">Nome (A-Z)</option>
@@ -378,22 +374,24 @@ export default function DashboardPage() {
                   <option value="lastNameAsc">Sobrenome (A-Z)</option>
                   <option value="lastNameDesc">Sobrenome (Z-A)</option>
                 </select>
-                <button 
+                <Button 
+                  variant={viewMode === 'grid' ? 'primary' : 'ghost'}
                   onClick={() => setViewMode('grid')}
-                  className={`btn p-2 transition-all ${viewMode === 'grid' ? 'btn-primary' : 'btn-ghost'}`}
+                  className="p-2"
                   title="Visualização em Grade"
                 >
                   <LayoutGrid size={20} />
-                </button>
-                <button 
+                </Button>
+                <Button 
+                  variant={viewMode === 'list' ? 'primary' : 'ghost'}
                   onClick={() => setViewMode('list')}
-                  className={`btn p-2 transition-all ${viewMode === 'list' ? 'btn-primary' : 'btn-ghost'}`}
+                  className="p-2"
                   title="Visualização em Lista"
                 >
                   <List size={20} />
-                </button>
+                </Button>
               </div>
-            </div>
+            </CardHeader>
             
             <div className={viewMode === 'list' ? "divide-y-2 divide-[var(--color-border)]" : "p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"}>
               {sortStudents(selectedClass.students).map((student) => (
@@ -401,7 +399,7 @@ export default function DashboardPage() {
                   key={student.id} 
                   className={viewMode === 'list' 
                     ? "px-6 py-4 hover:bg-white transition-colors"
-                    : `bg-white border-2 border-[var(--color-border)] rounded-xl p-4 flex flex-col items-center text-center hover:shadow-md transition-all relative group ${editingStudentId === student.id ? 'z-20' : ''}`
+                    : `bg-white border-2 border-[var(--color-border)] rounded-xl p-4 flex flex-col items-center text-center hover:shadow-md transition-all relative group`
                   }
                 >
                   <div className={viewMode === 'list' ? "flex flex-col sm:flex-row items-center justify-between gap-4" : "w-full"}>
@@ -445,42 +443,46 @@ export default function DashboardPage() {
                     
                     <div className={viewMode === 'list' ? "flex items-center gap-2" : "flex flex-col gap-2 w-full"}>
                       <div className={viewMode === 'list' ? "flex gap-2" : "grid grid-cols-3 gap-2 w-full"}>
-                        <button
+                        <Button
+                          variant="primary"
                           onClick={() => handleMarkAttendance(student.id, 'PRESENT')}
-                          className={`btn btn-primary ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'} ${student.todayStatus && student.todayStatus !== 'PRESENT' ? 'opacity-30' : ''}`}
+                          className={`${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'} ${student.todayStatus && student.todayStatus !== 'PRESENT' ? 'opacity-30' : ''}`}
                           title="Presente"
                         >
                           Presente
-                        </button>
-                        <button
+                        </Button>
+                        <Button
+                          variant="warning"
                           onClick={() => handleMarkAttendance(student.id, 'LATE')}
-                          className={`btn btn-warning ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'} ${student.todayStatus && student.todayStatus !== 'LATE' ? 'opacity-30' : ''}`}
+                          className={`${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'} ${student.todayStatus && student.todayStatus !== 'LATE' ? 'opacity-30' : ''}`}
                           title="Atrasado"
                         >
                           Atrasado
-                        </button>
-                        <button
+                        </Button>
+                        <Button
+                          variant="anger"
                           onClick={() => handleMarkAttendance(student.id, 'ABSENT')}
-                          className={`btn btn-anger ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'} ${student.todayStatus && student.todayStatus !== 'ABSENT' ? 'opacity-30' : ''}`}
+                          className={`${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'} ${student.todayStatus && student.todayStatus !== 'ABSENT' ? 'opacity-30' : ''}`}
                           title="Ausente"
                         >
                            Ausente
-                        </button>
+                        </Button>
                       </div>
                       <div className={viewMode === 'list' ? "" : "w-full mt-1"}>
-                        <button
+                        <Button
+                          variant="info"
                           onClick={() => openBehaviorModal(student.id, student.name)}
-                          className={`btn btn-info flex items-center justify-center gap-2 ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs w-full'}`}
+                          className={`flex items-center justify-center gap-2 ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs w-full'}`}
                         >
                           Feedback
-                        </button>
+                        </Button>
                       </div>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
+          </Card>
         )}
       </main>
 
@@ -528,7 +530,7 @@ export default function DashboardPage() {
                 setEditingStudentData(null);
             }}
             student={editingStudentData}
-            onUpdate={(data: any) => handleUpdateStudent(data)}
+            onUpdate={(data: Partial<Student>) => handleUpdateStudent(data)}
             onDelete={handleDeleteStudent}
         />
       )}

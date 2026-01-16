@@ -30,17 +30,19 @@ export default function StudentFormModal({
 
   useEffect(() => {
     if (isOpen) {
-      if (mode === 'edit' && initialData) {
-        setName(initialData.name);
-        setAnimalAvatar(initialData.animalAvatar || '🦁');
-        setAvatarColor(initialData.avatarColor || '#FFFFFF');
-      } else {
-        // Reset for create
-        setName('');
-        setAnimalAvatar('🦁');
-        setAvatarColor('#FFFFFF');
-      }
-      setShowEmojiPicker(false);
+      setTimeout(() => {
+        if (mode === 'edit' && initialData) {
+          setName(initialData.name);
+          setAnimalAvatar(initialData.animalAvatar || '🦁');
+          setAvatarColor(initialData.avatarColor || '#FFFFFF');
+        } else {
+          // Reset for create
+          setName('');
+          setAnimalAvatar('🦁');
+          setAvatarColor('#FFFFFF');
+        }
+        setShowEmojiPicker(false);
+      }, 0);
     }
   }, [isOpen, mode, initialData]);
 

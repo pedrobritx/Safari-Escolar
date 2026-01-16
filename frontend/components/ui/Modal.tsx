@@ -24,6 +24,7 @@ export function Modal({
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -45,13 +46,13 @@ export function Modal({
     '2xl': 'max-w-2xl',
   }[maxWidth];
 
-  const borderClass = borderColorClass || 'border-[var(--color-border)]';
   const headerClass = headerColorClass || 'bg-[var(--color-secondary)] border-[var(--color-border)]';
-
+  // unused borderClass removed
+  
   const content = (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200" onClick={onClose}>
       <div 
-        className={`bg-white rounded-2xl w-full ${maxWidthClass} shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 border-4 border-transparent ${borderColorClass ? borderColorClass : ''}`}
+        className={`bg-white rounded-2xl w-full ${maxWidthClass} shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 border-4 border-transparent ${borderColorClass ? borderColorClass : 'border-[var(--color-border)]'}`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

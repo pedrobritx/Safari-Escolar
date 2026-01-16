@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
-import { X, Pencil, Trash2, Plus, Check, ArrowLeft } from 'lucide-react';
+import { Pencil, Trash2, Plus, Check, ArrowLeft, X } from 'lucide-react';
 import { FeedbackItem } from './FeedbackModal';
+import { Modal } from './ui/Modal';
+import { Button } from './ui/Button';
+import { Input } from './ui/Input';
 
 interface FeedbackEditorModalProps {
   isOpen: boolean;
@@ -33,8 +36,7 @@ export default function FeedbackEditorModal({
   const [editScore, setEditScore] = useState(1);
   const [isCreating, setIsCreating] = useState(false);
 
-  if (!isOpen) return null;
-
+  // Helper to safely manipulate behaviors
   const currentList = activeTab === 'positive' ? positiveBehaviors : negativeBehaviors;
 
   const handleStartEdit = (item: FeedbackItem) => {
@@ -90,30 +92,22 @@ export default function FeedbackEditorModal({
     setDeletingId(null);
   };
 
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={onClose}>
-      <div 
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-lg border-4 border-[#F0B000] overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200 transition-colors"
-        onClick={(e) => e.stopPropagation()}
-      >
-        
-        {/* Header - Yellow for Edit Mode */}
-        <div className="bg-[#F0B000] p-4 flex justify-between items-center border-b-2 border-[#CA9400] relative transition-colors">
-           <div className="w-full text-center">
-             <h3 className="text-xl font-black text-black uppercase tracking-wider">EDITAR FEEDBACK</h3>
-           </div>
-           <button 
-             onClick={onClose}
-             className="btn btn-accent p-2 rounded-lg absolute right-4"
-           >
-             <X size={20} strokeWidth={3} />
-           </button>
-        </div>
+  const headerColorClass = "bg-[#F0B000] border-[#CA9400] text-black";
 
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      headerColorClass={headerColorClass}
+      title="EDITAR FEEDBACK"
+      maxWidth="lg"
+      borderColorClass="border-[#F0B000]"
+    >
         {/* Navigation & Tabs */}
         <div className="bg-[#F3F4F6] p-2 flex gap-2">
-            {/* Back Button - Handles "Back to List" if editing, or "Back to Feedback" if in list */}
-            <button
+            {/* Back Button */}
+            <Button
+                variant="ghost"
                 onClick={() => {
                   if (editingId) {
                     setEditingId(null);
@@ -122,11 +116,11 @@ export default function FeedbackEditorModal({
                     onBack();
                   }
                 }}
-                className="btn bg-white border-gray-300 text-gray-600 w-12 flex-none flex items-center justify-center rounded-xl shadow-sm hover:bg-gray-50"
+                className="w-12 bg-white flex items-center justify-center p-0"
                 title="Voltar"
             >
                 <ArrowLeft size={24} strokeWidth={2.5} />
-            </button>
+            </Button>
 
             {/* Tabs */}
             <div className="flex-1 flex gap-2">
@@ -175,37 +169,39 @@ export default function FeedbackEditorModal({
                     <div className="flex gap-2 ml-4">
                       {deletingId === item.id ? (
                         <>
-                          <button 
+                          <Button 
+                            variant="accent"
                             onClick={() => handleConfirmDelete(item.id)} 
-                            className="btn bg-[var(--safari-orange)] text-white p-2 rounded-lg" 
+                            className="p-2"
                             title="Confirmar"
                           >
                             <Check size={18} />
-                          </button>
-                          <button 
+                          </Button>
+                          <Button 
+                            variant="ghost"
                             onClick={() => setDeletingId(null)} 
-                            className="btn bg-gray-400 text-white p-2 rounded-lg" 
+                            className="p-2 bg-gray-400 text-white hover:bg-gray-500 border-gray-500"
                             title="Cancelar"
                           >
                             <X size={18} />
-                          </button>
+                          </Button>
                         </>
                       ) : (
                         <>
-                          <button 
+                          <Button 
                             onClick={() => handleStartEdit(item)} 
-                            className="btn bg-amber-400 border-amber-600 text-white p-2 rounded-lg hover:bg-amber-500" 
+                            className="bg-amber-400 border-amber-600 hover:bg-amber-500 p-2" 
                             title="Editar"
                           >
                             <Pencil size={18} />
-                          </button>
-                          <button 
+                          </Button>
+                          <Button
                             onClick={() => handleInitiateDelete(item.id)} 
-                            className="btn bg-amber-400 border-amber-600 text-white p-2 rounded-lg hover:bg-amber-500" 
+                            className="bg-amber-400 border-amber-600 hover:bg-amber-500 p-2"
                             title="Excluir"
                           >
                             <Trash2 size={18} />
-                          </button>
+                          </Button>
                         </>
                       )}
                     </div>
@@ -249,60 +245,58 @@ export default function FeedbackEditorModal({
 
                       {/* Inputs */}
                       <div className="space-y-4">
-                          <div>
-                              <label className="block text-xs font-bold text-gray-400 mb-1 uppercase">Nome</label>
-                              <input
-                                  type="text"
-                                  value={editLabel}
-                                  onChange={(e) => setEditLabel(e.target.value)}
-                                  className="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-yellow-500 outline-none font-bold text-lg transition-colors"
-                                  placeholder="Nome do comportamento..."
-                                  autoFocus
-                              />
-                          </div>
+                          <Input
+                              label="Nome"
+                              value={editLabel}
+                              onChange={(e) => setEditLabel(e.target.value)}
+                              placeholder="Nome do comportamento..."
+                              autoFocus
+                          />
+                          
                           <div>
                               <label className="block text-xs font-bold text-gray-400 mb-1 uppercase">Pontos</label>
                               <div className="flex items-center gap-3">
-                                    <button 
+                                    <Button 
+                                        variant="ghost"
                                         onClick={() => setEditScore(Math.max(1, editScore - 1))}
-                                        className="w-12 h-12 rounded-xl bg-gray-100 font-black text-xl hover:bg-gray-200 border-b-4 border-gray-300 active:border-b-0 active:translate-y-1 transition-all"
-                                    >-</button>
+                                        className="w-12 h-12 text-xl"
+                                    >-</Button>
                                     <div className="flex-1 flex justify-center">
                                       <span className={`text-4xl font-black ${activeTab === 'positive' ? 'text-[var(--safari-green)]' : 'text-[var(--safari-orange)]'}`}>
                                           {editScore}
                                       </span>
                                     </div>
-                                    <button 
+                                    <Button 
+                                        variant="ghost"
                                         onClick={() => setEditScore(Math.min(5, editScore + 1))}
-                                        className="w-12 h-12 rounded-xl bg-gray-100 font-black text-xl hover:bg-gray-200 border-b-4 border-gray-300 active:border-b-0 active:translate-y-1 transition-all"
-                                    >+</button>
+                                        className="w-12 h-12 text-xl"
+                                    >+</Button>
                               </div>
                           </div>
                       </div>
 
                       {/* Actions */}
                       <div className="flex gap-3 pt-4 border-t mt-2">
-                          <button
+                          <Button
+                              variant="ghost"
                               onClick={() => { setEditingId(null); setIsCreating(false); }}
-                              className="flex-1 py-3 text-gray-500 font-bold hover:bg-gray-100 rounded-xl transition-colors uppercase border-2 border-transparent hover:border-gray-200"
+                              className="flex-1 uppercase"
                           >
                               Cancelar
-                          </button>
-                          <button
+                          </Button>
+                          <Button
+                              variant="primary"
                               onClick={handleSave}
-                              className="flex-[2] py-3 bg-[var(--safari-green)] text-white font-bold rounded-xl hover:brightness-110 shadow-md border-b-4 border-[#365314] active:border-b-0 active:translate-y-1 transition-all flex items-center justify-center gap-2 uppercase"
+                              className="flex-[2] uppercase"
                           >
-                              <Check size={20} /> Salvar
-                          </button>
+                              <Check size={20} className="mr-2" /> Salvar
+                          </Button>
                       </div>
                   </div>
                </div>
             </div>
           )}
         </div>
-
-
-      </div>
-    </div>
+    </Modal>
   );
 }

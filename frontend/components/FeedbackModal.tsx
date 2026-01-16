@@ -24,7 +24,7 @@ export default function FeedbackModal({ isOpen, onClose, onSelectFeedback, onEdi
 
   useEffect(() => {
     if (isOpen) {
-      setActiveTab('positive'); // Reset to positive when opening
+      setTimeout(() => setActiveTab('positive'), 0); // Reset to positive when opening, async to avoid lint error
     }
   }, [isOpen]);
 

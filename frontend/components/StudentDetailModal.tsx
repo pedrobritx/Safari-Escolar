@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
-import { X, Save, Trash2, Pencil, Phone, Mail, Cake, MessageSquare } from 'lucide-react';
+import { Phone, Mail, Cake, MessageSquare, Trash2, Save, X } from 'lucide-react';
 import { Student, FeedbackEvent } from '../lib/types';
 import EmojiPicker from './EmojiPicker';
 import { api } from '../lib/api';
 import { toast } from 'sonner';
+import { Modal } from './ui/Modal';
+import { Button } from './ui/Button';
+import { Input } from './ui/Input';
 
 interface StudentDetailModalProps {
   isOpen: boolean;
@@ -53,7 +56,7 @@ export default function StudentDetailModal({
     try {
       const data = await api.get(`/feedback/${studentId}`);
       setFeedbacks(data);
-    } catch (err) {
+    } catch {
       toast.error('Erro ao carregar histórico de feedback');
     } finally {
       setLoadingFeedbacks(false);
@@ -82,7 +85,7 @@ export default function StudentDetailModal({
             setFeedbacks(prev => prev.filter(f => f.id !== feedbackId));
             toast.success('Feedback removido!');
         }
-    } catch (err) {
+    } catch {
         toast.error('Erro ao remover feedback');
     }
   };
@@ -90,20 +93,21 @@ export default function StudentDetailModal({
   if (!isOpen || !student) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={onClose}>
-      <div 
-        className="bg-white rounded-[2rem] shadow-2xl w-full max-w-md overflow-hidden flex flex-col h-[85vh] animate-in fade-in zoom-in duration-200"
-        onClick={(e) => e.stopPropagation()}
-      >
-        
-        {/* Header - Safari Green */}
-        <div className="bg-[#4D7C0F] pt-8 pb-12 px-6 flex flex-col items-center relative shrink-0">
-           <button 
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      headerColorClass="hidden" // Hiding default header to use Custom Green Header
+      maxWidth="md"
+    >
+        {/* Custom Header - Safari Green */}
+        <div className="bg-[#4D7C0F] pt-8 pb-12 px-6 flex flex-col items-center relative shrink-0 -mx-6 -mt-6 rounded-b-[2.5rem] shadow-lg mb-6">
+           <Button 
+             variant="accent"
              onClick={onClose}
-             className="absolute top-4 right-4 bg-[#EA580C] text-white p-2 rounded-xl border-b-4 border-[#9A3412] hover:bg-[#c2410c] active:border-b-0 active:translate-y-1 transition-all shadow-lg"
+             className="absolute top-4 right-4 p-2 rounded-xl !border-b-4 active:!border-b-0 shadow-lg"
            >
              <X size={24} strokeWidth={3} />
-           </button>
+           </Button>
 
            <div className="relative group cursor-pointer" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
               <div 
@@ -134,7 +138,7 @@ export default function StudentDetailModal({
         </div>
 
         {/* Tabs */}
-        <div className="flex px-6 -mt-6 gap-4 relative z-10 shrink-0">
+        <div className="flex gap-4 relative z-10 shrink-0 px-2 mb-4">
           <button
             onClick={() => setActiveTab('feedback')}
             className={`flex-1 py-3 rounded-xl font-black text-lg shadow-md transition-all ${
@@ -158,7 +162,7 @@ export default function StudentDetailModal({
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto p-6 custom-scrollbar bg-white">
+        <div className="min-h-[300px]">
           
           {activeTab === 'feedback' && (
             <div className="space-y-4">
@@ -191,13 +195,14 @@ export default function StudentDetailModal({
                         <div className={`font-black text-white rounded-lg h-9 w-12 flex items-center justify-center ${event.type === 'positive' ? 'bg-[#4D7C0F]' : 'bg-[#EA580C]'}`}>
                           {event.type === 'positive' ? '+1' : '-1'}
                         </div>
-                        <button 
+                        <Button 
+                            variant="accent"
                             onClick={() => handleDeleteFeedback(event.id)}
-                            className="bg-[#EA580C] rounded-lg text-white hover:bg-[#c2410c] transition-colors shadow-sm h-9 w-12 flex items-center justify-center"
+                            className="!p-0 h-9 w-12"
                             title="Apagar"
                         >
                           <Trash2 size={20} strokeWidth={3} />
-                        </button>
+                        </Button>
                      </div>
                   </div>
                 ))
@@ -207,18 +212,16 @@ export default function StudentDetailModal({
 
           {activeTab === 'contact' && (
             <form onSubmit={handleSaveContact} className="space-y-6 pt-2">
-               <div>
-                 <label className="text-xs font-bold text-[#4D7C0F] uppercase ml-1 mb-1 block">Nome Completo</label>
-                 <input 
-                   type="text" 
-                   value={name}
-                   onChange={e => setName(e.target.value)}
-                   className="w-full border-2 border-[#4D7C0F] rounded-xl px-4 py-3 font-bold text-gray-800 outline-none focus:ring-4 focus:ring-[#4D7C0F]/20"
-                 />
-               </div>
+               
+               <Input 
+                  label="Nome Completo"
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  className="border-[#4D7C0F]"
+               />
 
                <div>
-                 <label className="text-xs font-bold text-[#4D7C0F] uppercase ml-1 mb-1 block">WhatsApp</label>
+                 <label className="text-sm font-bold text-[#4D7C0F] mb-2 block">WhatsApp</label>
                  <div className="relative">
                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                    <input 
@@ -226,13 +229,13 @@ export default function StudentDetailModal({
                      value={whatsapp}
                      onChange={e => setWhatsapp(e.target.value)}
                      placeholder="+55 (99) 9 9999-9999"
-                     className="w-full border-2 border-[#4D7C0F] rounded-xl pl-12 pr-4 py-3 font-bold text-gray-800 outline-none focus:ring-4 focus:ring-[#4D7C0F]/20"
+                     className="input-field pl-12 border-[#4D7C0F]"
                    />
                  </div>
                </div>
 
                <div>
-                 <label className="text-xs font-bold text-[#4D7C0F] uppercase ml-1 mb-1 block">E-mail</label>
+                 <label className="text-sm font-bold text-[#4D7C0F] mb-2 block">E-mail</label>
                  <div className="relative">
                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                    <input 
@@ -240,13 +243,13 @@ export default function StudentDetailModal({
                      value={email}
                      onChange={e => setEmail(e.target.value)}
                      placeholder="email@exemplo.com"
-                     className="w-full border-2 border-[#4D7C0F] rounded-xl pl-12 pr-4 py-3 font-bold text-gray-800 outline-none focus:ring-4 focus:ring-[#4D7C0F]/20"
+                     className="input-field pl-12 border-[#4D7C0F]"
                    />
                  </div>
                </div>
 
                <div>
-                 <label className="text-xs font-bold text-[#4D7C0F] uppercase ml-1 mb-1 block">Aniversário</label>
+                 <label className="text-sm font-bold text-[#4D7C0F] mb-2 block">Aniversário</label>
                  <div className="relative">
                    <Cake className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                    <input 
@@ -254,35 +257,36 @@ export default function StudentDetailModal({
                      value={birthday}
                      onChange={e => setBirthday(e.target.value)}
                      placeholder="Ex: 14 fevereiro 2019"
-                     className="w-full border-2 border-[#4D7C0F] rounded-xl pl-12 pr-4 py-3 font-bold text-gray-800 outline-none focus:ring-4 focus:ring-[#4D7C0F]/20"
+                     className="input-field pl-12 border-[#4D7C0F]"
                    />
                  </div>
                </div>
                
                <div className="flex gap-3 pt-6">
                  {onDelete && (
-                   <button 
+                   <Button 
                      type="button"
+                     variant="accent"
                      onClick={() => {
                         if(confirm('Tem certeza que deseja excluir este aluno?')) onDelete();
                      }}
-                     className="bg-[#EA580C] text-white p-4 rounded-xl hover:bg-[#c2410c] transition-colors"
+                     className="p-4 rounded-xl"
                    >
                      <Trash2 size={24} />
-                   </button>
+                   </Button>
                  )}
-                 <button 
+                 <Button 
                    type="submit"
-                   className="flex-1 bg-[#4D7C0F] text-white font-bold text-lg p-4 rounded-xl hover:bg-[#365314] transition-colors flex items-center justify-center gap-2 shadow-lg"
+                   variant="primary"
+                   className="flex-1 font-bold text-lg p-4 h-auto"
                  >
                    <Save size={24} /> Salvar Alterações
-                 </button>
+                 </Button>
                </div>
             </form>
           )}
 
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }
