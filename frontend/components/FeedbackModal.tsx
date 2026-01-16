@@ -30,14 +30,15 @@ export default function FeedbackModal({ isOpen, onClose, onSelectFeedback, stude
 
   const currentBehaviors = activeTab === 'positive' ? positiveBehaviors : negativeBehaviors;
   const themeColor = activeTab === 'positive' ? 'green' : 'orange'; 
-  const currentBorderColor = activeTab === 'positive' ? 'border-green-500' : 'border-[#EA580C]';
+  const currentBorderColor = activeTab === 'positive' ? 'border-[#4D7C0F]' : 'border-[#EA580C]';
+  const currentHeaderColor = activeTab === 'positive' ? 'bg-[#4D7C0F] border-[#365314]' : 'bg-[#EA580C] border-[#9A3412]';
   
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className={`bg-white rounded-2xl shadow-2xl w-full max-w-lg border-4 ${currentBorderColor} overflow-hidden animate-in fade-in zoom-in duration-200`}>
+      <div className={`bg-white rounded-2xl shadow-2xl w-full max-w-lg border-4 ${currentBorderColor} overflow-hidden animate-in fade-in zoom-in duration-200 transition-colors`}>
         
         {/* Header - Unified "Feedback" Title */}
-        <div className={`bg-green-500 p-4 flex justify-between items-center border-b-2 border-green-600 relative`}>
+        <div className={`${currentHeaderColor} p-4 flex justify-between items-center border-b-2 relative transition-colors`}>
            <div className="w-full text-center">
              <h3 className="text-xl font-black text-white uppercase tracking-wider">FEEDBACK</h3>
            </div>
@@ -55,7 +56,7 @@ export default function FeedbackModal({ isOpen, onClose, onSelectFeedback, stude
             onClick={() => setActiveTab('positive')}
             className={`flex-1 btn rounded-xl transition-all uppercase ${
               activeTab === 'positive' 
-                ? 'bg-[#0284C7] text-white border-[#0369A1] shadow-sm' 
+                ? 'bg-[#4D7C0F] text-white border-[#365314] shadow-sm' 
                 : 'bg-gray-100 border-gray-300 text-gray-500 hover:bg-gray-200'
             }`}
           >
@@ -82,7 +83,7 @@ export default function FeedbackModal({ isOpen, onClose, onSelectFeedback, stude
                 onClick={() => onSelectFeedback(behavior.label, activeTab)}
                 className={`flex flex-col items-center justify-center bg-white border-2 border-b-4 rounded-xl p-4 transition-all group active:border-b-2 active:translate-y-1 ${activeTab === 'positive' ? 'border-gray-200 hover:border-green-500 hover:bg-green-50' : 'border-gray-200 hover:border-orange-500 hover:bg-orange-50'}`}
               >
-                <div className={`${activeTab === 'positive' ? 'bg-blue-50' : 'bg-orange-50'} w-16 h-16 rounded-full flex items-center justify-center text-3xl mb-3 group-hover:scale-110 transition-transform`}>
+                <div className={`${activeTab === 'positive' ? 'bg-green-50' : 'bg-orange-50'} w-16 h-16 rounded-full flex items-center justify-center text-3xl mb-3 group-hover:scale-110 transition-transform`}>
                   {behavior.icon}
                 </div>
                 <span className="font-bold text-primary text-sm text-center line-clamp-2">{behavior.label}</span>

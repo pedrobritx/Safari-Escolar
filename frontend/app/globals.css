@@ -121,9 +121,9 @@ body {
     @apply bg-yellow-500 text-white border-yellow-700 hover:bg-yellow-600;
   }
 
-  /* Azul (Positivo/Feedback) */
+  /* Teal (Positivo/Feedback) */
   .btn-info {
-    @apply bg-[var(--safari-blue)] text-white border-[#0369A1] hover:brightness-110;
+    @apply bg-[#0D9488] text-white border-[#0F766E] hover:brightness-110;
   }
 
   /* Fantasma/Secundário (Cinza/Branco) */
