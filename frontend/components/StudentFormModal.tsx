@@ -59,9 +59,9 @@ export default function StudentFormModal({
           </h2>
           <button 
             onClick={onClose}
-            className="p-1 rounded-full hover:bg-white/50 text-primary transition-colors"
+            className="bg-white text-red-500 p-1.5 rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
           >
-            <X size={24} />
+            <X size={24} strokeWidth={2.5} />
           </button>
         </div>
 

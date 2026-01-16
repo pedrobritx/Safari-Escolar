@@ -37,15 +37,15 @@ export default function BehaviorModal({ isOpen, onClose, onSelectBehavior, stude
       <div className={`bg-white rounded-2xl shadow-2xl w-full max-w-lg border-4 ${currentBorderColor} overflow-hidden animate-in fade-in zoom-in duration-200`}>
         
         {/* Header - Unified "Feedback" Title */}
-        <div className={`bg-green-500 p-4 flex justify-between items-center border-b-2 border-green-600`}>
+        <div className={`bg-green-500 p-4 flex justify-between items-center border-b-2 border-green-600 relative`}>
            <div className="w-full text-center">
              <h3 className="text-xl font-black text-white uppercase tracking-wider">FEEDBACK</h3>
            </div>
            <button 
              onClick={onClose}
-             className="bg-white/20 hover:bg-white/40 text-white p-2 rounded-full transition-colors absolute right-4"
+             className="bg-white text-red-500 p-1.5 rounded-lg hover:bg-gray-50 transition-colors shadow-sm absolute right-4"
            >
-             <X size={24} />
+             <X size={24} strokeWidth={2.5} />
            </button>
         </div>
 
