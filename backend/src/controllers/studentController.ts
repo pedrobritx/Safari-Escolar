@@ -99,11 +99,8 @@ export const deleteStudent = async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
 
     // Use transaction to delete all related data manually to ensure no foreign key constraint errors
-    await prisma.$transaction([
-      prisma.attendance.deleteMany({ where: { studentId: id as string } }),
-      prisma.behaviorEvent.deleteMany({ where: { studentId: id as string } }),
-      prisma.student.delete({ where: { id: id as string } })
-    ]);
+    // Cascade delete handling by database
+    await prisma.student.delete({ where: { id: id as string } });
 
     res.status(204).send();
   } catch (error) {

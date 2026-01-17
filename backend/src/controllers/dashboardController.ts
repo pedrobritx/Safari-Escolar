@@ -44,7 +44,7 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
                 }
               },
             },
-            behaviorEvents: {
+            feedbackEvents: {
               where: {
                 date: {
                   gte: targetDateStart,
@@ -71,7 +71,7 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
         student.attendances.some((att) => att.status === 'LATE')
       ).length;
 
-      const todayBehaviorEvents = cls.students.flatMap((student) => student.behaviorEvents);
+      const todayFeedbackEvents = cls.students.flatMap((student) => student.feedbackEvents);
 
       return {
         classId: cls.id,
@@ -80,8 +80,8 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
         todayAttendance,
         todayLate,
         attendanceRate: totalStudents > 0 ? (todayAttendance / totalStudents) * 100 : 0,
-        todayPositiveEvents: todayBehaviorEvents.filter((e) => e.type === 'positive').length,
-        todayNegativeEvents: todayBehaviorEvents.filter((e) => e.type === 'negative').length,
+        todayPositiveEvents: todayFeedbackEvents.filter((e) => e.type === 'positive').length,
+        todayNegativeEvents: todayFeedbackEvents.filter((e) => e.type === 'negative').length,
       };
     });
 
@@ -140,7 +140,7 @@ export const resetDay = async (req: AuthRequest, res: Response) => {
     });
 
     // Delete behavior/feedback
-    const deleteFeedback = await prisma.behaviorEvent.deleteMany({
+    const deleteFeedback = await prisma.feedbackEvent.deleteMany({
         where: {
              date: {
                 gte: targetDateStart,

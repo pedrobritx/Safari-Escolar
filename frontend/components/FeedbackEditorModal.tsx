@@ -9,9 +9,9 @@ interface FeedbackEditorModalProps {
   isOpen: boolean;
   onClose: () => void;
   onBack: () => void;
-  positiveBehaviors: FeedbackItem[];
-  negativeBehaviors: FeedbackItem[];
-  onUpdateBehaviors: (type: 'positive' | 'negative', behaviors: FeedbackItem[]) => void;
+  positiveFeedbacks: FeedbackItem[];
+  negativeFeedbacks: FeedbackItem[];
+  onUpdateFeedbacks: (type: 'positive' | 'negative', feedbacks: FeedbackItem[]) => void;
 }
 
 const EMOJI_LIST = [
@@ -24,9 +24,9 @@ export default function FeedbackEditorModal({
   isOpen, 
   onClose,
   onBack,
-  positiveBehaviors, 
-  negativeBehaviors,
-  onUpdateBehaviors 
+  positiveFeedbacks, 
+  negativeFeedbacks,
+  onUpdateFeedbacks 
 }: FeedbackEditorModalProps) {
   const [activeTab, setActiveTab] = useState<'positive' | 'negative'>('positive');
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -37,7 +37,7 @@ export default function FeedbackEditorModal({
   const [isCreating, setIsCreating] = useState(false);
 
   // Helper to safely manipulate behaviors
-  const currentList = activeTab === 'positive' ? positiveBehaviors : negativeBehaviors;
+  const currentList = activeTab === 'positive' ? positiveFeedbacks : negativeFeedbacks;
 
   const handleStartEdit = (item: FeedbackItem) => {
     setEditingId(item.id);
@@ -76,7 +76,7 @@ export default function FeedbackEditorModal({
       updatedList = currentList.map(item => item.id === editingId ? newItem : item);
     }
 
-    onUpdateBehaviors(activeTab, updatedList);
+    onUpdateFeedbacks(activeTab, updatedList);
     setEditingId(null);
     setIsCreating(false);
   };
@@ -88,7 +88,7 @@ export default function FeedbackEditorModal({
 
   const handleConfirmDelete = (id: string) => {
     const updatedList = currentList.filter(item => item.id !== id);
-    onUpdateBehaviors(activeTab, updatedList);
+    onUpdateFeedbacks(activeTab, updatedList);
     setDeletingId(null);
   };
 

@@ -27,20 +27,13 @@ export interface Student {
   attendances?: Attendance[];
   todayStatus?: 'PRESENT' | 'ABSENT' | 'LATE' | null;
   todayScore?: number;
-  behaviorEvents?: FeedbackEvent[];
+  feedbackEvents?: FeedbackEvent[];
 }
 
 export interface Attendance {
   id?: string;
   date: string;
   status: 'PRESENT' | 'ABSENT' | 'LATE';
-}
-
-export interface BehaviorEvent {
-  id: string;
-  type: 'positive' | 'negative';
-  description: string;
-  date: string;
 }
 
 export interface FeedbackEvent {

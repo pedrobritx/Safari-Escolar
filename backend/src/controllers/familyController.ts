@@ -27,7 +27,7 @@ export const getFamilyView = async (req: AuthRequest, res: Response) => {
               orderBy: { date: 'desc' },
               take: 30,
             },
-            behaviorEvents: {
+            feedbackEvents: {
               orderBy: { date: 'desc' },
               take: 20,
             },
@@ -47,8 +47,8 @@ export const getFamilyView = async (req: AuthRequest, res: Response) => {
         ? (presentCount / recentAttendances.length) * 100 
         : 0;
 
-      const positiveEvents = student.behaviorEvents.filter((e) => e.type === 'positive').length;
-      const negativeEvents = student.behaviorEvents.filter((e) => e.type === 'negative').length;
+      const positiveEvents = student.feedbackEvents.filter((e) => e.type === 'positive').length;
+      const negativeEvents = student.feedbackEvents.filter((e) => e.type === 'negative').length;
 
       return {
         id: student.id,
@@ -63,7 +63,7 @@ export const getFamilyView = async (req: AuthRequest, res: Response) => {
           date: att.date,
           status: att.status,
         })),
-        recentBehaviorEvents: student.behaviorEvents.map((event) => ({
+        recentBehaviorEvents: student.feedbackEvents.map((event) => ({
           id: event.id,
           type: event.type,
           description: event.description,

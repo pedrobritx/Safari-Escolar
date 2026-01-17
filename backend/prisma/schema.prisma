@@ -71,7 +71,7 @@ model Student {
   updatedAt     DateTime @updatedAt
 
   attendances      Attendance[]
-  behaviorEvents   BehaviorEvent[]
+  feedbackEvents   FeedbackEvent[]
 }
 
 model Family {
@@ -101,7 +101,7 @@ model Attendance {
   @@unique([studentId, date])
 }
 
-model BehaviorEvent {
+model FeedbackEvent {
   id          String   @id @default(uuid())
   studentId   String
   student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)

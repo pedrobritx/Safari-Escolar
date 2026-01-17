@@ -12,14 +12,14 @@ export interface FeedbackItem {
 interface FeedbackModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelectFeedback: (behavior: string, type: 'positive' | 'negative') => void;
+  onSelectFeedback: (feedback: string, type: 'positive' | 'negative') => void;
   onEditFeedback: () => void;
   studentName: string;
-  positiveBehaviors: FeedbackItem[];
-  negativeBehaviors: FeedbackItem[];
+  positiveFeedbacks: FeedbackItem[];
+  negativeFeedbacks: FeedbackItem[];
 }
 
-export default function FeedbackModal({ isOpen, onClose, onSelectFeedback, onEditFeedback, studentName, positiveBehaviors, negativeBehaviors }: FeedbackModalProps) {
+export default function FeedbackModal({ isOpen, onClose, onSelectFeedback, onEditFeedback, studentName, positiveFeedbacks, negativeFeedbacks }: FeedbackModalProps) {
   const [activeTab, setActiveTab] = useState<'positive' | 'negative'>('positive');
 
   useEffect(() => {
@@ -28,7 +28,7 @@ export default function FeedbackModal({ isOpen, onClose, onSelectFeedback, onEdi
     }
   }, [isOpen]);
 
-  const currentBehaviors = activeTab === 'positive' ? positiveBehaviors : negativeBehaviors;
+  const currentFeedbacks = activeTab === 'positive' ? positiveFeedbacks : negativeFeedbacks;
   
   // Dynamic styling based on state
   const currentBorderColor = activeTab === 'positive' ? 'border-[#4D7C0F]' : 'border-[#EA580C]';
@@ -101,18 +101,18 @@ export default function FeedbackModal({ isOpen, onClose, onSelectFeedback, onEdi
         {/* Content */}
         <div className="p-6 bg-[#FAF9F6] h-[60vh] overflow-y-auto custom-scrollbar">
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-            {currentBehaviors.map((behavior) => (
+            {currentFeedbacks.map((item) => (
               <button
-                key={behavior.id}
-                onClick={() => onSelectFeedback(behavior.label, activeTab)}
+                key={item.id}
+                onClick={() => onSelectFeedback(item.label, activeTab)}
                 className={`flex flex-col items-center justify-center bg-white border-2 border-b-4 rounded-xl p-4 transition-all group active:border-b-2 active:translate-y-1 ${activeTab === 'positive' ? 'border-gray-200 hover:border-green-500 hover:bg-green-50' : 'border-gray-200 hover:border-orange-500 hover:bg-orange-50'}`}
               >
                 <div className={`${activeTab === 'positive' ? 'bg-green-50' : 'bg-orange-50'} w-16 h-16 rounded-full flex items-center justify-center text-3xl mb-3 group-hover:scale-110 transition-transform`}>
-                  {behavior.icon}
+                  {item.icon}
                 </div>
-                <span className="font-bold text-primary text-sm text-center line-clamp-2">{behavior.label}</span>
+                <span className="font-bold text-primary text-sm text-center line-clamp-2">{item.label}</span>
                 <span className={`text-xs font-bold mt-1 ${activeTab === 'positive' ? 'text-[var(--safari-green)]' : 'text-[var(--safari-orange)]'}`}>
-                  {activeTab === 'positive' ? '+' : ''}{behavior.points}
+                  {activeTab === 'positive' ? '+' : ''}{item.points}
                 </span>
               </button>
             ))}

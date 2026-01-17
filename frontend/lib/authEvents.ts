@@ -15,7 +15,7 @@ class AuthEvents {
   }
 
   emitSessionExpired() {
-    console.log('[AuthEvents] Session expired event emitted');
+
     this.listeners.forEach(listener => listener());
   }
 }

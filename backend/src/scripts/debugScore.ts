@@ -14,7 +14,7 @@ async function debug() {
 
     const students = await prisma.student.findMany({
         include: {
-            behaviorEvents: {
+            feedbackEvents: {
                 where: {
                     date: {
                         gte: targetDateStart,
@@ -28,19 +28,19 @@ async function debug() {
     console.log(`Found ${students.length} students.`);
     
     students.forEach(s => {
-        const positives = s.behaviorEvents.filter((e) => e.type === 'positive').length;
-        const negatives = s.behaviorEvents.filter((e) => e.type === 'negative').length;
+        const positives = s.feedbackEvents.filter((e) => e.type === 'positive').length;
+        const negatives = s.feedbackEvents.filter((e) => e.type === 'negative').length;
         const score = positives - negatives;
-        if (s.behaviorEvents.length > 0) {
-            console.log(`Student: ${s.name} | Events: ${s.behaviorEvents.length} | Score: ${score}`);
-            s.behaviorEvents.forEach(e => {
+        if (s.feedbackEvents.length > 0) {
+            console.log(`Student: ${s.name} | Events: ${s.feedbackEvents.length} | Score: ${score}`);
+            s.feedbackEvents.forEach(e => {
                 console.log(`  - Event: ${e.description} (${e.type}) Date: ${e.date}`);
             });
         }
     });
     
     // Also check raw events for verify
-    const allEvents = await prisma.behaviorEvent.findMany({ take: 5, orderBy: { date: 'desc' } });
+    const allEvents = await prisma.feedbackEvent.findMany({ take: 5, orderBy: { date: 'desc' } });
     console.log('--- LATEST 5 RAW EVENTS ---');
     allEvents.forEach(e => console.log(`  ${e.description} (${e.type}) - ${e.date}`));
 

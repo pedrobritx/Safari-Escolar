@@ -1,20 +1,22 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
-import { DashboardData, User, Class, Student } from '@/lib/types';
+import { User, Student } from '@/lib/types';
 import FeedbackModal, { FeedbackItem } from '@/components/FeedbackModal';
 import FeedbackEditorModal from '@/components/FeedbackEditorModal';
 import StudentDetailModal from '@/components/StudentDetailModal';
 import StudentFormModal from '@/components/StudentFormModal';
 import Calendar from '@/components/Calendar';
-import { LayoutGrid, List, Pencil, Plus, Trash } from 'lucide-react';
+import { LayoutGrid, List, Plus, Trash } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { toast } from 'sonner';
+import { useDashboard } from '@/hooks/useDashboard';
+import { StudentCard } from '@/components/StudentCard';
 
-const DEFAULT_POSITIVE_BEHAVIORS: FeedbackItem[] = [
+const DEFAULT_POSITIVE_FEEDBACKS: FeedbackItem[] = [
   { id: 'task_ok', label: 'Tarefa em Dia', icon: '📝', points: 1 },
   { id: 'participating', label: 'Participando', icon: '🙋', points: 1 },
   { id: 'helping', label: 'Ajudando os Outros', icon: '🤝', points: 1 },
@@ -22,7 +24,7 @@ const DEFAULT_POSITIVE_BEHAVIORS: FeedbackItem[] = [
   { id: 'effort', label: 'Se Esforçando', icon: '💪', points: 1 },
 ];
 
-const DEFAULT_NEGATIVE_BEHAVIORS: FeedbackItem[] = [
+const DEFAULT_NEGATIVE_FEEDBACKS: FeedbackItem[] = [
   { id: 'no_collab', label: 'Não Colabora', icon: '🚫', points: -1 },
   { id: 'late_task', label: 'Tarefa Atrasada', icon: '⏰', points: -1 },
   { id: 'disrupting', label: 'Atrapalhando a Aula', icon: '🗣️', points: -1 },
@@ -31,47 +33,54 @@ const DEFAULT_NEGATIVE_BEHAVIORS: FeedbackItem[] = [
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
-  const [dashboardData, setDashboardData] = useState<DashboardData[]>([]);
-  const [classes, setClasses] = useState<Class[]>([]);
-  const [selectedClass, setSelectedClass] = useState<Class | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortOption, setSortOption] = useState<'firstNameAsc' | 'firstNameDesc' | 'lastNameAsc' | 'lastNameDesc'>('firstNameAsc');
-  const [loading, setLoading] = useState(true);
-  // unused editingStudentId removed
+
+  // Custom Hook
+  const { 
+    dashboardData, 
+    classes, 
+    selectedClass, 
+    setSelectedClass, 
+    loading, 
+    selectedDate, 
+    setSelectedDate,
+    refreshData,
+    setClasses, 
+    setDashboardData
+  } = useDashboard(user);
+
   
   // Estado do Modal de Comportamento
-  const [behaviorModalOpen, setBehaviorModalOpen] = useState(false);
-  const [currentBehaviorStudent, setCurrentBehaviorStudent] = useState<{id: string, name: string} | null>(null);
+  const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
+  const [currentFeedbackStudent, setCurrentFeedbackStudent] = useState<{id: string, name: string} | null>(null);
 
   // Estado do Editor de Feedback
   const [feedbackEditorOpen, setFeedbackEditorOpen] = useState(false);
-  const [positiveBehaviors, setPositiveBehaviors] = useState<FeedbackItem[]>(DEFAULT_POSITIVE_BEHAVIORS);
-  const [negativeBehaviors, setNegativeBehaviors] = useState<FeedbackItem[]>(DEFAULT_NEGATIVE_BEHAVIORS);
+  const [positiveFeedbacks, setPositiveFeedbacks] = useState<FeedbackItem[]>(DEFAULT_POSITIVE_FEEDBACKS);
+  const [negativeFeedbacks, setNegativeFeedbacks] = useState<FeedbackItem[]>(DEFAULT_NEGATIVE_FEEDBACKS);
 
   // Estado do Formulário de Aluno
   const [studentFormOpen, setStudentFormOpen] = useState(false);
   const [studentFormMode, setStudentFormMode] = useState<'create' | 'edit'>('create');
   const [editingStudentData, setEditingStudentData] = useState<Student | null>(null);
 
-  // Estado do Calendário
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-
   useEffect(() => {
     // Carregar comportamentos personalizados do armazenamento local se disponível
-    const savedPositive = localStorage.getItem('safari_positive_behaviors');
-    const savedNegative = localStorage.getItem('safari_negative_behaviors');
+    const savedPositive = localStorage.getItem('safari_positive_feedbacks');
+    const savedNegative = localStorage.getItem('safari_negative_feedbacks');
 
-    if (savedPositive) setPositiveBehaviors(JSON.parse(savedPositive));
-    if (savedNegative) setNegativeBehaviors(JSON.parse(savedNegative));
+    if (savedPositive) setPositiveFeedbacks(JSON.parse(savedPositive));
+    if (savedNegative) setNegativeFeedbacks(JSON.parse(savedNegative));
   }, []);
 
-  const handleUpdateBehaviors = (type: 'positive' | 'negative', updatedList: FeedbackItem[]) => {
+  const handleUpdateFeedbacks = (type: 'positive' | 'negative', updatedList: FeedbackItem[]) => {
     if (type === 'positive') {
-      setPositiveBehaviors(updatedList);
-      localStorage.setItem('safari_positive_behaviors', JSON.stringify(updatedList));
+      setPositiveFeedbacks(updatedList);
+      localStorage.setItem('safari_positive_feedbacks', JSON.stringify(updatedList));
     } else {
-      setNegativeBehaviors(updatedList);
-      localStorage.setItem('safari_negative_behaviors', JSON.stringify(updatedList));
+      setNegativeFeedbacks(updatedList);
+      localStorage.setItem('safari_negative_feedbacks', JSON.stringify(updatedList));
     }
   };
 
@@ -93,41 +102,6 @@ export default function DashboardPage() {
     setUser(parsedUser);
   }, [router]);
 
-  // Memoizing loadData via useCallback to avoid dependency warnings
-  const loadData = useCallback(async (token: string) => {
-    try {
-      const formattedDate = selectedDate.toISOString().split('T')[0];
-      const [dashboard, classesData] = await Promise.all([
-        api.getDashboard(token, formattedDate), 
-        api.getClasses(token, formattedDate),
-      ]);
-
-      setDashboardData(dashboard);
-      setClasses(classesData);
-      
-      // Update selectedClass based on previous state and new data
-      setSelectedClass(prev => {
-        if (prev) {
-          const updatedClass = classesData.find((c: Class) => c.id === prev.id);
-          return updatedClass || prev;
-        } else if (classesData.length > 0) {
-          return classesData[0];
-        }
-        return null;
-      });
-    } catch (error) {
-      console.error('Error loading data:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [selectedDate]); 
-
-  useEffect(() => {
-    if (user) {
-      const token = localStorage.getItem('token');
-      if (token) loadData(token);
-    }
-  }, [user, loadData]);
 
   const sortStudents = (students: Student[] | undefined) => {
     if (!students) return [];
@@ -203,12 +177,6 @@ export default function DashboardPage() {
     }
   };
 
-  // ... (keeping other handlers if needed)
-
-  // In the JSX, replacing the buttons:
-  /* ... */
-
-
   const handleCreateStudent = async (data: { name: string; animalAvatar?: string; avatarColor?: string }) => {
     const token = localStorage.getItem('token');
     if (!token || !selectedClass) return;
@@ -217,7 +185,7 @@ export default function DashboardPage() {
       await api.createStudent(token, { ...data, classId: selectedClass.id });
       toast.success('Aluno adicionado com sucesso!');
       setStudentFormOpen(false);
-      loadData(token);
+      refreshData();
     } catch (error) {
       console.error('Error creating student:', error);
       toast.error('Erro ao adicionar aluno. Tente novamente.');
@@ -233,19 +201,19 @@ export default function DashboardPage() {
       toast.success('Aluno removido com sucesso!');
       setStudentFormOpen(false);
       setEditingStudentData(null);
-      loadData(token);
+      refreshData();
     } catch (error) {
       console.error('Error deleting student:', error);
       toast.error('Erro ao remover aluno. Tente novamente.');
     }
   };
 
-  const openBehaviorModal = (studentId: string, studentName: string) => {
-    setCurrentBehaviorStudent({ id: studentId, name: studentName });
-    setBehaviorModalOpen(true);
+  const openFeedbackModal = (studentId: string, studentName: string) => {
+    setCurrentFeedbackStudent({ id: studentId, name: studentName });
+    setFeedbackModalOpen(true);
   };
 
-  const handleAddBehavior = async (studentId: string, type: 'positive' | 'negative', description?: string) => {
+  const handleAddFeedback = async (studentId: string, type: 'positive' | 'negative', description?: string) => {
     const token = localStorage.getItem('token');
     if (!token) return;
 
@@ -259,8 +227,8 @@ export default function DashboardPage() {
       const formattedDate = selectedDate.toISOString().split('T')[0];
       await api.addFeedbackEvent(token, studentId, type, finalDescription, formattedDate);
       toast.success('Feedback registrado!');
-      setBehaviorModalOpen(false); // Close modal if open
-      loadData(token);
+      setFeedbackModalOpen(false);
+      refreshData();
     } catch (error) {
       console.error('Error adding feedback:', error);
       toast.error('Erro ao registrar feedback. Tente novamente.');
@@ -277,7 +245,7 @@ export default function DashboardPage() {
         const formattedDate = selectedDate.toISOString().split('T')[0];
         await api.resetDay(token, formattedDate, selectedClass.id);
         toast.success('Dados do dia reiniciados com sucesso!');
-        loadData(token);
+        refreshData();
     } catch (error) {
         console.error('Error resetting day:', error);
         toast.error('Erro ao reiniciar o dia');
@@ -293,21 +261,11 @@ export default function DashboardPage() {
       toast.success('Aluno atualizado com sucesso!');
       setStudentFormOpen(false);
       setEditingStudentData(null);
-      await loadData(token);
+      refreshData();
     } catch (error) {
       console.error('Error updating student:', error);
       toast.error('Erro ao atualizar aluno. Tente novamente.');
     }
-  };
-
-  const getAvatarEmoji = (avatar: string) => {
-    // Mapear nomes legados para emojis
-    const map: Record<string, string> = {
-      'Leão': '🦁', 'Tigre': '🐯', 'Elefante': '🐘', 'Girafa': '🦒', 'Zebra': '🦓', 
-      'Macaco': '🐒', 'Urso': '🐻', 'Lobo': '🐺', 'Raposa': '🦊', 'Coelho': '🐰', 
-      'Panda': '🐼', 'Koala': '🐨'
-    };
-    return map[avatar] || avatar; 
   };
 
   if (loading) {
@@ -475,108 +433,18 @@ export default function DashboardPage() {
             
             <div className={viewMode === 'list' ? "divide-y-2 divide-[var(--color-border)]" : "p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"}>
               {sortStudents(selectedClass.students).map((student) => (
-                <div 
-                  key={student.id} 
-                  className={viewMode === 'list' 
-                    ? "px-6 py-4 hover:bg-white transition-colors"
-                    : `bg-white border-2 border-[var(--color-border)] rounded-xl p-4 flex flex-col items-center text-center hover:shadow-md transition-all relative group`
-                  }
-                >
-                  <div className={viewMode === 'list' ? "flex flex-col sm:flex-row items-center justify-between gap-4" : "w-full"}>
-                    <div className={viewMode === 'list' ? "flex items-center space-x-4" : "flex flex-col items-center gap-2 mb-4 relative"}>
-                      <div className="relative group/avatar">
-                        <div 
-                          className={`flex items-center justify-center border-2 border-[var(--color-border)] rounded-full shadow-sm cursor-pointer ${viewMode === 'list' ? 'w-12 h-12 text-2xl' : 'w-24 h-24 text-5xl mb-1'}`}
-                          style={{ backgroundColor: student.avatarColor || '#FFFFFF' }}
-                        >
-                          {getAvatarEmoji(student.animalAvatar)}
-                        </div>
-                        
-                        {/* Edit Overlay */}
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setEditingStudentData(student);
-                            setStudentFormMode('edit');
-                            setStudentFormOpen(true);
-                          }}
-                          className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover/avatar:opacity-100 transition-opacity"
-                        >
-                          <div className="bg-white text-primary text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-md">
-                            <Pencil size={12} /> Detalhar
-                          </div>
-                        </button>
-                        
-                        {/* Pontuação Badge */}
-                        {(student.todayScore || 0) !== 0 && (
-                          <div 
-                            className={`absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold border-2 border-white shadow-md z-50 ${
-                              (student.todayScore || 0) >= 0 ? 'bg-[#4D7C0F]' : 'bg-[#EA580C]'
-                            }`}
-                          >
-                            {student.todayScore}
-                          </div>
-                        )}
-                      </div>
-
-                      <span className={`font-bold text-primary ${viewMode === 'list' ? 'text-lg' : 'text-xl'}`}>{student.name}</span>
-                    </div>
-                    
-                    <div className={viewMode === 'list' ? "flex items-center gap-2" : "flex flex-col gap-2 w-full"}>
-                      <div className={viewMode === 'list' ? "w-[140px]" : "w-full"}>
-                        <div 
-                          onClick={(e) => e.stopPropagation()} 
-                          className="relative"
-                        >
-                          <select
-                            id={`attendance-${student.id}`}
-                            aria-label={`Presença de ${student.name}`}
-                            value={student.todayStatus || ''}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              if (val) handleMarkAttendance(student.id, val as 'PRESENT' | 'ABSENT' | 'LATE');
-                              else handleMarkAttendance(student.id, 'CLEARED');
-                            }}
-                            className={`w-full appearance-none font-bold rounded-lg border-2 cursor-pointer outline-none transition-colors text-sm text-center
-                              ${!student.todayStatus 
-                                ? 'bg-white border-[#E5E7EB] text-[#57534E] py-2' 
-                                : student.todayStatus === 'PRESENT' 
-                                  ? 'bg-[#ECFCCB] border-[#4D7C0F] text-[#3F6212] py-2' 
-                                  : student.todayStatus === 'LATE'
-                                    ? 'bg-[#FEF9C3] border-[#CA8A04] text-[#854D0E] py-2'
-                                    : 'bg-[#FFEDD5] border-[#EA580C] text-[#9A3412] py-2'
-                              }
-                            `}
-                          >
-                            <option value="" className="bg-white text-gray-500">Marcar Presença</option>
-                            <option value="PRESENT" className="bg-[#ECFCCB] text-[#3F6212]">✅ Presente</option>
-                            <option value="LATE" className="bg-[#FEF9C3] text-[#854D0E]">⏰ Atrasado</option>
-                            <option value="ABSENT" className="bg-[#FFEDD5] text-[#9A3412]">🚫 Ausente</option>
-                            <option value="CLEARED" className="bg-white text-gray-400">🗑️ Limpar</option>
-                          </select>
-                          {/* Chevron Icon for better UX since appearance-none removes it */}
-                          <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none opacity-50">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                              <path d="M6 9l6 6 6-6"/>
-                            </svg>
-                          </div>
-                        </div>
-                      </div>
-                      <div className={viewMode === 'list' ? "" : "w-full mt-1"}>
-                        <Button
-                          variant="info"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openBehaviorModal(student.id, student.name);
-                          }}
-                          className={`flex items-center justify-center gap-2 ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs w-full'}`}
-                        >
-                          Feedback
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <StudentCard 
+                    key={student.id}
+                    student={student}
+                    viewMode={viewMode}
+                    onEdit={(s) => {
+                        setEditingStudentData(s);
+                        setStudentFormMode('edit');
+                        setStudentFormOpen(true);
+                    }}
+                    onAttendanceChange={handleMarkAttendance}
+                    onOpenFeedback={openFeedbackModal}
+                />
               ))}
             </div>
           </Card>
@@ -584,20 +452,20 @@ export default function DashboardPage() {
       </main>
 
       <FeedbackModal 
-        isOpen={behaviorModalOpen}
-        onClose={() => setBehaviorModalOpen(false)}
+        isOpen={feedbackModalOpen}
+        onClose={() => setFeedbackModalOpen(false)}
         onSelectFeedback={(behavior, type) => {
-          if (currentBehaviorStudent) {
-            handleAddBehavior(currentBehaviorStudent.id, type, behavior);
+          if (currentFeedbackStudent) {
+            handleAddFeedback(currentFeedbackStudent.id, type, behavior);
           }
         }}
         onEditFeedback={() => {
-          setBehaviorModalOpen(false);
+          setFeedbackModalOpen(false);
           setFeedbackEditorOpen(true);
         }}
-        studentName={currentBehaviorStudent?.name || ''}
-        positiveBehaviors={positiveBehaviors}
-        negativeBehaviors={negativeBehaviors}
+        studentName={currentFeedbackStudent?.name || ''}
+        positiveFeedbacks={positiveFeedbacks}
+        negativeFeedbacks={negativeFeedbacks}
       />
 
       <FeedbackEditorModal
@@ -605,11 +473,11 @@ export default function DashboardPage() {
         onClose={() => setFeedbackEditorOpen(false)}
         onBack={() => {
           setFeedbackEditorOpen(false);
-          setBehaviorModalOpen(true);
+          setFeedbackModalOpen(true);
         }}
-        positiveBehaviors={positiveBehaviors}
-        negativeBehaviors={negativeBehaviors}
-        onUpdateBehaviors={handleUpdateBehaviors}
+        positiveFeedbacks={positiveFeedbacks}
+        negativeFeedbacks={negativeFeedbacks}
+        onUpdateFeedbacks={handleUpdateFeedbacks}
       />
 
       {studentFormMode === 'create' ? (

@@ -12,7 +12,7 @@ async function main() {
   console.log('Starting seed...');
 
   // Clear existing data
-  await prisma.behaviorEvent.deleteMany();
+  await prisma.feedbackEvent.deleteMany();
   await prisma.attendance.deleteMany();
   await prisma.student.deleteMany();
   await prisma.family.deleteMany();
@@ -182,7 +182,7 @@ async function main() {
   console.log('Created sample attendance');
 
   // 9. Create some sample behavior events
-  await prisma.behaviorEvent.create({
+  await prisma.feedbackEvent.create({
     data: {
       studentId: createdStudents[0].id,
       type: 'positive',
@@ -191,7 +191,7 @@ async function main() {
     },
   });
 
-  await prisma.behaviorEvent.create({
+  await prisma.feedbackEvent.create({
     data: {
       studentId: createdStudents[1].id,
       type: 'positive',
@@ -200,7 +200,7 @@ async function main() {
     },
   });
 
-  await prisma.behaviorEvent.create({
+  await prisma.feedbackEvent.create({
     data: {
       studentId: createdStudents[2].id,
       type: 'negative',

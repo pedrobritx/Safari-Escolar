@@ -54,7 +54,7 @@ export default function StudentDetailModal({
   const fetchFeedbacks = async (studentId: string) => {
     setLoadingFeedbacks(true);
     try {
-      const data = await api.get(`/feedback/${studentId}`);
+      const data = await api.get<FeedbackEvent[]>(`/feedback/${studentId}`);
       setFeedbacks(data);
     } catch {
       toast.error('Erro ao carregar histórico de feedback');
@@ -77,10 +77,10 @@ export default function StudentDetailModal({
   };
 
   const handleDeleteFeedback = async (feedbackId: string) => {
-    console.log('[Delete Feedback] Attempting to delete:', feedbackId);
+
     
     if (!confirm('Tem certeza que deseja apagar este feedback?')) {
-      console.log('[Delete Feedback] User cancelled confirmation');
+
       return;
     }
     
@@ -92,9 +92,9 @@ export default function StudentDetailModal({
     }
     
     try {
-      console.log('[Delete Feedback] Calling API...');
+
       await api.deleteFeedbackEvent(token, feedbackId);
-      console.log('[Delete Feedback] API call successful');
+
       setFeedbacks(prev => prev.filter(f => f.id !== feedbackId));
       toast.success('Feedback removido!');
     } catch (error) {
