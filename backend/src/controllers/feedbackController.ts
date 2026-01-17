@@ -6,12 +6,23 @@ export const createFeedbackEvent = async (req: AuthRequest, res: Response) => {
   try {
     const { studentId, type, description, date } = req.body;
 
-    if (!studentId || !type || !description) {
-      return res.status(400).json({ error: 'studentId, type, and description are required' });
+    // Enhanced validation
+    if (!studentId || typeof studentId !== 'string') {
+      return res.status(400).json({ success: false, error: 'studentId is required and must be a string' });
     }
 
-    if (type !== 'positive' && type !== 'negative') {
-      return res.status(400).json({ error: 'Type must be "positive" or "negative"' });
+    if (!type || (type !== 'positive' && type !== 'negative')) {
+      return res.status(400).json({ success: false, error: 'Type must be "positive" or "negative"' });
+    }
+
+    if (!description || typeof description !== 'string' || description.trim().length === 0) {
+      return res.status(400).json({ success: false, error: 'Description is required and must be non-empty' });
+    }
+
+    // Verify student exists before creating event
+    const student = await prisma.student.findUnique({ where: { id: studentId } });
+    if (!student) {
+      return res.status(404).json({ success: false, error: 'Student not found' });
     }
 
     let eventDate: Date | undefined;
@@ -28,7 +39,7 @@ export const createFeedbackEvent = async (req: AuthRequest, res: Response) => {
       data: {
         studentId,
         type,
-        description,
+        description: description.trim(),
         date: eventDate,
       },
       include: {
@@ -36,12 +47,19 @@ export const createFeedbackEvent = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    res.status(201).json(feedbackEvent);
+    console.log(`[Feedback] Created ${type} feedback for student ${studentId}: "${description}"`);
+
+    res.status(201).json({ 
+      success: true, 
+      data: feedbackEvent,
+      message: 'Feedback event created successfully'
+    });
   } catch (error) {
     console.error('Create feedback event error:', error);
-    res.status(500).json({ error: 'Failed to create feedback event' });
+    res.status(500).json({ success: false, error: 'Failed to create feedback event' });
   }
 };
+
 
 export const getFeedbackEvents = async (req: AuthRequest, res: Response) => {
   try {

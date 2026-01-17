@@ -77,16 +77,29 @@ export default function StudentDetailModal({
   };
 
   const handleDeleteFeedback = async (feedbackId: string) => {
-    if (!confirm('Tem certeza que deseja apagar este feedback?')) return;
+    console.log('[Delete Feedback] Attempting to delete:', feedbackId);
+    
+    if (!confirm('Tem certeza que deseja apagar este feedback?')) {
+      console.log('[Delete Feedback] User cancelled confirmation');
+      return;
+    }
+    
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('[Delete Feedback] No token found');
+      toast.error('Sessão expirada. Faça login novamente.');
+      return;
+    }
+    
     try {
-        const token = localStorage.getItem('token');
-        if (token) {
-            await api.deleteFeedbackEvent(token, feedbackId);
-            setFeedbacks(prev => prev.filter(f => f.id !== feedbackId));
-            toast.success('Feedback removido!');
-        }
-    } catch {
-        toast.error('Erro ao remover feedback');
+      console.log('[Delete Feedback] Calling API...');
+      await api.deleteFeedbackEvent(token, feedbackId);
+      console.log('[Delete Feedback] API call successful');
+      setFeedbacks(prev => prev.filter(f => f.id !== feedbackId));
+      toast.success('Feedback removido!');
+    } catch (error) {
+      console.error('[Delete Feedback] Error:', error);
+      toast.error('Erro ao remover feedback');
     }
   };
 
@@ -201,7 +214,11 @@ export default function StudentDetailModal({
                             </div>
                             <Button 
                                 variant="accent"
-                                onClick={() => handleDeleteFeedback(event.id)}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  e.preventDefault();
+                                  handleDeleteFeedback(event.id);
+                                }}
                                 className="!p-0 h-9 w-12"
                                 title="Apagar"
                             >
@@ -225,10 +242,11 @@ export default function StudentDetailModal({
                    />
 
                    <div>
-                     <label className="text-sm font-bold text-[#4D7C0F] mb-2 block">WhatsApp</label>
+                     <label htmlFor="student-whatsapp" className="text-sm font-bold text-[#4D7C0F] mb-2 block">WhatsApp</label>
                      <div className="relative">
                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                        <input 
+                         id="student-whatsapp"
                          type="text" 
                          value={whatsapp}
                          onChange={e => setWhatsapp(e.target.value)}
@@ -239,10 +257,11 @@ export default function StudentDetailModal({
                    </div>
 
                    <div>
-                     <label className="text-sm font-bold text-[#4D7C0F] mb-2 block">E-mail</label>
+                     <label htmlFor="student-email" className="text-sm font-bold text-[#4D7C0F] mb-2 block">E-mail</label>
                      <div className="relative">
                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                        <input 
+                         id="student-email"
                          type="email" 
                          value={email}
                          onChange={e => setEmail(e.target.value)}
@@ -253,10 +272,11 @@ export default function StudentDetailModal({
                    </div>
 
                    <div>
-                     <label className="text-sm font-bold text-[#4D7C0F] mb-2 block">Aniversário</label>
+                     <label htmlFor="student-birthday" className="text-sm font-bold text-[#4D7C0F] mb-2 block">Aniversário</label>
                      <div className="relative">
                        <Cake className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                        <input 
+                         id="student-birthday"
                          type="text" 
                          value={birthday}
                          onChange={e => setBirthday(e.target.value)}

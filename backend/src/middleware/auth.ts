@@ -11,14 +11,19 @@ export interface AuthRequest extends Request {
 
 export const authenticate = (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const token = req.headers.authorization?.replace('Bearer ', '');
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.replace('Bearer ', '');
+
+    console.log(`[Auth] Request to ${req.method} ${req.path} - Auth header present: ${!!authHeader}`);
 
     if (!token) {
+      console.log('[Auth] No token provided');
       return res.status(401).json({ error: 'No token provided' });
     }
 
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) {
+      console.error('[Auth] JWT_SECRET is not defined');
       throw new Error('JWT_SECRET is not defined');
     }
 
@@ -28,10 +33,13 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
       role: string;
     };
 
+    console.log(`[Auth] Token valid for user: ${decoded.email}`);
     req.user = decoded;
     next();
-  } catch {
-    return res.status(401).json({ error: 'Invalid token' });
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    console.log(`[Auth] Token validation failed: ${errorMsg}`);
+    return res.status(401).json({ error: 'Invalid token', details: errorMsg });
   }
 };
 

@@ -8,8 +8,24 @@ export const markAttendance = async (req: AuthRequest, res: Response) => {
 
     console.log(`[Attendance] Marking attendance for student ${studentId} with status ${status} on ${date || 'today'}`);
 
-    if (!studentId || !status) {
-      return res.status(400).json({ error: 'studentId and status are required' });
+    // Enhanced validation
+    if (!studentId || typeof studentId !== 'string') {
+      return res.status(400).json({ success: false, error: 'studentId is required and must be a string' });
+    }
+
+    if (!status) {
+      return res.status(400).json({ success: false, error: 'status is required' });
+    }
+
+    const validStatuses = ['PRESENT', 'ABSENT', 'LATE', 'CLEARED'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ success: false, error: 'Invalid status. Must be PRESENT, ABSENT, LATE, or CLEARED' });
+    }
+
+    // Verify student exists before marking attendance
+    const student = await prisma.student.findUnique({ where: { id: studentId } });
+    if (!student) {
+      return res.status(404).json({ success: false, error: 'Student not found' });
     }
 
     let attendanceDate = new Date();
@@ -36,7 +52,8 @@ export const markAttendance = async (req: AuthRequest, res: Response) => {
         // Ignore specific error if record not found, otherwise rethrow
         if (e.code !== 'P2025') throw e;
       });
-      return res.json({ message: 'Attendance cleared' });
+      console.log(`[Attendance] Cleared attendance for student ${studentId} on ${date || 'today'}`);
+      return res.json({ success: true, message: 'Attendance cleared' });
     }
 
     const attendance = await prisma.attendance.upsert({
@@ -56,12 +73,15 @@ export const markAttendance = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    res.json(attendance);
+    console.log(`[Attendance] Saved attendance for student ${studentId}: ${status}`);
+
+    res.json({ success: true, data: attendance });
   } catch (error) {
     console.error('Mark attendance error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ success: false, error: 'Internal server error' });
   }
 };
+
 
 export const getTodayAttendance = async (req: AuthRequest, res: Response) => {
   try {

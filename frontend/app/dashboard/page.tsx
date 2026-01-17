@@ -163,6 +163,10 @@ export default function DashboardPage() {
     const token = localStorage.getItem('token');
     if (!token) return;
 
+    // Save previous state for rollback
+    const previousClass = selectedClass;
+    const previousClasses = classes;
+
     // Direct assignment, no toggling
     const newStatus = status === 'CLEARED' ? null : status;
     const apiStatus = status;
@@ -184,13 +188,18 @@ export default function DashboardPage() {
       const formattedDate = selectedDate.toISOString().split('T')[0];
       await api.markAttendance(token, studentId, apiStatus, formattedDate);
       
+      // Show success feedback
+      toast.success('Presença marcada!');
+      
       // Fetch only dashboard data to update counts without reloading student list (avoiding race conditions)
       const dashboard = await api.getDashboard(token, formattedDate);
       setDashboardData(dashboard);
     } catch (error) {
       console.error('Error marking attendance:', error);
-      // Revert/Reload on error
-      loadData(token);
+      // Rollback to previous state
+      setSelectedClass(previousClass);
+      setClasses(previousClasses);
+      toast.error('Erro ao marcar presença. Tente novamente.');
     }
   };
 
@@ -206,10 +215,12 @@ export default function DashboardPage() {
 
     try {
       await api.createStudent(token, { ...data, classId: selectedClass.id });
+      toast.success('Aluno adicionado com sucesso!');
       setStudentFormOpen(false);
       loadData(token);
     } catch (error) {
       console.error('Error creating student:', error);
+      toast.error('Erro ao adicionar aluno. Tente novamente.');
     }
   };
 
@@ -219,11 +230,13 @@ export default function DashboardPage() {
 
     try {
       await api.deleteStudent(token, editingStudentData.id);
+      toast.success('Aluno removido com sucesso!');
       setStudentFormOpen(false);
       setEditingStudentData(null);
       loadData(token);
     } catch (error) {
       console.error('Error deleting student:', error);
+      toast.error('Erro ao remover aluno. Tente novamente.');
     }
   };
 
@@ -245,10 +258,12 @@ export default function DashboardPage() {
     try {
       const formattedDate = selectedDate.toISOString().split('T')[0];
       await api.addFeedbackEvent(token, studentId, type, finalDescription, formattedDate);
+      toast.success('Feedback registrado!');
       setBehaviorModalOpen(false); // Close modal if open
       loadData(token);
     } catch (error) {
       console.error('Error adding feedback:', error);
+      toast.error('Erro ao registrar feedback. Tente novamente.');
     }
   };
 
@@ -275,11 +290,13 @@ export default function DashboardPage() {
 
     try {
       await api.updateStudent(token, editingStudentData.id, data);
+      toast.success('Aluno atualizado com sucesso!');
       setStudentFormOpen(false);
       setEditingStudentData(null);
       await loadData(token);
     } catch (error) {
       console.error('Error updating student:', error);
+      toast.error('Erro ao atualizar aluno. Tente novamente.');
     }
   };
 
@@ -326,8 +343,10 @@ export default function DashboardPage() {
         {classes.length > 0 && (
           <div className="mb-6 flex gap-4 items-end">
             <div className="flex-1 max-w-md">
-              <label className="block text-sm font-bold text-primary mb-2 ml-1">MAPA (SELECIONE A TURMA):</label>
+              <label htmlFor="class-selector" className="block text-sm font-bold text-primary mb-2 ml-1">MAPA (SELECIONE A TURMA):</label>
               <select
+                id="class-selector"
+                name="class-selector"
                 value={selectedClass?.id || ''}
                 onChange={(e) => {
                   const cls = classes.find((c) => c.id === e.target.value);
@@ -422,9 +441,12 @@ export default function DashboardPage() {
               <h2 className="text-xl font-bold text-primary">{selectedClass.name} - Exploradores</h2>
               <div className="flex gap-2">
                 <select
+                  id="sort-selector"
+                  name="sort-selector"
                   value={sortOption}
                   onChange={(e) => setSortOption(e.target.value as 'firstNameAsc' | 'firstNameDesc' | 'lastNameAsc' | 'lastNameDesc')}
                   className="px-3 py-2 rounded-lg border-2 border-[var(--color-border)] bg-white text-sm font-bold text-primary outline-none focus:border-primary cursor-pointer mr-2"
+                  aria-label="Ordenar alunos"
                 >
                   <option value="firstNameAsc">Nome (A-Z)</option>
                   <option value="firstNameDesc">Nome (Z-A)</option>
@@ -506,6 +528,8 @@ export default function DashboardPage() {
                           className="relative"
                         >
                           <select
+                            id={`attendance-${student.id}`}
+                            aria-label={`Presença de ${student.name}`}
                             value={student.todayStatus || ''}
                             onChange={(e) => {
                               const val = e.target.value;
