@@ -9,6 +9,7 @@ import attendanceRoutes from './routes/attendanceRoutes';
 import feedbackRoutes from './routes/feedbackRoutes';
 import dashboardRoutes from './routes/dashboardRoutes';
 import familyRoutes from './routes/familyRoutes';
+import exportRoutes from './routes/exportRoutes';
 
 dotenv.config();
 
@@ -27,6 +28,7 @@ app.use('/api/attendance', attendanceRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/family', familyRoutes);
+app.use('/api/export', exportRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

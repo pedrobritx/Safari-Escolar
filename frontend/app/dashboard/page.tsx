@@ -9,7 +9,7 @@ import FeedbackEditorModal from '@/components/FeedbackEditorModal';
 import StudentDetailModal from '@/components/StudentDetailModal';
 import StudentFormModal from '@/components/StudentFormModal';
 import Calendar from '@/components/Calendar';
-import { LayoutGrid, List, Plus, Trash } from 'lucide-react';
+import { LayoutGrid, List, Plus, Trash, Download } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { toast } from 'sonner';
@@ -321,6 +321,49 @@ export default function DashboardPage() {
             </div>
 
             <div className="flex gap-2">
+              <div className="relative group">
+                <Button
+                  variant="ghost"
+                  className="mb-[2px] px-4 py-3 text-primary hover:bg-primary/10"
+                  title="Exportar CSV"
+                >
+                  <Download size={20} />
+                </Button>
+                <div className="absolute right-0 top-full mt-1 bg-white border-2 border-primary rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 min-w-[180px]">
+                  <button
+                    onClick={async () => {
+                      const token = localStorage.getItem('token');
+                      if (token) {
+                        try {
+                          await api.exportStudents(token);
+                          toast.success('Alunos exportados!');
+                        } catch {
+                          toast.error('Erro ao exportar');
+                        }
+                      }
+                    }}
+                    className="w-full px-4 py-2 text-left hover:bg-gray-100 text-sm"
+                  >
+                    📋 Exportar Alunos
+                  </button>
+                  <button
+                    onClick={async () => {
+                      const token = localStorage.getItem('token');
+                      if (token) {
+                        try {
+                          await api.exportHistory(token);
+                          toast.success('Histórico exportado!');
+                        } catch {
+                          toast.error('Erro ao exportar');
+                        }
+                      }
+                    }}
+                    className="w-full px-4 py-2 text-left hover:bg-gray-100 text-sm border-t"
+                  >
+                    📅 Exportar Histórico
+                  </button>
+                </div>
+              </div>
               <Button
                 variant="ghost"
                 onClick={handleResetDay}
