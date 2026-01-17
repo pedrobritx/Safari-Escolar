@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/auth';
 import prisma from '../utils/prisma';
+import { parseDateString } from '../utils/dateUtils';
 
 export const createFeedbackEvent = async (req: AuthRequest, res: Response) => {
   try {
@@ -25,15 +26,7 @@ export const createFeedbackEvent = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ success: false, error: 'Student not found' });
     }
 
-    let eventDate: Date | undefined;
-    if (date) {
-        // Parse YYYY-MM-DD manually to prevent UTC shift
-        const parts = date.split('-');
-        const year = parseInt(parts[0]);
-        const month = parseInt(parts[1]) - 1;
-        const day = parseInt(parts[2]);
-        eventDate = new Date(year, month, day, 0, 0, 0, 0);
-    }
+    const eventDate = date ? parseDateString(date) : undefined;
 
     const feedbackEvent = await prisma.feedbackEvent.create({
       data: {
@@ -46,8 +39,6 @@ export const createFeedbackEvent = async (req: AuthRequest, res: Response) => {
         student: true,
       },
     });
-
-    console.log(`[Feedback] Created ${type} feedback for student ${studentId}: "${description}"`);
 
     res.status(201).json({ 
       success: true, 
@@ -83,7 +74,6 @@ export const getFeedbackEvents = async (req: AuthRequest, res: Response) => {
 export const deleteFeedbackEvent = async (req: AuthRequest, res: Response) => {
   try {
     const id = req.params.id as string;
-    console.log(`Attempting to delete feedback event with ID: ${id}`);
 
     await prisma.feedbackEvent.delete({
       where: { id },

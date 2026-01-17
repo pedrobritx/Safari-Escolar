@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/auth';
 import prisma from '../utils/prisma';
+import { getDayRange } from '../utils/dateUtils';
 
 export const getDashboard = async (req: AuthRequest, res: Response) => {
   try {
@@ -13,23 +14,8 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
 
 
 
-    // Use a data da query ou o padrão para hoje
     const { date } = req.query;
-    let targetDateStart: Date;
-    let targetDateEnd: Date;
-
-    if (date) {
-         const parts = (date as string).split('-');
-         const year = parseInt(parts[0]);
-         const month = parseInt(parts[1]) - 1;
-         const day = parseInt(parts[2]);
-         targetDateStart = new Date(year, month, day, 0, 0, 0, 0);
-         targetDateEnd = new Date(year, month, day, 23, 59, 59, 999);
-    } else {
-         const now = new Date();
-         targetDateStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
-         targetDateEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
-    }
+    const { start: targetDateStart, end: targetDateEnd } = getDayRange(date as string | undefined);
 
     const classes = await prisma.class.findMany({
       where: { teacherId: userId },
@@ -101,13 +87,7 @@ export const resetDay = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: 'Date requirement' });
     }
 
-    const parts = (date as string).split('-');
-    const year = parseInt(parts[0]);
-    const month = parseInt(parts[1]) - 1;
-    const day = parseInt(parts[2]);
-    
-    const targetDateStart = new Date(year, month, day, 0, 0, 0, 0);
-    const targetDateEnd = new Date(year, month, day, 23, 59, 59, 999);
+    const { start: targetDateStart, end: targetDateEnd } = getDayRange(date as string);
 
     // Find classes for this teacher (or strict to specific classId if provided)
     const whereClass: any = { teacherId: userId };
@@ -151,8 +131,6 @@ export const resetDay = async (req: AuthRequest, res: Response) => {
             }
         }
     });
-
-    console.log(`Reset day ${date} for ${userId}: Deleted ${deleteAttendance.count} attendances and ${deleteFeedback.count} feedbacks.`);
 
     res.json({ 
         message: 'Day reset successfully', 

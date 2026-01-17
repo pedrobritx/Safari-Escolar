@@ -63,7 +63,7 @@ export const getFamilyView = async (req: AuthRequest, res: Response) => {
           date: att.date,
           status: att.status,
         })),
-        recentBehaviorEvents: student.feedbackEvents.map((event) => ({
+        recentFeedbackEvents: student.feedbackEvents.map((event) => ({
           id: event.id,
           type: event.type,
           description: event.description,

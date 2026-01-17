@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/auth';
 import prisma from '../utils/prisma';
+import { getDayRange } from '../utils/dateUtils';
 
 export const createClass = async (req: AuthRequest, res: Response) => {
   try {
@@ -38,25 +39,7 @@ export const getClasses = async (req: AuthRequest, res: Response) => {
     const userId = req.user!.id;
     const dateQuery = req.query.date as string;
 
-    // Date handling simplification to match attendanceController
-    // We expect dateQuery to be YYYY-MM-DD
-    let targetDateStart: Date;
-    let targetDateEnd: Date;
-
-    if (dateQuery) {
-      // Create date from string (treated as UTC or local depending on parsing, but let's force local 00:00)
-      const parts = dateQuery.split('-');
-      const year = parseInt(parts[0]);
-      const month = parseInt(parts[1]) - 1;
-      const day = parseInt(parts[2]);
-      
-      targetDateStart = new Date(year, month, day, 0, 0, 0, 0);
-      targetDateEnd = new Date(year, month, day, 23, 59, 59, 999);
-    } else {
-      const now = new Date();
-      targetDateStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
-      targetDateEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
-    }
+    const { start: targetDateStart, end: targetDateEnd } = getDayRange(dateQuery);
 
     let classes;
 

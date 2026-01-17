@@ -29,32 +29,7 @@ export default function FeedbackModal({ isOpen, onClose, onSelectFeedback, onEdi
   }, [isOpen]);
 
   const currentFeedbacks = activeTab === 'positive' ? positiveFeedbacks : negativeFeedbacks;
-  
-  // Dynamic styling based on state
   const currentBorderColor = activeTab === 'positive' ? 'border-[#4D7C0F]' : 'border-[#EA580C]';
-  
-  // We need to override the header text color to white because the background is dark green/orange
-  // standard Modal uses text-primary which is dark green. 
-  // We can't easily override internal Modal title color via props without adding more complexity.
-  // BUT, we can use the `headerColorClass` to set the background. 
-  // For the text color, since we want standardization, maybe we should stick to the standard header?
-  // However, the "Positive/Negative" reinforcement is strong with color.
-  // Let's keep the colored header but maybe accept that the title text logic in Modal might need a tweak if we want it white.
-  // Inspecting Modal.tsx: <h2 className="text-xl font-bold text-primary">
-  // It forces text-primary. 
-  // If I pass a dark background, text-primary (dark green) might be hard to read on dark green?
-  // Wait, text-primary is #4D7C0F. On #4D7C0F background it is invisible.
-  
-  // DECISION: To properly support this "Validated" Feedback view, I should update Modal.tsx to allow `titleTextColor` or similar, 
-  // OR just use the standard neutral header for consistency and use the TABS to show the color.
-  // Standardization > Customization.
-  // I will use a standard header. The tabs below will clearly indicate positive/negative.
-  
-  // Actually, let's try to match the original "pop" but with standard components.
-  // If I use standard header, I lose the simplified game-like feel.
-  // Let's use the `headerColorClass` and expect to fix `Modal.tsx` to allow overriding text color if needed, 
-  // OR, effectively, for this iteration, I will stick to the standard modal style to prove the point of "Standardization".
-  // A standard gray/khaki header is better for consistency across the app.
   
   return (
     <Modal

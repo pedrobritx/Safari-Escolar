@@ -14,10 +14,7 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
     const authHeader = req.headers.authorization;
     const token = authHeader?.replace('Bearer ', '');
 
-    console.log(`[Auth] Request to ${req.method} ${req.path} - Auth header present: ${!!authHeader}`);
-
     if (!token) {
-      console.log('[Auth] No token provided');
       return res.status(401).json({ error: 'No token provided' });
     }
 
@@ -33,12 +30,10 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
       role: string;
     };
 
-    console.log(`[Auth] Token valid for user: ${decoded.email}`);
     req.user = decoded;
     next();
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-    console.log(`[Auth] Token validation failed: ${errorMsg}`);
     return res.status(401).json({ error: 'Invalid token', details: errorMsg });
   }
 };

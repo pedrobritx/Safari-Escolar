@@ -1,12 +1,11 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/auth';
 import prisma from '../utils/prisma';
+import { parseDateString } from '../utils/dateUtils';
 
 export const markAttendance = async (req: AuthRequest, res: Response) => {
   try {
     const { studentId, status, date } = req.body;
-
-    console.log(`[Attendance] Marking attendance for student ${studentId} with status ${status} on ${date || 'today'}`);
 
     // Enhanced validation
     if (!studentId || typeof studentId !== 'string') {
@@ -28,17 +27,8 @@ export const markAttendance = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ success: false, error: 'Student not found' });
     }
 
-    let attendanceDate = new Date();
-    if (date) {
-        // Parse YYYY-MM-DD manually to prevent UTC shift
-        const parts = date.split('-');
-        const year = parseInt(parts[0]);
-        const month = parseInt(parts[1]) - 1;
-        const day = parseInt(parts[2]);
-        attendanceDate = new Date(year, month, day, 0, 0, 0, 0);
-    } else {
-        attendanceDate.setHours(0, 0, 0, 0);
-    }
+    let attendanceDate = date ? parseDateString(date) : new Date();
+    if (!date) attendanceDate.setHours(0, 0, 0, 0);
 
     if (status === 'CLEARED') {
       await prisma.attendance.delete({
@@ -52,7 +42,6 @@ export const markAttendance = async (req: AuthRequest, res: Response) => {
         // Ignore specific error if record not found, otherwise rethrow
         if (e.code !== 'P2025') throw e;
       });
-      console.log(`[Attendance] Cleared attendance for student ${studentId} on ${date || 'today'}`);
       return res.json({ success: true, message: 'Attendance cleared' });
     }
 
@@ -72,8 +61,6 @@ export const markAttendance = async (req: AuthRequest, res: Response) => {
         date: attendanceDate,
       },
     });
-
-    console.log(`[Attendance] Saved attendance for student ${studentId}: ${status}`);
 
     res.json({ success: true, data: attendance });
   } catch (error) {
