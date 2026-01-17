@@ -38,22 +38,24 @@ export const getClasses = async (req: AuthRequest, res: Response) => {
     const userId = req.user!.id;
     const dateQuery = req.query.date as string;
 
-    // Use provided date or default to start of today in UTC to match how we store/search
-    // For simplicity, we'll assume the date passed is YYYY-MM-DD or use simple JS date matching
-    // Ideally use a library like date-fns, but native JS works for simple cases
+    // Date handling simplification to match attendanceController
+    // We expect dateQuery to be YYYY-MM-DD
     let targetDateStart: Date;
     let targetDateEnd: Date;
 
     if (dateQuery) {
-      const d = new Date(dateQuery);
-      // Construct UTC date range for the query date
-      targetDateStart = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 0, 0, 0));
-      targetDateEnd = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 23, 59, 59, 999));
+      // Create date from string (treated as UTC or local depending on parsing, but let's force local 00:00)
+      const parts = dateQuery.split('-');
+      const year = parseInt(parts[0]);
+      const month = parseInt(parts[1]) - 1;
+      const day = parseInt(parts[2]);
+      
+      targetDateStart = new Date(year, month, day, 0, 0, 0, 0);
+      targetDateEnd = new Date(year, month, day, 23, 59, 59, 999);
     } else {
       const now = new Date();
-      // Construct UTC date range for today
-      targetDateStart = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0));
-      targetDateEnd = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999));
+      targetDateStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+      targetDateEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
     }
 
     let classes;
@@ -112,14 +114,14 @@ export const getClasses = async (req: AuthRequest, res: Response) => {
     }
 
     // Process classes to attach 'todayStatus' simplified field for frontend
-    const classesWithStatus = classes.map((cls: any) => ({
+    const classesWithStatus = classes.map((cls) => ({
       ...cls,
-      students: cls.students.map((student: any) => {
+      students: cls.students.map((student) => {
         const attendance = student.attendances[0]; // Should be only 1 or 0 due to date filter
         
         // Calculate todayScore from fetched behaviorEvents
-        const positives = student.behaviorEvents.filter((e: any) => e.type === 'positive').length;
-        const negatives = student.behaviorEvents.filter((e: any) => e.type === 'negative').length;
+        const positives = student.behaviorEvents.filter((e) => e.type === 'positive').length;
+        const negatives = student.behaviorEvents.filter((e) => e.type === 'negative').length;
         const todayScore = positives - negatives;
 
         return {

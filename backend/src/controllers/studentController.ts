@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/auth';
 import prisma from '../utils/prisma';
+import { Prisma } from '@prisma/client';
 
 const ANIMAL_AVATARS = [
   'Leão', 'Tigre', 'Elefante', 'Girafa', 'Zebra', 'Macaco',
@@ -41,7 +42,7 @@ export const getStudents = async (req: AuthRequest, res: Response) => {
   try {
     const { classId } = req.query;
 
-    const where: any = {};
+    const where: Prisma.StudentWhereInput = {};
     if (classId) {
       where.classId = classId as string;
     }
@@ -73,7 +74,7 @@ export const updateStudent = async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const { name, animalAvatar, avatarColor } = req.body;
 
-    const data: any = {};
+    const data: Prisma.StudentUpdateInput = {};
     if (name) data.name = name;
     if (animalAvatar) data.animalAvatar = animalAvatar;
     if (avatarColor) data.avatarColor = avatarColor;
@@ -97,16 +98,12 @@ export const deleteStudent = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
 
-    // Delete related data first (optional if using cascade, but safe here)
-    // Prisma usually handles simple relations, but Attendances/Events might need cascade delete in Schema
-    // For now assuming schema handles it or we just delete student
-    
-    // Note: If you don't have Cascade Delete in schema, this might fail if there are records.
-    // Let's assume we proceed. Ideally check schema.
-    
-    await prisma.student.delete({
-      where: { id: id as string },
-    });
+    // Use transaction to delete all related data manually to ensure no foreign key constraint errors
+    await prisma.$transaction([
+      prisma.attendance.deleteMany({ where: { studentId: id as string } }),
+      prisma.behaviorEvent.deleteMany({ where: { studentId: id as string } }),
+      prisma.student.delete({ where: { id: id as string } })
+    ]);
 
     res.status(204).send();
   } catch (error) {

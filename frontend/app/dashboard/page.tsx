@@ -9,9 +9,10 @@ import FeedbackEditorModal from '@/components/FeedbackEditorModal';
 import StudentDetailModal from '@/components/StudentDetailModal';
 import StudentFormModal from '@/components/StudentFormModal';
 import Calendar from '@/components/Calendar';
-import { LayoutGrid, List, Pencil, Plus } from 'lucide-react';
+import { LayoutGrid, List, Pencil, Plus, Trash } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { toast } from 'sonner';
 
 const DEFAULT_POSITIVE_BEHAVIORS: FeedbackItem[] = [
   { id: 'task_ok', label: 'Tarefa em Dia', icon: '📝', points: 1 },
@@ -104,19 +105,22 @@ export default function DashboardPage() {
       setDashboardData(dashboard);
       setClasses(classesData);
       
-      // Persistir seleção se atualizando dados
-      if (selectedClass) {
-        const updatedClass = classesData.find((c: Class) => c.id === selectedClass.id);
-        if (updatedClass) setSelectedClass(updatedClass);
-      } else if (classesData.length > 0) {
-        setSelectedClass(classesData[0]);
-      }
+      // Update selectedClass based on previous state and new data
+      setSelectedClass(prev => {
+        if (prev) {
+          const updatedClass = classesData.find((c: Class) => c.id === prev.id);
+          return updatedClass || prev;
+        } else if (classesData.length > 0) {
+          return classesData[0];
+        }
+        return null;
+      });
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
       setLoading(false);
     }
-  }, [selectedDate, selectedClass]); 
+  }, [selectedDate]); 
 
   useEffect(() => {
     if (user) {
@@ -155,18 +159,46 @@ export default function DashboardPage() {
     router.push('/login');
   };
 
-  const handleMarkAttendance = async (studentId: string, status: 'PRESENT' | 'ABSENT' | 'LATE') => {
+  const handleMarkAttendance = async (studentId: string, status: 'PRESENT' | 'ABSENT' | 'LATE' | 'CLEARED') => {
     const token = localStorage.getItem('token');
     if (!token) return;
 
+    // Direct assignment, no toggling
+    const newStatus = status === 'CLEARED' ? null : status;
+    const apiStatus = status;
+
+    // Optimistic Update: Update UI immediately
+    if (selectedClass) {
+      const updatedStudents = selectedClass.students.map(s => 
+        s.id === studentId ? { ...s, todayStatus: newStatus } : s
+      );
+      
+      const updatedClass = { ...selectedClass, students: updatedStudents };
+      setSelectedClass(updatedClass);
+      
+      // Update classes list as well ensure consistency if switching views
+      setClasses(prev => prev.map(c => c.id === selectedClass.id ? updatedClass : c));
+    }
+
     try {
       const formattedDate = selectedDate.toISOString().split('T')[0];
-      await api.markAttendance(token, studentId, status, formattedDate);
-      loadData(token);
+      await api.markAttendance(token, studentId, apiStatus, formattedDate);
+      
+      // Fetch only dashboard data to update counts without reloading student list (avoiding race conditions)
+      const dashboard = await api.getDashboard(token, formattedDate);
+      setDashboardData(dashboard);
     } catch (error) {
       console.error('Error marking attendance:', error);
+      // Revert/Reload on error
+      loadData(token);
     }
   };
+
+  // ... (keeping other handlers if needed)
+
+  // In the JSX, replacing the buttons:
+  /* ... */
+
 
   const handleCreateStudent = async (data: { name: string; animalAvatar?: string; avatarColor?: string }) => {
     const token = localStorage.getItem('token');
@@ -217,6 +249,23 @@ export default function DashboardPage() {
       loadData(token);
     } catch (error) {
       console.error('Error adding feedback:', error);
+    }
+  };
+
+  const handleResetDay = async () => {
+    if (!confirm('ATENÇÃO: Isso apagará TODOS os registros de presença e feedback desta turma para a data selecionada. Deseja continuar?')) return;
+    
+    const token = localStorage.getItem('token');
+    if (!token || !selectedClass) return;
+
+    try {
+        const formattedDate = selectedDate.toISOString().split('T')[0];
+        await api.resetDay(token, formattedDate, selectedClass.id);
+        toast.success('Dados do dia reiniciados com sucesso!');
+        loadData(token);
+    } catch (error) {
+        console.error('Error resetting day:', error);
+        toast.error('Erro ao reiniciar o dia');
     }
   };
 
@@ -295,6 +344,14 @@ export default function DashboardPage() {
             </div>
 
             <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                onClick={handleResetDay}
+                className="mb-[2px] px-4 py-3 text-red-500 hover:bg-red-50 hover:text-red-700"
+                title="Reiniciar Dia"
+              >
+                <Trash size={20} />
+              </Button>
               <Button
                 variant="ghost"
                 onClick={() => {
@@ -414,7 +471,8 @@ export default function DashboardPage() {
                         
                         {/* Edit Overlay */}
                         <button
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation();
                             setEditingStudentData(student);
                             setStudentFormMode('edit');
                             setStudentFormOpen(true);
@@ -442,36 +500,50 @@ export default function DashboardPage() {
                     </div>
                     
                     <div className={viewMode === 'list' ? "flex items-center gap-2" : "flex flex-col gap-2 w-full"}>
-                      <div className={viewMode === 'list' ? "flex gap-2" : "grid grid-cols-3 gap-2 w-full"}>
-                        <Button
-                          variant="primary"
-                          onClick={() => handleMarkAttendance(student.id, 'PRESENT')}
-                          className={`${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'} ${student.todayStatus && student.todayStatus !== 'PRESENT' ? 'opacity-30' : ''}`}
-                          title="Presente"
+                      <div className={viewMode === 'list' ? "w-[140px]" : "w-full"}>
+                        <div 
+                          onClick={(e) => e.stopPropagation()} 
+                          className="relative"
                         >
-                          Presente
-                        </Button>
-                        <Button
-                          variant="warning"
-                          onClick={() => handleMarkAttendance(student.id, 'LATE')}
-                          className={`${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'} ${student.todayStatus && student.todayStatus !== 'LATE' ? 'opacity-30' : ''}`}
-                          title="Atrasado"
-                        >
-                          Atrasado
-                        </Button>
-                        <Button
-                          variant="anger"
-                          onClick={() => handleMarkAttendance(student.id, 'ABSENT')}
-                          className={`${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs'} ${student.todayStatus && student.todayStatus !== 'ABSENT' ? 'opacity-30' : ''}`}
-                          title="Ausente"
-                        >
-                           Ausente
-                        </Button>
+                          <select
+                            value={student.todayStatus || ''}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              if (val) handleMarkAttendance(student.id, val as 'PRESENT' | 'ABSENT' | 'LATE');
+                              else handleMarkAttendance(student.id, 'CLEARED');
+                            }}
+                            className={`w-full appearance-none font-bold rounded-lg border-2 cursor-pointer outline-none transition-colors text-sm text-center
+                              ${!student.todayStatus 
+                                ? 'bg-white border-[#E5E7EB] text-[#57534E] py-2' 
+                                : student.todayStatus === 'PRESENT' 
+                                  ? 'bg-[#ECFCCB] border-[#4D7C0F] text-[#3F6212] py-2' 
+                                  : student.todayStatus === 'LATE'
+                                    ? 'bg-[#FEF9C3] border-[#CA8A04] text-[#854D0E] py-2'
+                                    : 'bg-[#FFEDD5] border-[#EA580C] text-[#9A3412] py-2'
+                              }
+                            `}
+                          >
+                            <option value="" className="bg-white text-gray-500">Marcar Presença</option>
+                            <option value="PRESENT" className="bg-[#ECFCCB] text-[#3F6212]">✅ Presente</option>
+                            <option value="LATE" className="bg-[#FEF9C3] text-[#854D0E]">⏰ Atrasado</option>
+                            <option value="ABSENT" className="bg-[#FFEDD5] text-[#9A3412]">🚫 Ausente</option>
+                            <option value="CLEARED" className="bg-white text-gray-400">🗑️ Limpar</option>
+                          </select>
+                          {/* Chevron Icon for better UX since appearance-none removes it */}
+                          <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none opacity-50">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M6 9l6 6 6-6"/>
+                            </svg>
+                          </div>
+                        </div>
                       </div>
                       <div className={viewMode === 'list' ? "" : "w-full mt-1"}>
                         <Button
                           variant="info"
-                          onClick={() => openBehaviorModal(student.id, student.name)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openBehaviorModal(student.id, student.name);
+                          }}
                           className={`flex items-center justify-center gap-2 ${viewMode === 'list' ? 'px-3 py-1.5 text-sm min-w-[90px]' : 'py-2 text-xs w-full'}`}
                         >
                           Feedback

@@ -30,7 +30,7 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
 
     req.user = decoded;
     next();
-  } catch (error) {
+  } catch {
     return res.status(401).json({ error: 'Invalid token' });
   }
 };

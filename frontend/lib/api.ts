@@ -35,6 +35,7 @@ export const api = {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
+      cache: 'no-store',
     });
 
     if (!response.ok) {
@@ -49,6 +50,7 @@ export const api = {
     const query = date ? `?date=${encodeURIComponent(date)}` : '';
     const response = await fetch(`${API_URL}/api/dashboard${query}`, {
       headers: { 'Authorization': `Bearer ${token}` },
+      cache: 'no-store',
     });
 
     if (!response.ok) {
@@ -56,6 +58,21 @@ export const api = {
       throw new Error(errorData.error || 'Failed to fetch dashboard');
     }
 
+    return response.json();
+  },
+
+  async resetDay(token: string, date: string, classId?: string) {
+    let url = `${API_URL}/api/dashboard/reset?date=${encodeURIComponent(date)}`;
+    if (classId) url += `&classId=${classId}`;
+
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to reset day');
+    }
     return response.json();
   },
 
@@ -72,7 +89,8 @@ export const api = {
     return response.json();
   },
 
-  async markAttendance(token: string, studentId: string, status: 'PRESENT' | 'ABSENT' | 'LATE', date?: string) {
+  async markAttendance(token: string, studentId: string, status: 'PRESENT' | 'ABSENT' | 'LATE' | 'CLEARED', date?: string) {
+    console.log('[API] markAttendance called', { url: `${API_URL}/api/attendance`, studentId, status, date });
     const response = await fetch(`${API_URL}/api/attendance`, {
       method: 'POST',
       headers: {

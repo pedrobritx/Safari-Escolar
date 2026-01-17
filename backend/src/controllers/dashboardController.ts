@@ -11,52 +11,67 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
       return res.status(403).json({ error: 'Only teachers can access dashboard' });
     }
 
+
+
+    // Use a data da query ou o padrão para hoje
+    const { date } = req.query;
+    let targetDateStart: Date;
+    let targetDateEnd: Date;
+
+    if (date) {
+         const parts = (date as string).split('-');
+         const year = parseInt(parts[0]);
+         const month = parseInt(parts[1]) - 1;
+         const day = parseInt(parts[2]);
+         targetDateStart = new Date(year, month, day, 0, 0, 0, 0);
+         targetDateEnd = new Date(year, month, day, 23, 59, 59, 999);
+    } else {
+         const now = new Date();
+         targetDateStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+         targetDateEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+    }
+
     const classes = await prisma.class.findMany({
       where: { teacherId: userId },
       include: {
         students: {
           include: {
             attendances: {
-              orderBy: { date: 'desc' },
-              take: 30,
+              where: {
+                date: {
+                  gte: targetDateStart,
+                  lte: targetDateEnd,
+                }
+              },
             },
             behaviorEvents: {
-              orderBy: { date: 'desc' },
-              take: 10,
+              where: {
+                date: {
+                  gte: targetDateStart,
+                  lte: targetDateEnd,
+                }
+              },
             },
           },
         },
       },
     });
 
-    // Use a data da query ou o padrão para hoje
-    const { date } = req.query;
-    const targetDate = date ? new Date(date as string) : new Date();
-    // Redefinir a parte da hora para evitar problemas de fuso horário, alinhando com como armazenamos datas (geralmente meia-noite UTC ou similar)
-    // Idealmente usar uma normalização consistente.
-    // No entanto, como comparamos toDateString(), a hora não importa muito, desde que seja o dia certo.
-    // Mas vamos manter a lógica existente de redefinição para meia-noite apenas por precaução.
-    targetDate.setHours(0, 0, 0, 0);
-
     const dashboardData = classes.map((cls) => {
       const totalStudents = cls.students.length;
+      
+      // Since we filtered in DB, just counting the array length is sufficient for today's events/attendance
       const todayAttendance = cls.students.filter((student) =>
         student.attendances.some(
-          (att) => att.date.toDateString() === targetDate.toDateString() && (att.status === 'PRESENT' || att.status === 'LATE')
+          (att) => att.status === 'PRESENT' || att.status === 'LATE'
         )
       ).length;
 
       const todayLate = cls.students.filter((student) =>
-        student.attendances.some(
-          (att) => att.date.toDateString() === targetDate.toDateString() && att.status === 'LATE'
-        )
+        student.attendances.some((att) => att.status === 'LATE')
       ).length;
 
-      const todayBehaviorEvents = cls.students.flatMap((student) =>
-        student.behaviorEvents.filter(
-          (event) => event.date.toDateString() === targetDate.toDateString()
-        )
-      );
+      const todayBehaviorEvents = cls.students.flatMap((student) => student.behaviorEvents);
 
       return {
         classId: cls.id,
@@ -73,6 +88,80 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
     res.json(dashboardData);
   } catch (error) {
     console.error('Get dashboard error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const resetDay = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user!.id;
+    const { date, classId } = req.query;
+
+    if (!date) {
+      return res.status(400).json({ error: 'Date requirement' });
+    }
+
+    const parts = (date as string).split('-');
+    const year = parseInt(parts[0]);
+    const month = parseInt(parts[1]) - 1;
+    const day = parseInt(parts[2]);
+    
+    const targetDateStart = new Date(year, month, day, 0, 0, 0, 0);
+    const targetDateEnd = new Date(year, month, day, 23, 59, 59, 999);
+
+    // Find classes for this teacher (or strict to specific classId if provided)
+    const whereClass: any = { teacherId: userId };
+    if (classId) {
+        whereClass.id = classId as string;
+    }
+
+    const classes = await prisma.class.findMany({
+        where: whereClass,
+        select: { id: true }
+    });
+
+    const classIds = classes.map(c => c.id);
+
+    if (classIds.length === 0) {
+        return res.json({ message: 'No classes found to reset' });
+    }
+
+    // Delete attendance
+    const deleteAttendance = await prisma.attendance.deleteMany({
+        where: {
+            date: {
+                gte: targetDateStart,
+                lte: targetDateEnd
+            },
+            student: {
+                classId: { in: classIds }
+            }
+        }
+    });
+
+    // Delete behavior/feedback
+    const deleteFeedback = await prisma.behaviorEvent.deleteMany({
+        where: {
+             date: {
+                gte: targetDateStart,
+                lte: targetDateEnd
+            },
+            student: {
+                classId: { in: classIds }
+            }
+        }
+    });
+
+    console.log(`Reset day ${date} for ${userId}: Deleted ${deleteAttendance.count} attendances and ${deleteFeedback.count} feedbacks.`);
+
+    res.json({ 
+        message: 'Day reset successfully', 
+        attendanceCount: deleteAttendance.count,
+        feedbackCount: deleteFeedback.count 
+    });
+
+  } catch (error) {
+    console.error('Reset day error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };

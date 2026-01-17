@@ -1,4 +1,4 @@
-import { Response, Request } from 'express';
+import { Response } from 'express';
 import { AuthRequest } from '../middleware/auth';
 import prisma from '../utils/prisma';
 
@@ -14,12 +14,22 @@ export const createFeedbackEvent = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ error: 'Type must be "positive" or "negative"' });
     }
 
+    let eventDate: Date | undefined;
+    if (date) {
+        // Parse YYYY-MM-DD manually to prevent UTC shift
+        const parts = date.split('-');
+        const year = parseInt(parts[0]);
+        const month = parseInt(parts[1]) - 1;
+        const day = parseInt(parts[2]);
+        eventDate = new Date(year, month, day, 0, 0, 0, 0);
+    }
+
     const feedbackEvent = await prisma.behaviorEvent.create({
       data: {
         studentId,
         type,
         description,
-        date: date ? new Date(date) : undefined,
+        date: eventDate,
       },
       include: {
         student: true,
@@ -55,6 +65,7 @@ export const getFeedbackEvents = async (req: AuthRequest, res: Response) => {
 export const deleteFeedbackEvent = async (req: AuthRequest, res: Response) => {
   try {
     const id = req.params.id as string;
+    console.log(`Attempting to delete feedback event with ID: ${id}`);
 
     await prisma.behaviorEvent.delete({
       where: { id },

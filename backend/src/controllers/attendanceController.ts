@@ -6,12 +6,38 @@ export const markAttendance = async (req: AuthRequest, res: Response) => {
   try {
     const { studentId, status, date } = req.body;
 
+    console.log(`[Attendance] Marking attendance for student ${studentId} with status ${status} on ${date || 'today'}`);
+
     if (!studentId || !status) {
       return res.status(400).json({ error: 'studentId and status are required' });
     }
 
-    const attendanceDate = date ? new Date(date) : new Date();
-    attendanceDate.setHours(0, 0, 0, 0);
+    let attendanceDate = new Date();
+    if (date) {
+        // Parse YYYY-MM-DD manually to prevent UTC shift
+        const parts = date.split('-');
+        const year = parseInt(parts[0]);
+        const month = parseInt(parts[1]) - 1;
+        const day = parseInt(parts[2]);
+        attendanceDate = new Date(year, month, day, 0, 0, 0, 0);
+    } else {
+        attendanceDate.setHours(0, 0, 0, 0);
+    }
+
+    if (status === 'CLEARED') {
+      await prisma.attendance.delete({
+        where: {
+          studentId_date: {
+            studentId,
+            date: attendanceDate,
+          },
+        },
+      }).catch((e) => {
+        // Ignore specific error if record not found, otherwise rethrow
+        if (e.code !== 'P2025') throw e;
+      });
+      return res.json({ message: 'Attendance cleared' });
+    }
 
     const attendance = await prisma.attendance.upsert({
       where: {

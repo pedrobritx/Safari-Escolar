@@ -28,8 +28,8 @@ async function debug() {
     console.log(`Found ${students.length} students.`);
     
     students.forEach(s => {
-        const positives = s.behaviorEvents.filter((e: any) => e.type === 'positive').length;
-        const negatives = s.behaviorEvents.filter((e: any) => e.type === 'negative').length;
+        const positives = s.behaviorEvents.filter((e) => e.type === 'positive').length;
+        const negatives = s.behaviorEvents.filter((e) => e.type === 'negative').length;
         const score = positives - negatives;
         if (s.behaviorEvents.length > 0) {
             console.log(`Student: ${s.name} | Events: ${s.behaviorEvents.length} | Score: ${score}`);
