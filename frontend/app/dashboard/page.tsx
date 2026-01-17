@@ -371,21 +371,10 @@ export default function DashboardPage() {
               >
                 <Trash size={20} />
               </Button>
-              <Button
-                variant="ghost"
-                onClick={() => {
-                  setStudentFormMode('create');
-                  setEditingStudentData(null);
-                  setStudentFormOpen(true);
-                }}
-                className="mb-[2px] px-6 py-3"
-              >
-                <Plus size={20} />
-                Adicionar Aluno
-              </Button>
             </div>
           </div>
         )}
+
 
         {/* Cartões do Dashboard e Calendário */}
         <div className="grid-dashboard mb-8">
@@ -440,6 +429,18 @@ export default function DashboardPage() {
             <CardHeader className="bg-[var(--color-secondary)]">
               <h2 className="text-xl font-bold text-primary">{selectedClass.name} - Exploradores</h2>
               <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setStudentFormMode('create');
+                    setEditingStudentData(null);
+                    setStudentFormOpen(true);
+                  }}
+                  className="bg-white px-4 py-2 h-[42px] border-2 border-transparent hover:border-[var(--color-border)] mr-2"
+                >
+                  <Plus size={20} />
+                  Adicionar Aluno
+                </Button>
                 <select
                   id="sort-selector"
                   name="sort-selector"
