@@ -1,0 +1,354 @@
+# DECISIONS.md — Safari Escolar (ADR‑Lite)
+
+> **Governance Policy:** This register records **binding** product, architecture, and UI-system decisions in abbreviated ADR form. Each entry includes **Decision**, **Rationale**, and **Alternatives rejected**. Decisions are **append-only**: they SHALL NOT be deleted or rewritten to conceal historical context. Reversal or refinement MUST be captured by creating a new entry that explicitly **supersedes** prior entries (e.g., “Supersedes: D‑00X”).
+
+---
+
+## D‑001 — Deliberate dual visual language: glass for structure, skeuomorphism for action
+
+**Decision:** Employ glassmorphism for structural hierarchy (navigation, panels, cards) and skeuomorphism for primary interactive controls (buttons, toggles, attendance primitives).
+
+**Rationale:** Glass-based structural surfaces support hierarchy without disproportionate attentional capture, while skeuomorphic tactility (elevation, press depth, state transitions) reduces interaction ambiguity and increases throughput for high-frequency classroom actions.
+
+**Alternatives rejected:**
+
+- Uniform glass application (insufficient affordance clarity on touch)
+- Purely flat/minimal styling (reduced discoverability under time pressure)
+
+---
+
+## D‑002 — Teacher core loop as the primary scope governor
+
+**Decision:** Features are admitted only insofar as they materially improve the core classroom loop: “Start class → attendance → feedback → assignments → communication”.
+
+**Rationale:** This constraint operationalizes scope discipline, preventing feature accretion from degrading speed, learnability, and classroom usability.
+
+**Alternatives rejected:**
+
+- Feature-first roadmap prioritization (high probability of unusable complexity)
+
+---
+
+## D‑003 — Role model with strict scoping (privacy by construction)
+
+**Decision:** Enforce role-based access control with row-level scoping as a first-order invariant: guardians are student-scoped; teachers are classroom-scoped; coordinators are oversight-scoped; admins provision.
+
+**Rationale:** Prevents lateral visibility, minimizes privacy risk, and aligns enforcement with institutional constraints by making unauthorized access structurally infeasible rather than merely discouraged.
+
+**Alternatives rejected:**
+
+- Broad “school member” visibility
+- Client-side filtering as an enforcement mechanism
+
+---
+
+## D‑004 — Prohibition of family-to-family discovery and interaction
+
+**Decision:** Guardians cannot discover, view, or message other guardians or students.
+
+**Rationale:** Eliminates common safety, privacy, and harassment failure modes and prevents emergent social dynamics outside the institution’s accountability structures.
+
+**Alternatives rejected:**
+
+- Guardian group chats
+- Class-wide parent forums
+
+---
+
+## D‑005 — Offline-first semantics for attendance and feedback
+
+**Decision:** Attendance and feedback operations MUST remain functional without network connectivity and synchronize later.
+
+**Rationale:** Connectivity is unreliable in target environments and these workflows are time-critical; online-only constraints would systematically fail at the moment of need.
+
+**Alternatives rejected:**
+
+- Online-only writes
+- “Read-only offline” approaches
+
+---
+
+## D‑006 — Client write-ahead log (WAL) with optimistic interaction model
+
+**Decision:** Implement a local write-ahead log (IndexedDB) and optimistic UI for attendance/feedback, with deterministic replay and reconciliation during synchronization.
+
+**Rationale:** Preserves teacher throughput, supports error recovery under intermittent connectivity, and provides ordered, auditable client intent for replay.
+
+**Alternatives rejected:**
+
+- Blocking UI pending server acknowledgment
+- Best-effort local storage without ordered replay guarantees
+
+---
+
+## D‑007 — Idempotency keys for resilience-critical write paths
+
+**Decision:** Support `Idempotency-Key` for attendance/feedback write endpoints.
+
+**Rationale:** Offline replay and retry semantics otherwise induce duplicates or inconsistent state; idempotency stabilizes outcomes under retransmission.
+
+**Alternatives rejected:**
+
+- “Client must not retry” (operationally unrealistic)
+- Timestamp-only deduplication (collision-prone and semantically weak)
+
+---
+
+## D‑008 — Path-prefixed API versioning
+
+**Decision:** Version API contracts under `/api/v1`, promoting to `/api/v2` exclusively for breaking changes.
+
+**Rationale:** Provides explicit contract stability and migration semantics; reduces ambiguity in documentation and client compatibility.
+
+**Alternatives rejected:**
+
+- No versioning
+- Header-only versioning (harder to operationalize and document consistently)
+
+---
+
+## D‑009 — Standardized error envelope
+
+**Decision:** All errors SHALL use a stable envelope: `{ error: { code, message, details, trace_id? } }`.
+
+**Rationale:** Enables predictable client handling, improves observability, and permits structured conflict/validation metadata without per-endpoint divergence.
+
+**Alternatives rejected:**
+
+- Ad hoc error formats per endpoint
+
+---
+
+## D‑010 — Cursor pagination as the default for growing collections
+
+**Decision:** Use cursor pagination for feed/timeline-like endpoints.
+
+**Rationale:** Improves performance and stability as datasets grow and as items are inserted/updated, avoiding the fragility of offset-based pagination.
+
+**Alternatives rejected:**
+
+- Offset pagination for large, frequently changing lists
+
+---
+
+## D‑011 — Templates-first feedback issuance; free text as optional augmentation
+
+**Decision:** Feedback issuance defaults to single-tap templates; optional notes are additive and never required for core flows.
+
+**Rationale:** Reduces cognitive load, accelerates issuance, and improves consistency and comparability of behavioral signals.
+
+**Alternatives rejected:**
+
+- Free-text-first feedback (slow and inconsistent in practice)
+
+---
+
+## D‑012 — Template semantics are immutable in effect (version, do not mutate)
+
+**Decision:** If a template’s meaning changes, a new template MUST be created; historical semantics MUST NOT be retroactively altered.
+
+**Rationale:** Preserves interpretability of historical events, reporting integrity, and analytical validity.
+
+**Alternatives rejected:**
+
+- In-place edits to label/points that change historical meaning
+
+---
+
+## D‑013 — Denormalize `type` and `points` into feedback events
+
+**Decision:** Feedback events store `type` and `points` at creation time (in addition to any template reference).
+
+**Rationale:** Guarantees stable interpretation even if templates are later deactivated, superseded, or re-scoped.
+
+**Alternatives rejected:**
+
+- Strict normalization where event meaning depends on the current template state
+
+---
+
+## D‑014 — Prohibition of public rankings and comparative family-facing gamification
+
+**Decision:** Avoid leaderboards and family-visible comparisons; gamification is collective and growth-framed.
+
+**Rationale:** Mitigates shame dynamics, reduces guardian anxiety, and supports a healthier behavioral feedback model aligned with pedagogical intent.
+
+**Alternatives rejected:**
+
+- Public class rankings
+- Competitive, family-facing comparative metrics
+
+---
+
+## D‑015 — Attendance uniqueness invariant
+
+**Decision:** Exactly one attendance record exists per (student, classroom, date).
+
+**Rationale:** Eliminates ambiguity and simplifies both reconciliation and reporting.
+
+**Alternatives rejected:**
+
+- Multiple marks per day (requires complex state machines and reconciliation rules)
+
+---
+
+## D‑016 — Append-only audit log for sensitive mutations
+
+**Decision:** Maintain immutable audit events for attendance changes, grade changes (v1), guardian link changes, exports, and role changes.
+
+**Rationale:** Establishes accountability, supports institutional traceability, and enables post-hoc investigation.
+
+**Alternatives rejected:**
+
+- No audit trail
+- Mutable audit records
+
+---
+
+## D‑017 — Soft deletion as the default for core entities
+
+**Decision:** Use soft deletion for students, templates, posts, and grade items; exclude from default querysets.
+
+**Rationale:** Prevents accidental data loss and supports institutional retention expectations.
+
+**Alternatives rejected:**
+
+- Hard deletion as the default lifecycle action
+
+---
+
+## D‑018 — JWT stored in HttpOnly cookies
+
+**Decision:** Use JWT access/refresh tokens in HttpOnly cookies, with refresh rotation enabled.
+
+**Rationale:** Reduces XSS token exfiltration risk while preserving API ergonomics and session continuity.
+
+**Alternatives rejected:**
+
+- LocalStorage token storage
+- Pure server sessions without a refresh strategy
+
+---
+
+## D‑019 — Monorepo with explicit, enforceable domain boundaries
+
+**Decision:** Maintain `apps/web` (Next.js) and `apps/api` (Django/DRF) in a single repository, plus shared packages for schemas and UI.
+
+**Rationale:** Preserves cohesion, reduces contract drift, and supports synchronized evolution of schemas, tokens, and interfaces.
+
+**Alternatives rejected:**
+
+- Split repositories (higher drift risk)
+- Single combined codebase without explicit boundaries (coupling and erosion risk)
+
+---
+
+## D‑020 — Stack selection: Next.js + TypeScript; Django/DRF + PostgreSQL
+
+**Decision:** Frontend uses Next.js (App Router) with TypeScript; backend uses Django/DRF; primary datastore is PostgreSQL.
+
+**Rationale:** Maximizes delivery velocity with mature tooling, strong modeling/migrations, and reliable relational constraints suited to school-domain data.
+
+**Alternatives rejected:**
+
+- SPA-only architecture without strong routing and server capabilities
+- NoSQL-first datastore for relational, constraint-heavy educational data
+
+---
+
+## D‑021 — Bottom navigation as the mobile primary navigation primitive
+
+**Decision:** Teacher/Parent primary navigation on mobile is bottom-based; hamburger menus are avoided for core flows.
+
+**Rationale:** Improves thumb-zone accessibility and reduces navigation friction in time-constrained contexts.
+
+**Alternatives rejected:**
+
+- Hamburger-only navigation
+
+---
+
+## D‑022 — Attendance “Fast Mode” remains single-screen, reversible, and bulk-capable
+
+**Decision:** Attendance MUST be completable without leaving the roster view; bulk actions and undo are mandatory.
+
+**Rationale:** Preserves speed, reduces context switching, and decreases error cost through reversibility.
+
+**Alternatives rejected:**
+
+- Per-student detail screens for marking
+- Bulk actions without undo
+
+---
+
+## D‑023 — Glass performance constraints and mandatory reduced-glass mode
+
+**Decision:** Blur intensity is capped; blur is prohibited over long scrolling lists; reduced-glass mode disables blur.
+
+**Rationale:** Protects mobile performance, battery life, and frame stability.
+
+**Alternatives rejected:**
+
+- Unbounded blur usage
+
+---
+
+## D‑024 — Token-only styling discipline
+
+**Decision:** Components consume semantic tokens; direct literal colors/shadows are prohibited outside token definitions.
+
+**Rationale:** Ensures visual consistency, supports theming, and enables controlled evolution of the UI system.
+
+**Alternatives rejected:**
+
+- Per-component bespoke styling with hard-coded literals
+
+---
+
+## D‑025 — Child-scoped messaging threads
+
+**Decision:** Messages occur only within a thread bound to (student, teacher, guardian).
+
+**Rationale:** Prevents privacy leakage, maintains contextual integrity, and ensures the communication surface is institutionally legible.
+
+**Alternatives rejected:**
+
+- General “teacher inbox” without student binding
+- Guardian-to-guardian messaging
+
+---
+
+## D‑026 — Aggregated student timeline endpoint
+
+**Decision:** Provide a timeline aggregation endpoint (attendance + feedback + posts + grades v1) for teacher and guardian consumption.
+
+**Rationale:** Reduces client complexity and ensures consistent ordering and visibility filtering under server enforcement.
+
+**Alternatives rejected:**
+
+- Client-side aggregation from multiple endpoints
+
+---
+
+## D‑027 — Coordinator “at-risk” indicators are rule-based, not predictive
+
+**Decision:** At-risk indicators use transparent, configurable rules (rolling windows, thresholds) rather than opaque ML models.
+
+**Rationale:** Maximizes interpretability, reduces operational risk, and improves institutional acceptance and accountability.
+
+**Alternatives rejected:**
+
+- Predictive risk scoring without explainability guarantees
+
+---
+
+## D‑028 — Student identity representation: animal icon + chosen color
+
+**Decision:** Each student has an animal avatar and a user-selected color identity used in tiles/avatars.
+
+**Rationale:** Improves recognition, engagement, and roster scanning speed while avoiding photo-by-default privacy and logistics issues.
+
+**Alternatives rejected:**
+
+- Text-only rosters
+- Photos as the default identity marker
