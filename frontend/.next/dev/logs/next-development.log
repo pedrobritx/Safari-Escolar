@@ -1,0 +1,32 @@
+[00:16:16.651] Server  ERROR   Error: Cannot find module 'next/dist/compiled/cookie'
+Require stack:
+- /Users/pedr/Developer/Safari Escolar/frontend/node_modules/next/dist/server/api-utils/get-cookie-parser.js
+- /Users/pedr/Developer/Safari Escolar/frontend/node_modules/next/dist/shared/lib/router/utils/prepare-destination.js
+- /Users/pedr/Developer/Safari Escolar/frontend/node_modules/next/dist/shared/lib/router/utils/middleware-route-matcher.js
+- /Users/pedr/Developer/Safari Escolar/frontend/node_modules/next/dist/server/lib/router-utils/filesystem.js
+- /Users/pedr/Developer/Safari Escolar/frontend/node_modules/next/dist/server/lib/router-server.js
+- /Users/pedr/Developer/Safari Escolar/frontend/node_modules/next/dist/server/lib/start-server.js
+[00:16:16.668] Server  ERROR   Error: Cannot find module 'next/dist/compiled/cookie'
+Require stack:
+- /Users/pedr/Developer/Safari Escolar/frontend/node_modules/next/dist/server/api-utils/get-cookie-parser.js
+- /Users/pedr/Developer/Safari Escolar/frontend/node_modules/next/dist/shared/lib/router/utils/prepare-destination.js
+- /Users/pedr/Developer/Safari Escolar/frontend/node_modules/next/dist/shared/lib/router/utils/middleware-route-matcher.js
+- /Users/pedr/Developer/Safari Escolar/frontend/node_modules/next/dist/server/lib/router-utils/filesystem.js
+- /Users/pedr/Developer/Safari Escolar/frontend/node_modules/next/dist/server/lib/router-server.js
+- /Users/pedr/Developer/Safari Escolar/frontend/node_modules/next/dist/server/lib/start-server.js
+[00:16:16.702] Server  ERROR   Error: Cannot find module 'next/dist/compiled/cookie'
+Require stack:
+- /Users/pedr/Developer/Safari Escolar/frontend/node_modules/next/dist/server/api-utils/get-cookie-parser.js
+- /Users/pedr/Developer/Safari Escolar/frontend/node_modules/next/dist/shared/lib/router/utils/prepare-destination.js
+- /Users/pedr/Developer/Safari Escolar/frontend/node_modules/next/dist/shared/lib/router/utils/middleware-route-matcher.js
+- /Users/pedr/Developer/Safari Escolar/frontend/node_modules/next/dist/server/lib/router-utils/filesystem.js
+- /Users/pedr/Developer/Safari Escolar/frontend/node_modules/next/dist/server/lib/router-server.js
+- /Users/pedr/Developer/Safari Escolar/frontend/node_modules/next/dist/server/lib/start-server.js
+[00:16:16.716] Server  ERROR   Error: Cannot find module 'next/dist/compiled/cookie'
+Require stack:
+- /Users/pedr/Developer/Safari Escolar/frontend/node_modules/next/dist/server/api-utils/get-cookie-parser.js
+- /Users/pedr/Developer/Safari Escolar/frontend/node_modules/next/dist/shared/lib/router/utils/prepare-destination.js
+- /Users/pedr/Developer/Safari Escolar/frontend/node_modules/next/dist/shared/lib/router/utils/middleware-route-matcher.js
+- /Users/pedr/Developer/Safari Escolar/frontend/node_modules/next/dist/server/lib/router-utils/filesystem.js
+- /Users/pedr/Developer/Safari Escolar/frontend/node_modules/next/dist/server/lib/router-server.js
+- /Users/pedr/Developer/Safari Escolar/frontend/node_modules/next/dist/server/lib/start-server.js
