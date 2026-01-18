@@ -98,13 +98,27 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className="mt-10 p-5 bg-[var(--color-secondary)] rounded-2xl border-2 border-[var(--color-border)]">
+        <div className="mt-10 p-5 bg-[var(--color-secondary)] rounded-2xl border-2 border-[var(--color-border)] overflow-x-auto">
           <p className="text-sm text-primary font-bold mb-3 uppercase tracking-wider text-center">🗺️ Acesso Rápido</p>
-          <p className="text-xs text-primary/80 font-medium mb-1">joao.professor@escola.com</p>
-          <p className="text-xs text-primary/80 font-medium mb-1">familia.silva@email.com</p>
-          <p className="text-xs text-primary/80 font-medium mb-1">coordenacao@escola.com</p>
-          <p className="text-xs text-primary/80 font-medium mb-1">admin@escola.com</p>
-          <p className="text-xs text-primary/80 font-medium mb-1">password123</p>
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="text-primary font-bold text-left">
+                <th className="pb-2">Cargo</th>
+                <th className="pb-2">Email</th>
+                <th className="pb-2">Senha</th>
+              </tr>
+            </thead>
+            <tbody className="text-primary/80 font-medium">
+              <tr><td className="py-1">Admin</td><td>admin@safariescolar.com</td><td>password123</td></tr>
+              <tr><td className="py-1">Coordenador</td><td>coordenador@escola.com</td><td>password123</td></tr>
+              <tr><td className="py-1">Professor 1</td><td>joao.professor@escola.com</td><td>password123</td></tr>
+              <tr><td className="py-1">Professor 2</td><td>ana.professora@escola.com</td><td>password123</td></tr>
+              <tr><td className="py-1">Família 1</td><td>familia.silva@email.com</td><td>password123</td></tr>
+              <tr><td className="py-1">Família 2</td><td>familia.santos@email.com</td><td>password123</td></tr>
+              <tr><td className="py-1">Família 3</td><td>familia.oliveira@email.com</td><td>password123</td></tr>
+              <tr><td className="py-1">Família 4</td><td>familia.costa@email.com</td><td>password123</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

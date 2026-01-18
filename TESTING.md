@@ -37,22 +37,30 @@ Você será automaticamente redirecionado para a tela de login.
 ## 👥 Credenciais de Teste
 
 ### Professor
-- **Email:** joao.professor@escola.com
+
+- **Email 1:** `joao.professor@escola.com`
+- **Email 2:** `ana.professora@escola.com`
 - **Senha:** password123
 - **Acesso:** Dashboard do professor, visualizar turmas, marcar presença, adicionar eventos
 
 ### Família
-- **Email:** familia.silva@email.com
+
+- **Email 1:** `familia.silva@email.com`
+- **Email 2:** `familia.santos@email.com`
+- **Email 3:** `familia.oliveira@email.com`
+- **Email 4:** `familia.costa@email.com`
 - **Senha:** password123
 - **Acesso:** Visualização read-only dos filhos vinculados
 
 ### Coordenador
-- **Email:** coordenador@escola.com
+
+- **Email:** `coordenador@escola.com`
 - **Senha:** password123
 - **Acesso:** Visualizar todas as turmas da escola
 
 ### Admin
-- **Email:** admin@safariescolar.com
+
+- **Email:** `admin@safariescolar.com`
 - **Senha:** password123
 - **Acesso:** Acesso total ao sistema
 
