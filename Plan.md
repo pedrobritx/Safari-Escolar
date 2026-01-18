@@ -1,4 +1,4 @@
-# Safari Escolar — Detailed Product Plan
+# PLAN.md — Safari Escolar
 
 ## 1. Purpose
 

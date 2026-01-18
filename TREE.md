@@ -28,15 +28,21 @@ tree -a -I node_modules > TREE.md
 
 ```text
 .
-├── ARCH.md
+├── .gitignore
 ├── API.md
+├── ARCH.md
 ├── CONSTRAINTS.md
+├── CREDENTIALS.md
 ├── DATA.md
 ├── DECISIONS.md
+├── GLOSSARY.md
+├── LICENSE.md
+├── PLAN.md
+├── README.md
 ├── SPEC.md
 ├── TASKS.md
-├── UI.md
 ├── TREE.md
+├── UI.md
 ├── apps
 │   ├── api
 │   │   ├── config

@@ -1,0 +1,23 @@
+# General
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.log
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+.next/
+dist/
+build/
+coverage/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+.pytest_cache/
