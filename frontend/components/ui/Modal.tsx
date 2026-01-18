@@ -46,25 +46,25 @@ export function Modal({
     '2xl': 'max-w-2xl',
   }[maxWidth];
 
-  const headerClass = headerColorClass || 'bg-[var(--color-secondary)] border-[var(--color-border)]';
+  const headerClass = headerColorClass || 'bg-[var(--safari-green-light)] border-[var(--neu-border-color)]';
   // unused borderClass removed
   
   const content = (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200" onClick={onClose}>
       <div 
-        className={`bg-white rounded-2xl w-full ${maxWidthClass} shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 border-4 border-transparent ${borderColorClass ? borderColorClass : 'border-[var(--color-border)]'}`}
+        className={`bg-white rounded-[var(--neu-radius-lg)] w-full ${maxWidthClass} shadow-[var(--neu-shadow-hover)] overflow-hidden animate-in zoom-in-95 duration-200 border-3 ${borderColorClass ? borderColorClass : 'border-[var(--neu-border-color)]'}`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className={`px-6 py-4 border-b-2 flex justify-between items-center ${headerClass}`}>
+        <div className={`px-6 py-4 border-b-2 border-[var(--neu-border-color)] flex justify-between items-center ${headerClass}`}>
           {title && (
-            <h2 className="text-xl font-bold text-primary">
+            <h2 className="text-xl font-bold text-[var(--safari-green)]">
               {title}
             </h2>
           )}
           <button 
             onClick={onClose}
-            className="btn btn-accent p-2 rounded-lg ml-auto"
+            className="btn btn-accent p-2 rounded-[var(--neu-radius)] ml-auto"
             aria-label="Close modal"
           >
             <X size={24} strokeWidth={2.5} />

@@ -32,14 +32,14 @@ export const StudentCard: React.FC<StudentCardProps> = ({
     <div 
       className={viewMode === 'list' 
         ? "px-6 py-4 hover:bg-white transition-colors"
-        : `bg-white border-2 border-[var(--color-border)] rounded-xl p-4 flex flex-col items-center text-center hover:shadow-md transition-all relative group`
+        : `card-interactive p-4 flex flex-col items-center text-center relative group`
       }
     >
       <div className={viewMode === 'list' ? "flex flex-col sm:flex-row items-center justify-between gap-4" : "w-full"}>
         <div className={viewMode === 'list' ? "flex items-center space-x-4" : "flex flex-col items-center gap-2 mb-4 relative"}>
           <div className="relative group/avatar">
             <div 
-              className={`flex items-center justify-center border-2 border-[var(--color-border)] rounded-full shadow-sm cursor-pointer ${viewMode === 'list' ? 'w-12 h-12 text-2xl' : 'w-24 h-24 text-5xl mb-1'}`}
+              className={`flex items-center justify-center border-2 border-[var(--neu-border-color)] rounded-full shadow-sm cursor-pointer ${viewMode === 'list' ? 'w-12 h-12 text-2xl' : 'w-24 h-24 text-5xl mb-1'}`}
               style={{ backgroundColor: student.avatarColor || '#FFFFFF' }}
             >
               {getAvatarEmoji(student.animalAvatar)}
@@ -61,8 +61,8 @@ export const StudentCard: React.FC<StudentCardProps> = ({
             {/* Pontuação Badge */}
             {(student.todayScore || 0) !== 0 && (
               <div 
-                className={`absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold border-2 border-white shadow-md z-50 ${
-                  (student.todayScore || 0) >= 0 ? 'bg-[#4D7C0F]' : 'bg-[#EA580C]'
+                className={`score-badge ${
+                  (student.todayScore || 0) >= 0 ? 'score-badge-positive' : 'score-badge-negative'
                 }`}
               >
                 {student.todayScore}
@@ -70,7 +70,7 @@ export const StudentCard: React.FC<StudentCardProps> = ({
             )}
           </div>
 
-          <span className={`font-bold text-primary ${viewMode === 'list' ? 'text-lg' : 'text-xl'}`}>{student.name}</span>
+          <span className={`font-bold text-[var(--safari-green)] ${viewMode === 'list' ? 'text-lg' : 'text-xl'}`}>{student.name}</span>
         </div>
         
         <div className={viewMode === 'list' ? "flex items-center gap-2" : "flex flex-col gap-2 w-full"}>

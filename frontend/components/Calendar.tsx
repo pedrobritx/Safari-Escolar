@@ -62,15 +62,15 @@ const Calendar: React.FC<CalendarProps> = ({ selectedDate, onDateChange }) => {
                 onClick={() => handleDayClick(i)}
                 className={`h-8 w-8 md:h-10 md:w-10 rounded-full flex items-center justify-center text-sm font-bold transition-all relative
                     ${isSelected 
-                        ? 'bg-[var(--color-primary)] text-white shadow-md scale-105' 
-                        : 'text-[#57534E] hover:bg-[var(--color-secondary)] hover:text-primary'
+                        ? 'bg-[var(--safari-green)] text-white shadow-md scale-105' 
+                        : 'text-[#57534E] hover:bg-[var(--safari-green-light)] hover:text-[var(--safari-green)]'
                     }
-                    ${isToday && !isSelected ? 'border-2 border-[var(--color-primary)] text-primary' : ''}
+                    ${isToday && !isSelected ? 'border-2 border-[var(--safari-green)] text-[var(--safari-green)]' : ''}
                 `}
             >
                 {i}
                 {isToday && !isSelected && (
-                  <span className="absolute -bottom-1 w-1 h-1 bg-primary rounded-full"></span>
+                  <span className="absolute -bottom-1 w-1 h-1 bg-[var(--safari-green)] rounded-full"></span>
                 )}
             </button>
         );
@@ -79,22 +79,22 @@ const Calendar: React.FC<CalendarProps> = ({ selectedDate, onDateChange }) => {
   };
 
   return (
-    <div className="bg-[#FAF9F6] border-2 border-[var(--color-border)] rounded-2xl shadow-[4px_4px_0px_var(--color-border)] p-4 md:p-6 w-full h-full flex flex-col">
+    <div className="bg-white border-2 border-[var(--neu-border-color)] rounded-[var(--neu-radius-lg)] shadow-[var(--neu-shadow)] p-4 md:p-6 w-full h-full flex flex-col">
       <div className="flex items-center justify-between mb-4 md:mb-6">
         <button 
             onClick={handlePrevMonth}
-            className="p-1 rounded-full hover:bg-[var(--color-secondary)] text-primary transition-colors"
+            className="p-1 rounded-full hover:bg-[var(--safari-green-light)] text-[var(--safari-green)] transition-colors"
         >
             <ChevronLeft size={24} />
         </button>
         <div className="text-center">
-            <h3 className="text-lg md:text-xl font-bold text-primary capitalize">
+            <h3 className="text-lg md:text-xl font-bold text-[var(--safari-green)] capitalize">
                 {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
             </h3>
         </div>
         <button 
             onClick={handleNextMonth}
-            className="p-1 rounded-full hover:bg-[var(--color-secondary)] text-primary transition-colors"
+            className="p-1 rounded-full hover:bg-[var(--safari-green-light)] text-[var(--safari-green)] transition-colors"
         >
             <ChevronRight size={24} />
         </button>

@@ -116,11 +116,11 @@ export default function StudentDetailModal({
         <div className="p-6">
             
             {/* Custom Header - Safari Green */}
-            <div className="bg-[#4D7C0F] pt-8 pb-12 px-6 flex flex-col items-center relative shrink-0 -mx-6 -mt-6 rounded-b-[2.5rem] shadow-lg mb-6">
+            <div className="bg-[var(--safari-green)] pt-8 pb-12 px-6 flex flex-col items-center relative shrink-0 -mx-6 -mt-6 rounded-b-[2.5rem] shadow-lg mb-6">
                <Button 
                  variant="accent"
                  onClick={onClose}
-                 className="absolute top-5 right-5 p-3 rounded-xl !border-b-4 active:!border-b-0 shadow-lg z-20"
+                 className="absolute top-5 right-5 p-3 rounded-[var(--neu-radius)] !border-b-4 active:!border-b-0 shadow-lg z-20"
                  aria-label="Fechar"
                >
                  <X size={26} strokeWidth={3} />
@@ -133,7 +133,7 @@ export default function StudentDetailModal({
                   >
                     {animalAvatar}
                   </div>
-                  <div className="absolute -bottom-3 -right-2 bg-white px-3 py-1 rounded-full shadow-md text-xs font-bold text-[#4D7C0F]">
+                  <div className="absolute -bottom-3 -right-2 bg-white px-3 py-1 rounded-full shadow-md text-xs font-bold text-[var(--safari-green)]">
                     Mudar
                   </div>
                </div>
@@ -158,20 +158,16 @@ export default function StudentDetailModal({
             <div className="flex gap-4 relative z-10 shrink-0 px-2 mb-4">
               <button
                 onClick={() => setActiveTab('feedback')}
-                className={`flex-1 py-3 rounded-xl font-black text-lg shadow-md transition-all ${
-                  activeTab === 'feedback'
-                   ? 'bg-[#EAB308] text-white ring-2 ring-[#EAB308] ring-offset-2'
-                   : 'bg-[#E5E7EB] text-gray-400 hover:bg-gray-200'
+                className={`tab ${
+                  activeTab === 'feedback' ? 'tab-neutral' : 'tab-inactive'
                 }`}
               >
                 Feedback
               </button>
               <button
                 onClick={() => setActiveTab('contact')}
-                className={`flex-1 py-3 rounded-xl font-black text-lg shadow-md transition-all ${
-                  activeTab === 'contact'
-                   ? 'bg-[#EAB308] text-white ring-2 ring-[#EAB308] ring-offset-2'
-                   : 'bg-[#E5E7EB] text-gray-400 hover:bg-gray-200'
+                className={`tab ${
+                  activeTab === 'contact' ? 'tab-neutral' : 'tab-inactive'
                 }`}
               >
                 Contato
@@ -192,9 +188,9 @@ export default function StudentDetailModal({
                     </div>
                   ) : (
                     feedbacks.map((event) => (
-                      <div key={event.id} className="bg-white border-2 border-[#C8C6A7] rounded-2xl p-3 flex items-center justify-between shadow-sm">
+                      <div key={event.id} className="list-item">
                          <div className="flex items-center gap-3">
-                            <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${event.type === 'positive' ? 'bg-[#ECFCCB]' : 'bg-[#FFEDD5]'}`}>
+                            <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${event.type === 'positive' ? 'bg-[var(--safari-green-light)]' : 'bg-orange-100'}`}>
                               {event.description.includes('Tarefa') ? '📝' : 
                                event.description.includes('Equipe') ? '🧩' :
                                event.description.includes('Ajudando') ? '🤝' :
@@ -209,7 +205,7 @@ export default function StudentDetailModal({
                             </div>
                          </div>
                          <div className="flex gap-2 items-center">
-                            <div className={`font-black text-white rounded-lg h-9 w-12 flex items-center justify-center ${event.type === 'positive' ? 'bg-[#4D7C0F]' : 'bg-[#EA580C]'}`}>
+                            <div className={`font-black text-white rounded-[var(--neu-radius)] h-9 w-12 flex items-center justify-center ${event.type === 'positive' ? 'bg-[var(--safari-green)]' : 'bg-[var(--safari-orange)]'}`}>
                               {event.type === 'positive' ? '+1' : '-1'}
                             </div>
                             <Button 
@@ -238,11 +234,11 @@ export default function StudentDetailModal({
                       label="Nome Completo"
                       value={name}
                       onChange={e => setName(e.target.value)}
-                      className="border-[#4D7C0F]"
+                      className="border-[var(--safari-green)]"
                    />
 
                    <div>
-                     <label htmlFor="student-whatsapp" className="text-sm font-bold text-[#4D7C0F] mb-2 block">WhatsApp</label>
+                     <label htmlFor="student-whatsapp" className="text-sm font-bold text-[var(--safari-green)] mb-2 block">WhatsApp</label>
                      <div className="relative">
                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                        <input 
@@ -251,13 +247,13 @@ export default function StudentDetailModal({
                          value={whatsapp}
                          onChange={e => setWhatsapp(e.target.value)}
                          placeholder="+55 (99) 9 9999-9999"
-                         className="input-field pl-12 border-[#4D7C0F]"
+                         className="input-field pl-12 border-[var(--safari-green)]"
                        />
                      </div>
                    </div>
 
                    <div>
-                     <label htmlFor="student-email" className="text-sm font-bold text-[#4D7C0F] mb-2 block">E-mail</label>
+                     <label htmlFor="student-email" className="text-sm font-bold text-[var(--safari-green)] mb-2 block">E-mail</label>
                      <div className="relative">
                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                        <input 
@@ -266,7 +262,7 @@ export default function StudentDetailModal({
                          value={email}
                          onChange={e => setEmail(e.target.value)}
                          placeholder="email@exemplo.com"
-                         className="input-field pl-12 border-[#4D7C0F]"
+                         className="input-field pl-12 border-[var(--safari-green)]"
                        />
                      </div>
                    </div>

@@ -126,20 +126,16 @@ export default function FeedbackEditorModal({
             <div className="flex-1 flex gap-2">
                 <button
                     onClick={() => { setActiveTab('positive'); setEditingId(null); setDeletingId(null); }}
-                    className={`flex-1 btn rounded-xl transition-all uppercase ${
-                    activeTab === 'positive' 
-                        ? 'bg-[var(--safari-green)] text-white border-[#365314] shadow-sm' 
-                        : 'bg-gray-100 border-gray-300 text-gray-500 hover:bg-gray-200'
+                    className={`tab ${
+                    activeTab === 'positive' ? 'tab-positive' : 'tab-inactive'
                     }`}
                 >
                     Positivo
                 </button>
                 <button
                     onClick={() => { setActiveTab('negative'); setEditingId(null); setDeletingId(null); }}
-                    className={`flex-1 btn rounded-xl transition-all uppercase ${
-                    activeTab === 'negative' 
-                        ? 'bg-[var(--safari-orange)] text-white border-[#9A3412] shadow-sm' 
-                        : 'bg-gray-100 border-gray-300 text-gray-500 hover:bg-gray-200'
+                    className={`tab ${
+                    activeTab === 'negative' ? 'tab-negative' : 'tab-inactive'
                     }`}
                 >
                     Construtivo
@@ -148,20 +144,20 @@ export default function FeedbackEditorModal({
         </div>
 
         {/* Content */}
-        <div className="p-6 bg-[#FAF9F6] overflow-y-auto h-[calc(60vh+3.5rem)] custom-scrollbar">
+        <div className="p-6 bg-[var(--safari-khaki)] overflow-y-auto h-[calc(60vh+3.5rem)] custom-scrollbar">
           
           {!editingId ? (
             /* LIST MODE */
             <>
               <div className="space-y-3 mb-6">
                 {currentList.map((item) => (
-                  <div key={item.id} className={`flex items-center justify-between bg-white p-3 px-4 rounded-xl border-2 border-gray-200 border-b-4 hover:border-gray-300 transition-all ${deletingId === item.id ? 'border-orange-500 bg-orange-50 !border-b-2 translate-y-0.5' : ''}`}>
+                  <div key={item.id} className={`list-item ${deletingId === item.id ? 'list-item-danger' : ''}`}>
                     <div className="flex items-center gap-4 flex-1">
-                      <div className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-full text-2xl border border-gray-200">
+                      <div className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-full text-2xl border border-[var(--neu-border-color)]">
                           {item.icon}
                       </div>
                       <span className="font-bold text-black text-lg flex-1 truncate">{item.label}</span>
-                      <div className="bg-gray-300 text-gray-600 font-bold px-3 py-1 rounded-lg text-sm">
+                      <div className="bg-gray-300 text-gray-600 font-bold px-3 py-1 rounded-[var(--neu-radius)] text-sm">
                         {item.points > 0 ? '+' : ''}{item.points}
                       </div>
                     </div>
