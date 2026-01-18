@@ -47,7 +47,9 @@ export default function DashboardPage() {
     setSelectedDate,
     refreshData,
     setClasses, 
-    setDashboardData
+    setDashboardData,
+    currentDashboardData,
+    setCurrentDashboardData
   } = useDashboard(user);
 
   
@@ -309,6 +311,12 @@ export default function DashboardPage() {
                 onChange={(e) => {
                   const cls = classes.find((c) => c.id === e.target.value);
                   setSelectedClass(cls || null);
+
+                  if(cls) {
+                    const selectedDashboard = dashboardData.find(dashboard => dashboard.classId === cls.id)
+
+                    if(selectedDashboard) setCurrentDashboardData(selectedDashboard)
+                  }
                 }}
                 className="select-field h-[52px] mb-[2px]"
               >
@@ -381,41 +389,41 @@ export default function DashboardPage() {
         <div className="grid-dashboard mb-8">
            {/* Cartão de Resumo */}
           <div className="lg:col-span-1">
-          {dashboardData.map((data) => (
-            <Card key={data.classId} className="h-full">
-              <CardBody>
-                <h3 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">
-                  🏕️ {data.className}
-                </h3>
-                <div className="space-y-3 text-sm font-medium">
-                  <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
-                    <span className="text-[#57534E]">Total de Alunos:</span>
-                    <span className="font-bold text-[var(--safari-green)]">{data.totalStudents}</span>
+          {currentDashboardData && (
+              <Card key={currentDashboardData.classId}>
+                <CardBody>
+                  <h3 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">
+                  🏕️ {currentDashboardData.className}
+                  </h3>
+                  <div className="space-y-3 text-sm font-medium">
+                    <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
+                      <span className="text-[#57534E]">Total de Alunos:</span>
+                      <span className="font-bold text-[var(--safari-green)]">{currentDashboardData.totalStudents}</span>
+                    </div>
+                    <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
+                      <span className="text-[#57534E]">Presentes:</span>
+                      <span className="font-bold text-[var(--safari-green)]">{currentDashboardData.todayAttendance}</span>
+                    </div>
+                    <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
+                      <span className="text-[#57534E]">Atrasados:</span>
+                      <span className="font-bold text-[var(--safari-orange)]">{currentDashboardData.todayLate}</span>
+                    </div>
+                    <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
+                      <span className="text-[#57534E]">Taxa de Presença:</span>
+                      <span className="font-bold text-[var(--safari-green)]">{currentDashboardData.attendanceRate.toFixed(1)}%</span>
+                    </div>
+                    <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
+                      <span className="text-[#57534E]">Feedbacks Positivos:</span>
+                      <span className="font-bold text-[var(--safari-green)]">+{currentDashboardData.todayPositiveEvents}</span>
+                    </div>
+                    <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
+                      <span className="text-[#57534E]">Feedbacks Construtivos:</span>
+                      <span className="font-bold text-[var(--safari-orange)]">-{currentDashboardData.todayNegativeEvents}</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
-                    <span className="text-[#57534E]">Presentes:</span>
-                    <span className="font-bold text-[var(--safari-green)]">{data.todayAttendance}</span>
-                  </div>
-                  <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
-                    <span className="text-[#57534E]">Atrasados:</span>
-                    <span className="font-bold text-[var(--safari-orange)]">{data.todayLate}</span>
-                  </div>
-                  <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
-                    <span className="text-[#57534E]">Taxa de Presença:</span>
-                    <span className="font-bold text-[var(--safari-green)]">{data.attendanceRate.toFixed(1)}%</span>
-                  </div>
-                  <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
-                    <span className="text-[#57534E]">Feedbacks Positivos:</span>
-                    <span className="font-bold text-[var(--safari-green)]">+{data.todayPositiveEvents}</span>
-                  </div>
-                  <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
-                    <span className="text-[#57534E]">Feedbacks Construtivos:</span>
-                    <span className="font-bold text-[var(--safari-orange)]">-{data.todayNegativeEvents}</span>
-                  </div>
-                </div>
-              </CardBody>
-            </Card>
-          ))}
+                </CardBody>
+              </Card>
+            )}
           </div>
 
            {/* Calendário */}

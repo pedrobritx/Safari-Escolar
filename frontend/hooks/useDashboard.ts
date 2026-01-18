@@ -9,6 +9,7 @@ export function useDashboard(user: User | null) {
   const [selectedClass, setSelectedClass] = useState<Class | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [currentDashboardData,setCurrentDashboardData] = useState<DashboardData | null>(null)
 
   const loadData = useCallback(async (token: string) => {
     try {
@@ -20,6 +21,16 @@ export function useDashboard(user: User | null) {
 
       setDashboardData(dashboard);
       setClasses(classesData);
+
+      if(currentDashboardData) {
+        const newCurrentDashboardData = dashboardData.find(dashboard => dashboard.classId === currentDashboardData.classId)
+ 
+        if(newCurrentDashboardData)
+          setCurrentDashboardData(newCurrentDashboardData)
+
+      } else if(dashboardData.length > 0) {
+        setCurrentDashboardData(dashboardData[0])
+      }
 
       setSelectedClass((prev) => {
         if (prev) {
@@ -61,5 +72,7 @@ export function useDashboard(user: User | null) {
     refreshData,
     setClasses, // Exposed for optimistic updates if needed
     setDashboardData,
+    currentDashboardData,
+    setCurrentDashboardData,
   };
 }

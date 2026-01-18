@@ -8,12 +8,6 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
     const userId = req.user!.id;
     const userRole = req.user!.role;
 
-    if (userRole !== 'TEACHER') {
-      return res.status(403).json({ error: 'Only teachers can access dashboard' });
-    }
-
-
-
     const { date } = req.query;
     const { start: targetDateStart, end: targetDateEnd } = getDayRange(date as string | undefined);
 
