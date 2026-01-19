@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
-import { User, Student } from '@/lib/types';
+import { User, Student, DashboardData } from '@/lib/types';
 import FeedbackModal, { FeedbackItem } from '@/components/FeedbackModal';
 import FeedbackEditorModal from '@/components/FeedbackEditorModal';
 import StudentDetailModal from '@/components/StudentDetailModal';
@@ -35,6 +35,7 @@ export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortOption, setSortOption] = useState<'firstNameAsc' | 'firstNameDesc' | 'lastNameAsc' | 'lastNameDesc'>('firstNameAsc');
+  const [currentDashboardData,setCurrentDashboardData] = useState<DashboardData | null>(null)
 
   // Custom Hook
   const { 
@@ -48,8 +49,6 @@ export default function DashboardPage() {
     refreshData,
     setClasses, 
     setDashboardData,
-    currentDashboardData,
-    setCurrentDashboardData
   } = useDashboard(user);
 
   
@@ -104,6 +103,14 @@ export default function DashboardPage() {
     setUser(parsedUser);
   }, [router]);
 
+  //Updates class summary when dahboard has any update
+  useEffect(() => {
+    const currentClassDashboard = dashboardData.find(dashboard => dashboard.classId === selectedClass?.id)
+
+    if(currentClassDashboard)
+      setCurrentDashboardData(currentClassDashboard)
+
+  },[dashboardData])
 
   const sortStudents = (students: Student[] | undefined) => {
     if (!students) return [];

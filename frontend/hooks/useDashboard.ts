@@ -9,7 +9,6 @@ export function useDashboard(user: User | null) {
   const [selectedClass, setSelectedClass] = useState<Class | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [currentDashboardData,setCurrentDashboardData] = useState<DashboardData | null>(null)
 
   const loadData = useCallback(async (token: string) => {
     try {
@@ -18,16 +17,6 @@ export function useDashboard(user: User | null) {
         api.getDashboard(token, formattedDate),
         api.getClasses(token, formattedDate),
       ]);
-
-      if(currentDashboardData) {
-        const newCurrentDashboardData = dashboard.find(dashboardItem => dashboardItem.classId === currentDashboardData.classId)
- 
-        if(newCurrentDashboardData)
-          setCurrentDashboardData(newCurrentDashboardData)
-
-      } else if(dashboard.length > 0) {
-        setCurrentDashboardData(dashboard[0])
-      }
 
       setDashboardData(dashboard);
       setClasses(classesData);
@@ -72,7 +61,5 @@ export function useDashboard(user: User | null) {
     refreshData,
     setClasses, // Exposed for optimistic updates if needed
     setDashboardData,
-    currentDashboardData,
-    setCurrentDashboardData,
   };
 }
