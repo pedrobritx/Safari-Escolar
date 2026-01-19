@@ -26,11 +26,24 @@ export function CreateClassroomModal({ onClassroomCreated }: CreateClassroomModa
     e.preventDefault();
     setIsLoading(true);
 
-    // TODO: Connect to actual API
-    // For now mocking the delay and callback
     try {
-      console.log("Creating classroom:", { name, gradeLevel });
-      await new Promise(resolve => setTimeout(resolve, 500)); // Mock delay
+      const res = await fetch("/api/classrooms/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          grade_level: gradeLevel,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to create classroom");
+      }
+
+      const newClassroom = await res.json();
+      console.log("Classroom created:", newClassroom);
       
       setOpen(false);
       setName("");
@@ -38,6 +51,7 @@ export function CreateClassroomModal({ onClassroomCreated }: CreateClassroomModa
       onClassroomCreated();
     } catch (error) {
       console.error(error);
+      // Optional: Add toast error here
     } finally {
       setIsLoading(false);
     }

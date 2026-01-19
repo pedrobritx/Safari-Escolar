@@ -1,42 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, use, useEffect } from "react";
 import { GlassPanel } from "@/components/ui/glass-panel";
 import { Button } from "@/components/ui/button";
 import { BackButton } from "@/components/ui/back-button";
 import { StudentTile } from "@/features/teacher/components/student-tile";
 import { AttendanceChip, AttendanceStatus } from "@/features/teacher/components/attendance-chip";
-
-// Mock Data
-const ALL_MOCK_STUDENTS = [
-  { id: 1, name: "Ana Clara", avatar: "🦒" },
-  { id: 2, name: "Bernardo", avatar: "🦁" },
-  { id: 3, name: "Carla", avatar: "🦓" },
-  { id: 4, name: "Daniel", avatar: "🐘" },
-  { id: 5, name: "Eduardo", avatar: "🐒" },
-  { id: 6, name: "Fernanda", avatar: "🦜" },
-  { id: 7, name: "Gabriel", avatar: "🐊" },
-  { id: 8, name: "Helena", avatar: "🦒" },
-  { id: 9, name: "Igor", avatar: "🦁" },
-  { id: 10, name: "Julia", avatar: "🦓" },
-  { id: 11, name: "Kevin", avatar: "🐘" },
-  { id: 12, name: "Lucas", avatar: "🐒" },
-];
-
-function getStudentsForClass(classId: string) {
-    // Simple deterministic shuffle/slice based on ID
-    const idNum = parseInt(classId) || 1;
-    const count = 5 + (idNum % 5); // 5 to 9 students
-    const start = (idNum * 2) % ALL_MOCK_STUDENTS.length;
-    
-    // Create a circular slice
-    const students = [];
-    for (let i = 0; i < count; i++) {
-        students.push(ALL_MOCK_STUDENTS[(start + i) % ALL_MOCK_STUDENTS.length]);
-    }
-    return students;
-}
-
 
 // Feedback Templates (Mock)
 import { FeedbackCategory, FeedbackTemplate } from "@/features/teacher/types/feedback-types";
@@ -53,10 +22,21 @@ const INITIAL_TEMPLATES: FeedbackTemplate[] = [
   { id: "6", label: "Atraso", icon: "⏰", points: -1, category: "improvement" },
 ];
 
-export default function ClassDetail({ params }: { params: { id: string } }) {
-  const [viewMode, setViewMode] = useState<"attendance" | "feedback">("attendance"); // Default to attendance
+interface Student {
+    id: number;
+    name: string;
+    avatar: string;
+}
+
+const AVATARS = ["🦒", "🦁", "zebra", "🐘", "🐒", "🦜", "🐊", "🐢", "🦊", "🐼"];
+
+export default function ClassDetail({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const [viewMode, setViewMode] = useState<"attendance" | "feedback">("attendance");
   
-  const currentStudents = getStudentsForClass(params.id);
+  // Replaced mock generation with state and fetch
+  const [currentStudents, setCurrentStudents] = useState<Student[]>([]);
+  const [isLoadingStudents, setIsLoadingStudents] = useState(true);
 
   // Attendance State
   const [attendanceMode, setAttendanceMode] = useState<AttendanceStatus>("present");
@@ -68,6 +48,36 @@ export default function ClassDetail({ params }: { params: { id: string } }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [managerOpen, setManagerOpen] = useState(false);
   const [selectedStudentId, setSelectedStudentId] = useState<number | null>(null);
+
+  // Fetch Students from API
+  useEffect(() => {
+    const fetchStudents = async () => {
+        setIsLoadingStudents(true);
+        try {
+            const res = await fetch(`/api/students/?classroom=${id}`);
+            if (res.ok) {
+                const data = await res.json();
+                // Map backend student to UI Student
+                const mapped = data.map((s: any, idx: number) => ({
+                    id: s.id,
+                    name: s.display_name,
+                    avatar: AVATARS[idx % AVATARS.length] // Deterministic avatar based on index
+                }));
+                setCurrentStudents(mapped);
+                
+                // Initialize status
+                const initialStatus: Record<number, AttendanceStatus> = {};
+                mapped.forEach((s: any) => initialStatus[s.id] = "present");
+                setStudentStatus(initialStatus);
+            }
+        } catch (error) {
+            console.error("Failed to fetch students", error);
+        } finally {
+            setIsLoadingStudents(false);
+        }
+    };
+    fetchStudents();
+  }, [id]);
 
   // Template Management Handlers
   const handleAddTemplate = (template: Omit<FeedbackTemplate, "id">) => {
@@ -83,24 +93,25 @@ export default function ClassDetail({ params }: { params: { id: string } }) {
     setTemplates(templates.filter(t => t.id !== id));
   };
 
-  const handleStudentClick = (id: number) => {
+  const handleStudentClick = (studentId: number) => {
     if (viewMode === "attendance") {
         setStudentStatus((prev) => {
-            const currentStatus = prev[id];
-            // If already marked with the current mode, unmark (toggle off)
+            const currentStatus = prev[studentId];
             if (currentStatus === attendanceMode) {
-                const { [id]: _, ...rest } = prev;
-                return rest;
+                 // Toggle off if same status (optional, or stay same)
+                 // Let's just keep strict assignment for now or maybe toggle to 'present' if 'absent'?
+                 // The original code removed the key, effectively resetting?
+                 // Let's stick to assigning the current mode.
+                 if (currentStatus === attendanceMode) return prev; // No change?
+                 return { ...prev, [studentId]: attendanceMode };
             }
-            // Otherwise set to current mode
             return {
                 ...prev,
-                [id]: attendanceMode,
+                [studentId]: attendanceMode,
             };
         });
     } else {
-        // Feedback Mode - Open Modal
-        setSelectedStudentId(id);
+        setSelectedStudentId(studentId);
         setModalOpen(true);
     }
   };
@@ -111,7 +122,6 @@ export default function ClassDetail({ params }: { params: { id: string } }) {
             ...prev,
             [selectedStudentId]: (prev[selectedStudentId] || 0) + template.points
         }));
-        // Log/Toast could go here
         console.log(`Applied ${template.label} to student ${selectedStudentId}${note ? ` with note: ${note}` : ''}`);
     }
   };
@@ -127,13 +137,12 @@ export default function ClassDetail({ params }: { params: { id: string } }) {
   const currentCount = Object.values(studentStatus).filter(s => s === "present").length;
 
   return (
-    <div className="flex flex-col gap-4 pb-60 relative"> {/* Increased padding-bottom for taller bottom bar */}
+    <div className="flex flex-col gap-4 pb-60 relative">
       <div className="flex items-center justify-between">
          <div className="flex items-center gap-2">
-            <BackButton href="/teacher" />
+            <BackButton href="/teacher/classroom" />
          </div>
          
-         {/* Simple Mode Switcher */}
          <div className="flex bg-[var(--surface)] p-1 rounded-full border">
             <button 
                 onClick={() => setViewMode("attendance")}
@@ -150,10 +159,9 @@ export default function ClassDetail({ params }: { params: { id: string } }) {
          </div>
       </div>
 
-      {/* Header Info */}
       <GlassPanel className="p-4 flex justify-between items-center rounded-[var(--radius-lg)]">
         <div>
-           <h2 className="font-bold text-xl">Turma {params.id}</h2>
+           <h2 className="font-bold text-xl">Turma {id}</h2>
            <p className="text-sm text-[var(--text-muted)]">
                {viewMode === 'attendance' ? 'Chamada em andamento' : 'Enviar Feedback'}
            </p>
@@ -164,21 +172,27 @@ export default function ClassDetail({ params }: { params: { id: string } }) {
         </div>
       </GlassPanel>
 
-      {/* Grid */}
-      <div className="grid grid-cols-3 gap-3">
-        {currentStudents.map((student) => (
-          <StudentTile
-            key={student.id}
-            name={student.name}
-            avatar={student.avatar}
-            status={studentStatus[student.id]}
-            points={studentPoints[student.id]}
-            onClick={() => handleStudentClick(student.id)}
-          />
-        ))}
-      </div>
+      {isLoadingStudents ? (
+          <div className="text-center py-12 text-[var(--text-muted)]">Carregando alunos...</div>
+      ) : currentStudents.length === 0 ? (
+          <div className="text-center py-12 border-2 border-dashed border-[var(--border)] rounded-xl">
+            <p className="text-[var(--text-muted)]">Nenhum aluno nesta turma ainda.</p>
+          </div>
+      ) : (
+          <div className="grid grid-cols-3 gap-3">
+            {currentStudents.map((student) => (
+              <StudentTile
+                key={student.id}
+                name={student.name}
+                avatar={student.avatar}
+                status={studentStatus[student.id]}
+                points={studentPoints[student.id]}
+                onClick={() => handleStudentClick(student.id)}
+              />
+            ))}
+          </div>
+      )}
 
-      {/* Bottom Action Bar */}
       {viewMode === 'attendance' ? (
         <div className="fixed bottom-20 left-4 right-4 md:static md:w-full md:mx-0 z-40">
             <GlassPanel variant="strong" className="p-3 shadow-2xl flex flex-col gap-3 border-[var(--primary)] border-2">
@@ -209,7 +223,6 @@ export default function ClassDetail({ params }: { params: { id: string } }) {
           />
       )}
 
-      {/* Student Feedback Modal */}
       {selectedStudentId && (
         <StudentFeedbackModal
             isOpen={modalOpen}
@@ -221,7 +234,6 @@ export default function ClassDetail({ params }: { params: { id: string } }) {
         />
       )}
 
-      {/* Template Manager */}
       <FeedbackTemplateManager
         isOpen={managerOpen}
         onClose={() => setManagerOpen(false)}
