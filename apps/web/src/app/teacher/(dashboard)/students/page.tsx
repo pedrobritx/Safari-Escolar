@@ -1,11 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { GlassPanel } from "@/components/ui/glass-panel";
 import { Input } from "@/components/ui/input";
 import { StudentTile } from "@/features/teacher/components/student-tile";
+import { StudentDetailModal } from "@/features/teacher/components/student-detail-modal";
 
-const STUDENTS = [
+interface Student {
+  id: number;
+  name: string;
+  avatar: string;
+  class: string;
+}
+
+const STUDENTS: Student[] = [
   { id: 1, name: "Ana Clara", avatar: "🦒", class: "2B" },
   { id: 2, name: "Bernardo", avatar: "🦁", class: "2B" },
   { id: 3, name: "Carla", avatar: "🦓", class: "3A" },
@@ -17,8 +24,15 @@ const STUDENTS = [
 
 export default function StudentsPage() {
   const [term, setTerm] = useState("");
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const filtered = STUDENTS.filter(s => s.name.toLowerCase().includes(term.toLowerCase()));
+
+  const handleStudentClick = (student: Student) => {
+    setSelectedStudent(student);
+    setIsModalOpen(true);
+  };
 
   return (
     <div className="flex flex-col gap-6 pt-2">
@@ -38,11 +52,18 @@ export default function StudentsPage() {
               key={s.id}
               name={s.name}
               avatar={s.avatar}
-              // No status for directory view
-              onClick={() => {}} 
+              onClick={() => handleStudentClick(s)} 
             />
           ))}
        </div>
+
+       {/* Student Detail Modal */}
+       <StudentDetailModal
+         isOpen={isModalOpen}
+         onClose={() => setIsModalOpen(false)}
+         student={selectedStudent}
+       />
     </div>
   );
 }
+

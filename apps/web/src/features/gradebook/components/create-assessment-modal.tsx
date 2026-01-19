@@ -1,49 +1,66 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { GradeCategory, GradeItem } from "../types";
 
-interface CreateAssessmentModalProps {
+interface AssessmentModalProps {
   isOpen: boolean;
   onClose: () => void;
   categories: GradeCategory[];
   onSave: (item: Partial<GradeItem>) => void;
+  editItem?: GradeItem | null;
 }
 
-export function CreateAssessmentModal({ 
+export function AssessmentModal({ 
   isOpen, 
   onClose, 
   categories, 
-  onSave 
-}: CreateAssessmentModalProps) {
+  onSave,
+  editItem 
+}: AssessmentModalProps) {
   const [title, setTitle] = useState("");
   const [categoryId, setCategoryId] = useState<string>("");
   const [maxScore, setMaxScore] = useState("10");
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
 
+  const isEditMode = !!editItem;
+
+  // Pre-fill form when editing
+  useEffect(() => {
+    if (editItem) {
+      setTitle(editItem.title);
+      setCategoryId(editItem.category);
+      setMaxScore(String(editItem.max_score));
+      setDate(editItem.graded_at);
+    } else {
+      // Reset form for create mode
+      setTitle("");
+      setCategoryId("");
+      setMaxScore("10");
+      setDate(new Date().toISOString().split('T')[0]);
+    }
+  }, [editItem, isOpen]);
+
   const handleSave = () => {
     onSave({
+      id: editItem?.id, // Include id when editing
       title,
       category: categoryId,
       max_score: parseFloat(maxScore),
       graded_at: date
     });
     onClose();
-    // Reset form
-    setTitle("");
-    setCategoryId("");
-    setMaxScore("10");
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Nova Avaliação</DialogTitle>
+          <DialogTitle>{isEditMode ? "Editar Avaliação" : "Nova Avaliação"}</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">

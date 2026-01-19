@@ -32,6 +32,7 @@ export function CreateClassroomModal({ onClassroomCreated }: CreateClassroomModa
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({
           name,
           grade_level: gradeLevel,

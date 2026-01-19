@@ -12,6 +12,7 @@ interface GradebookGridProps {
   items: GradeItem[];
   entries: GradeEntry[];
   onUpdateGrade: (studentId: string, itemId: string, score: number) => void;
+  onEditItem?: (item: GradeItem) => void;
 }
 
 export function GradebookGrid({
@@ -19,7 +20,8 @@ export function GradebookGrid({
   categories,
   items,
   entries,
-  onUpdateGrade
+  onUpdateGrade,
+  onEditItem
 }: GradebookGridProps) {
   
   const getScore = (studentId: string, itemId: string) => {
@@ -36,8 +38,15 @@ export function GradebookGrid({
                 Aluno
             </th>
             {items.map((item) => (
-              <th key={item.id} className="px-4 py-3 min-w-[100px] text-center border-l border-[var(--border)]">
-                <div className="font-bold text-[var(--text)]">{item.title}</div>
+              <th 
+                key={item.id} 
+                className={`px-4 py-3 min-w-[100px] text-center border-l border-[var(--border)] ${onEditItem ? 'cursor-pointer hover:bg-[var(--surface-hover)] transition-colors group' : ''}`}
+                onClick={() => onEditItem?.(item)}
+              >
+                <div className="font-bold text-[var(--text)] flex items-center justify-center gap-1">
+                  {item.title}
+                  {onEditItem && <span className="opacity-0 group-hover:opacity-60 text-xs">✏️</span>}
+                </div>
                 <div className="text-[10px] opacity-70">{item.max_score} pts</div>
               </th>
             ))}

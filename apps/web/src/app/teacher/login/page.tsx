@@ -1,22 +1,54 @@
-
 "use client";
 
 import { Button } from "@/components/ui/button";
 import { GlassPanel } from "@/components/ui/glass-panel";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import Link from "next/link"; // Import Link for navigation
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function TeacherPage() {
+export default function TeacherLoginPage() {
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    // Simulate API call
-    console.log("Login submitted");
-    setTimeout(() => setLoading(false), 1000);
+    setError("");
+
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    try {
+      const res = await fetch("/api/auth/login/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          username: email,
+          password: password,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        // Redirect to teacher dashboard on success
+        router.push("/teacher/classroom");
+      } else {
+        setError(data.error || "Credenciais inválidas");
+      }
+    } catch (err) {
+      setError("Erro ao conectar com o servidor");
+      console.error("Login error:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -35,13 +67,18 @@ export default function TeacherPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4 text-left">
+          {error && (
+            <div className="p-3 rounded-lg bg-red-100 border border-red-300 text-red-700 text-sm">
+              {error}
+            </div>
+          )}
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="professor@escola.com.br" required />
+            <Input id="email" name="email" type="email" placeholder="professor@escola.com.br" required />
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Senha</Label>
-            <Input id="password" type="password" required />
+            <Input id="password" name="password" type="password" required />
           </div>
 
           <Button type="submit" size="lg" className="w-full mt-2" disabled={loading}>

@@ -5,7 +5,7 @@ import { GlassPanel } from "@/components/ui/glass-panel";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { GradebookGrid } from "@/features/gradebook/components/gradebook-grid";
-import { CreateAssessmentModal } from "@/features/gradebook/components/create-assessment-modal";
+import { AssessmentModal } from "@/features/gradebook/components/create-assessment-modal";
 import { GradeCategory, GradeItem, GradeEntry } from "@/features/gradebook/types";
 
 // Mock Data matching the new schema
@@ -34,16 +34,43 @@ export default function GradebookPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [items, setItems] = useState<GradeItem[]>(MOCK_ITEMS);
   const [entries, setEntries] = useState<GradeEntry[]>(MOCK_ENTRIES);
+  const [editingItem, setEditingItem] = useState<GradeItem | null>(null);
 
-  const handleCreateAssessment = (newItem: Partial<GradeItem>) => {
-    const item: GradeItem = {
-      id: `item-${Date.now()}`,
-      category: newItem.category!,
-      title: newItem.title!,
-      max_score: newItem.max_score!,
-      graded_at: newItem.graded_at!,
-    };
-    setItems([...items, item]);
+  const handleSaveAssessment = (newItem: Partial<GradeItem>) => {
+    if (newItem.id) {
+      // Editing existing item
+      setItems(prev => prev.map(item => 
+        item.id === newItem.id 
+          ? { ...item, ...newItem } as GradeItem
+          : item
+      ));
+    } else {
+      // Creating new item
+      const item: GradeItem = {
+        id: `item-${Date.now()}`,
+        category: newItem.category!,
+        title: newItem.title!,
+        max_score: newItem.max_score!,
+        graded_at: newItem.graded_at!,
+      };
+      setItems([...items, item]);
+    }
+    setEditingItem(null);
+  };
+
+  const handleEditItem = (item: GradeItem) => {
+    setEditingItem(item);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenCreateModal = () => {
+    setEditingItem(null);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingItem(null);
   };
 
   const handleUpdateGrade = (studentId: string, itemId: string, score: number) => {
@@ -68,7 +95,7 @@ export default function GradebookPage() {
            <h1 className="text-2xl font-bold">Diário de Classe</h1>
            <p className="text-[var(--text-muted)]">Gerencie notas e avaliações</p>
         </div>
-        <Button onClick={() => setIsModalOpen(true)} className="gap-2">
+        <Button onClick={handleOpenCreateModal} className="gap-2">
             <Plus size={18} />
             Nova Avaliação
         </Button>
@@ -81,14 +108,16 @@ export default function GradebookPage() {
             items={items}
             entries={entries}
             onUpdateGrade={handleUpdateGrade}
+            onEditItem={handleEditItem}
         />
       </GlassPanel>
 
-      <CreateAssessmentModal
+      <AssessmentModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={handleCloseModal}
         categories={MOCK_CATEGORIES}
-        onSave={handleCreateAssessment}
+        onSave={handleSaveAssessment}
+        editItem={editingItem}
       />
     </div>
   );

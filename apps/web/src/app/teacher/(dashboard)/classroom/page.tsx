@@ -12,7 +12,9 @@ export default function ClassroomList() {
 
   const fetchClasses = async () => {
     try {
-      const res = await fetch("/api/classrooms/");
+      const res = await fetch("/api/classrooms/", {
+        credentials: "include",
+      });
       if (res.ok) {
         const data = await res.json();
         const mapped = data.map((c: any) => ({

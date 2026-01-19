@@ -54,7 +54,9 @@ export default function ClassDetail({ params }: { params: Promise<{ id: string }
     const fetchStudents = async () => {
         setIsLoadingStudents(true);
         try {
-            const res = await fetch(`/api/students/?classroom=${id}`);
+            const res = await fetch(`/api/students/?classroom=${id}`, {
+              credentials: "include",
+            });
             if (res.ok) {
                 const data = await res.json();
                 // Map backend student to UI Student
