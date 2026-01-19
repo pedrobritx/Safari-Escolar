@@ -107,7 +107,7 @@ export default function ClassDetail() {
   const currentCount = Object.values(studentStatus).filter(s => s === "present").length;
 
   return (
-    <div className="flex flex-col gap-4 pb-40 relative"> {/* Increased padding-bottom for taller bottom bar */}
+    <div className="flex flex-col gap-4 pb-60 relative"> {/* Increased padding-bottom for taller bottom bar */}
       <div className="flex items-center justify-between">
          <div className="flex items-center gap-2">
             <BackButton href="/teacher" />

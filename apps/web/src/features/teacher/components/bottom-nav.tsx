@@ -9,6 +9,7 @@ export const TEACHER_NAV_LINKS = [
   { href: "/teacher", label: "Início", icon: "🏠" },
   { href: "/teacher/classroom", label: "Turmas", icon: "📚" },
   { href: "/teacher/students", label: "Alunos", icon: "🎓" },
+  { href: "/teacher/gradebook", label: "Notas", icon: "📊" },
   { href: "/teacher/calendar", label: "Agenda", icon: "📅" },
 ];
 
