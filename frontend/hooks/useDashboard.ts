@@ -19,18 +19,18 @@ export function useDashboard(user: User | null) {
         api.getClasses(token, formattedDate),
       ]);
 
-      setDashboardData(dashboard);
-      setClasses(classesData);
-
       if(currentDashboardData) {
-        const newCurrentDashboardData = dashboardData.find(dashboard => dashboard.classId === currentDashboardData.classId)
+        const newCurrentDashboardData = dashboard.find(dashboardItem => dashboardItem.classId === currentDashboardData.classId)
  
         if(newCurrentDashboardData)
           setCurrentDashboardData(newCurrentDashboardData)
 
-      } else if(dashboardData.length > 0) {
-        setCurrentDashboardData(dashboardData[0])
+      } else if(dashboard.length > 0) {
+        setCurrentDashboardData(dashboard[0])
       }
+
+      setDashboardData(dashboard);
+      setClasses(classesData);
 
       setSelectedClass((prev) => {
         if (prev) {
