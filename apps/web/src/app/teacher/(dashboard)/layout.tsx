@@ -1,4 +1,4 @@
-import { BottomNav } from "@/features/teacher/components/bottom-nav";
+import { BottomNav, DesktopTopNav } from "@/features/teacher/components/bottom-nav";
 import { GlassPanel } from "@/components/ui/glass-panel";
 
 export default function TeacherDashboardLayout({
@@ -14,6 +14,9 @@ export default function TeacherDashboardLayout({
             <span className="text-2xl">👨‍🏫</span>
             <h1 className="font-bold text-lg text-[var(--primary)]">Safari Escolar</h1>
          </div>
+         
+         <DesktopTopNav />
+
          <div className="text-sm font-medium text-[var(--text-muted)]">
             Prof. Carlos
          </div>
