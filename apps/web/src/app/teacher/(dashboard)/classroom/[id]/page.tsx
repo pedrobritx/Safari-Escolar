@@ -23,7 +23,7 @@ const MOCK_STUDENTS = [
 // Feedback Templates (Mock)
 import { FeedbackCategory, FeedbackTemplate } from "@/features/teacher/types/feedback-types";
 import { FeedbackBottomBar } from "@/features/teacher/components/feedback-bottom-bar";
-import { FeedbackModal } from "@/features/teacher/components/feedback-modal";
+import { StudentFeedbackModal } from "@/features/teacher/components/student-feedback-modal";
 import { FeedbackTemplateManager } from "@/features/teacher/components/feedback-template-manager";
 
 const INITIAL_TEMPLATES: FeedbackTemplate[] = [
@@ -41,15 +41,13 @@ export default function ClassDetail() {
   // Attendance State
   const [attendanceMode, setAttendanceMode] = useState<AttendanceStatus>("present");
   const [studentStatus, setStudentStatus] = useState<Record<number, AttendanceStatus>>({});
+  const [studentPoints, setStudentPoints] = useState<Record<number, number>>({});
 
   // Feedback State
   const [templates, setTemplates] = useState<FeedbackTemplate[]>(INITIAL_TEMPLATES);
-  const [feedbackCategory, setFeedbackCategory] = useState<FeedbackCategory>("positive");
-  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
-  const [noteEnabled, setNoteEnabled] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [managerOpen, setManagerOpen] = useState(false);
-  const [pendingFeedbackStudentId, setPendingFeedbackStudentId] = useState<number | null>(null);
+  const [selectedStudentId, setSelectedStudentId] = useState<number | null>(null);
 
   // Template Management Handlers
   const handleAddTemplate = (template: Omit<FeedbackTemplate, "id">) => {
@@ -63,12 +61,8 @@ export default function ClassDetail() {
 
   const handleDeleteTemplate = (id: string) => {
     setTemplates(templates.filter(t => t.id !== id));
-    if (selectedTemplateId === id) setSelectedTemplateId(null);
   };
 
-  // Initialize with 'present' implicitly or explicitly? 
-  // UI.md says: Bulk action (Mark all present)
-  
   const handleStudentClick = (id: number) => {
     if (viewMode === "attendance") {
         setStudentStatus((prev) => {
@@ -85,23 +79,20 @@ export default function ClassDetail() {
             };
         });
     } else {
-        // Feedback Mode
-        if (!selectedTemplateId) {
-            // Ideally show a toast here
-            alert("Selecione um template de feedback primeiro!");
-            return;
-        }
+        // Feedback Mode - Open Modal
+        setSelectedStudentId(id);
+        setModalOpen(true);
+    }
+  };
 
-        if (noteEnabled) {
-            setPendingFeedbackStudentId(id);
-            setModalOpen(true);
-        } else {
-            // Apply immediately
-            const template = templates.find(t => t.id === selectedTemplateId);
-            console.log(`Applying feedback: ${template?.label} to student ${id}`);
-            // Here we would call the API
-            alert(`Feedback enviado: ${template?.label}`);
-        }
+  const handleApplyFeedback = (template: FeedbackTemplate, note?: string) => {
+    if (selectedStudentId) {
+        setStudentPoints(prev => ({
+            ...prev,
+            [selectedStudentId]: (prev[selectedStudentId] || 0) + template.points
+        }));
+        // Log/Toast could go here
+        console.log(`Applied ${template.label} to student ${selectedStudentId}${note ? ` with note: ${note}` : ''}`);
     }
   };
 
@@ -114,16 +105,6 @@ export default function ClassDetail() {
   };
 
   const currentCount = Object.values(studentStatus).filter(s => s === "present").length;
-
-  const handleFeedbackSubmit = (note: string) => {
-    if (pendingFeedbackStudentId && selectedTemplateId) {
-        const template = templates.find(t => t.id === selectedTemplateId);
-        console.log(`Applying feedback with note: ${template?.label} to student ${pendingFeedbackStudentId}. Note: ${note}`);
-        alert(`Feedback enviado com nota para aluno ${pendingFeedbackStudentId}`);
-    }
-    setModalOpen(false);
-    setPendingFeedbackStudentId(null);
-  }
 
   return (
     <div className="flex flex-col gap-4 pb-40 relative"> {/* Increased padding-bottom for taller bottom bar */}
@@ -171,6 +152,7 @@ export default function ClassDetail() {
             name={student.name}
             avatar={student.avatar}
             status={studentStatus[student.id]}
+            points={studentPoints[student.id]}
             onClick={() => handleStudentClick(student.id)}
           />
         ))}
@@ -203,25 +185,21 @@ export default function ClassDetail() {
         </div>
       ) : (
           <FeedbackBottomBar
-             templates={templates}
-             selectedTemplateId={selectedTemplateId}
-             onSelectTemplate={setSelectedTemplateId}
-             noteEnabled={noteEnabled}
-             onToggleNote={setNoteEnabled}
-             currentCategory={feedbackCategory}
-             onSelectCategory={setFeedbackCategory}
              onOpenManager={() => setManagerOpen(true)}
           />
       )}
 
-      {/* Feedback Modal */}
-      <FeedbackModal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onSubmit={handleFeedbackSubmit}
-        studentName={MOCK_STUDENTS.find(s => s.id === pendingFeedbackStudentId)?.name || ""}
-        templateName={templates.find(t => t.id === selectedTemplateId)?.label || ""}
-      />
+      {/* Student Feedback Modal */}
+      {selectedStudentId && (
+        <StudentFeedbackModal
+            isOpen={modalOpen}
+            onClose={() => setModalOpen(false)}
+            studentName={MOCK_STUDENTS.find(s => s.id === selectedStudentId)?.name || ""}
+            studentAvatar={MOCK_STUDENTS.find(s => s.id === selectedStudentId)?.avatar || ""}
+            templates={templates}
+            onApplyFeedback={handleApplyFeedback}
+        />
+      )}
 
       {/* Template Manager */}
       <FeedbackTemplateManager

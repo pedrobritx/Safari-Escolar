@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 
 const Dialog = ({
   open,
+  onOpenChange,
   children,
 }: {
   open?: boolean;
@@ -12,8 +13,18 @@ const Dialog = ({
   children: React.ReactNode;
 }) => {
   if (!open) return null;
+
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      onOpenChange?.(false);
+    }
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in-0">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in-0"
+      onClick={handleBackdropClick}
+    >
       {children}
     </div>
   );
