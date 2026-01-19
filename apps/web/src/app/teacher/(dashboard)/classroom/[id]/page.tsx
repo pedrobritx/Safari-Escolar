@@ -8,7 +8,7 @@ import { StudentTile } from "@/features/teacher/components/student-tile";
 import { AttendanceChip, AttendanceStatus } from "@/features/teacher/components/attendance-chip";
 
 // Mock Data
-const MOCK_STUDENTS = [
+const ALL_MOCK_STUDENTS = [
   { id: 1, name: "Ana Clara", avatar: "🦒" },
   { id: 2, name: "Bernardo", avatar: "🦁" },
   { id: 3, name: "Carla", avatar: "🦓" },
@@ -17,7 +17,25 @@ const MOCK_STUDENTS = [
   { id: 6, name: "Fernanda", avatar: "🦜" },
   { id: 7, name: "Gabriel", avatar: "🐊" },
   { id: 8, name: "Helena", avatar: "🦒" },
+  { id: 9, name: "Igor", avatar: "🦁" },
+  { id: 10, name: "Julia", avatar: "🦓" },
+  { id: 11, name: "Kevin", avatar: "🐘" },
+  { id: 12, name: "Lucas", avatar: "🐒" },
 ];
+
+function getStudentsForClass(classId: string) {
+    // Simple deterministic shuffle/slice based on ID
+    const idNum = parseInt(classId) || 1;
+    const count = 5 + (idNum % 5); // 5 to 9 students
+    const start = (idNum * 2) % ALL_MOCK_STUDENTS.length;
+    
+    // Create a circular slice
+    const students = [];
+    for (let i = 0; i < count; i++) {
+        students.push(ALL_MOCK_STUDENTS[(start + i) % ALL_MOCK_STUDENTS.length]);
+    }
+    return students;
+}
 
 
 // Feedback Templates (Mock)
@@ -35,9 +53,11 @@ const INITIAL_TEMPLATES: FeedbackTemplate[] = [
   { id: "6", label: "Atraso", icon: "⏰", points: -1, category: "improvement" },
 ];
 
-export default function ClassDetail() {
+export default function ClassDetail({ params }: { params: { id: string } }) {
   const [viewMode, setViewMode] = useState<"attendance" | "feedback">("attendance"); // Default to attendance
   
+  const currentStudents = getStudentsForClass(params.id);
+
   // Attendance State
   const [attendanceMode, setAttendanceMode] = useState<AttendanceStatus>("present");
   const [studentStatus, setStudentStatus] = useState<Record<number, AttendanceStatus>>({});
@@ -98,7 +118,7 @@ export default function ClassDetail() {
 
   const handleMarkAll = () => {
     const newStatus: Record<number, AttendanceStatus> = {};
-    MOCK_STUDENTS.forEach((s) => {
+    currentStudents.forEach((s) => {
       newStatus[s.id] = "present";
     });
     setStudentStatus(newStatus);
@@ -133,20 +153,20 @@ export default function ClassDetail() {
       {/* Header Info */}
       <GlassPanel className="p-4 flex justify-between items-center rounded-[var(--radius-lg)]">
         <div>
-           <h2 className="font-bold text-xl">Matemática 2B</h2>
+           <h2 className="font-bold text-xl">Turma {params.id}</h2>
            <p className="text-sm text-[var(--text-muted)]">
                {viewMode === 'attendance' ? 'Chamada em andamento' : 'Enviar Feedback'}
            </p>
         </div>
         <div className="text-right">
-           <span className="block text-2xl font-bold text-[var(--primary)]">{currentCount}/{MOCK_STUDENTS.length}</span>
+           <span className="block text-2xl font-bold text-[var(--primary)]">{currentCount}/{currentStudents.length}</span>
            <span className="text-xs">Presentes</span>
         </div>
       </GlassPanel>
 
       {/* Grid */}
       <div className="grid grid-cols-3 gap-3">
-        {MOCK_STUDENTS.map((student) => (
+        {currentStudents.map((student) => (
           <StudentTile
             key={student.id}
             name={student.name}
@@ -194,8 +214,8 @@ export default function ClassDetail() {
         <StudentFeedbackModal
             isOpen={modalOpen}
             onClose={() => setModalOpen(false)}
-            studentName={MOCK_STUDENTS.find(s => s.id === selectedStudentId)?.name || ""}
-            studentAvatar={MOCK_STUDENTS.find(s => s.id === selectedStudentId)?.avatar || ""}
+            studentName={currentStudents.find(s => s.id === selectedStudentId)?.name || ""}
+            studentAvatar={currentStudents.find(s => s.id === selectedStudentId)?.avatar || ""}
             templates={templates}
             onApplyFeedback={handleApplyFeedback}
         />
