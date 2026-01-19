@@ -47,7 +47,7 @@ export default function StudentsPage() {
 
   const fetchStudents = async () => {
     try {
-      const res = await fetch("/api/students/");
+      const res = await fetch("/api/students/", { credentials: "include" });
       if (res.ok) {
         const data = await res.json();
         setStudents(data);
@@ -59,7 +59,7 @@ export default function StudentsPage() {
 
   const fetchClassrooms = async () => {
     try {
-      const res = await fetch("/api/classrooms/");
+      const res = await fetch("/api/classrooms/", { credentials: "include" });
       if (res.ok) {
         const data = await res.json();
         setClassrooms(data);
@@ -124,6 +124,7 @@ export default function StudentsPage() {
             classroom: studentData.classroom,
             color_hex: studentData.color_hex,
           }),
+          credentials: "include",
         });
         if (!res.ok) throw new Error("Failed to update student");
       } else {
@@ -137,6 +138,7 @@ export default function StudentsPage() {
             classroom: studentData.classroom,
             color_hex: studentData.color_hex,
           }),
+          credentials: "include",
         });
         if (!res.ok) throw new Error("Failed to create student");
       }

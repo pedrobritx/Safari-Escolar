@@ -25,7 +25,10 @@ SECRET_KEY = 'django-insecure-ffr3#@032m+$%l_k07o2!jxi12-8x!3e1d)#1(gt%u0*2%=yhn
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+
+# Disable trailing slash redirect for API compatibility
+APPEND_SLASH = False
 
 
 # Application definition

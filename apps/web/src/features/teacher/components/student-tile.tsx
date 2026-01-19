@@ -7,9 +7,10 @@ interface StudentTileProps {
   status?: "present" | "absent" | "late";
   points?: number;
   onClick?: () => void;
+  onLongPress?: () => void;
 }
 
-export function StudentTile({ name, avatar, status, points = 0, onClick }: StudentTileProps) {
+export function StudentTile({ name, avatar, status, points = 0, onClick, onLongPress }: StudentTileProps) {
   const statusColors = {
     present: "border-[var(--secondary)] bg-[var(--green-50)]",
     absent: "border-[var(--accent)] bg-[var(--orange-50)]",
@@ -21,6 +22,7 @@ export function StudentTile({ name, avatar, status, points = 0, onClick }: Stude
   return (
     <Card 
       onClick={onClick}
+      onContextMenu={(e) => { e.preventDefault(); onLongPress?.(); }}
       className={`relative flex flex-col items-center justify-center gap-2 p-3 cursor-pointer hover:scale-[1.02] active:scale-95 border-2 ${activeStyle}`}
     >
       {/* Points Badge */}

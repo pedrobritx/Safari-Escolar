@@ -19,9 +19,15 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # With trailing slash
     path('api/auth/', include('accounts.urls')),
     path('api/grades/', include('grades.urls')),
     path('api/classrooms/', include('classrooms.urls')),
     path('api/students/', include('students.urls')),
+    # Without trailing slash (for Next.js compatibility)
+    path('api/auth', include('accounts.urls')),
+    path('api/grades', include('grades.urls')),
+    path('api/classrooms', include('classrooms.urls')),
+    path('api/students', include('students.urls')),
 ]
 

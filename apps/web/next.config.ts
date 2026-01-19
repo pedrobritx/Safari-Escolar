@@ -2,6 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  // Prevent Next.js from redirecting trailing slashes - important for API routes
+  skipTrailingSlashRedirect: true,
   async rewrites() {
     return [
       {
