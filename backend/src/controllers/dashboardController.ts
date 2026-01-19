@@ -88,8 +88,14 @@ export const resetDay = async (req: AuthRequest, res: Response) => {
 
     const { start: targetDateStart, end: targetDateEnd } = getDayRange(date as string);
 
-    // Find classes for this teacher (or strict to specific classId if provided)
-    const whereClass: any = { teacherId: userId };
+    // Find classes for this teacher or coordinator (or strict to specific classId if provided)
+    const whereClass: any = { OR: [
+			{ teacherId: userId},
+			{ school: {
+				coordinatorId: userId
+			}}
+		]};
+
     if (classId) {
         whereClass.id = classId as string;
     }

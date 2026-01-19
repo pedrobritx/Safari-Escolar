@@ -318,12 +318,6 @@ export default function DashboardPage() {
                 onChange={(e) => {
                   const cls = classes.find((c) => c.id === e.target.value);
                   setSelectedClass(cls || null);
-
-                  if(cls) {
-                    const selectedDashboard = dashboardData.find(dashboard => dashboard.classId === cls.id)
-
-                    if(selectedDashboard) setCurrentDashboardData(selectedDashboard)
-                  }
                 }}
                 className="select-field h-[52px] mb-[2px]"
               >
