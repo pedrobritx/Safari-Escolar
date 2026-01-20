@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Card } from "./card";
 import { cn } from "@/lib/utils";
 
@@ -8,7 +9,7 @@ interface MetricCardProps {
   title: string;
   value: string | number;
   subtitle?: string;
-  icon?: React.ReactNode;
+  icon?: ReactNode;
   accent?: Accent;
   trendLabel?: string;
   trendDirection?: TrendDirection;

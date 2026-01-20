@@ -88,7 +88,7 @@ const WINDOWS = [
 ];
 
 export default function CoordinatorDashboard() {
-  const [window, setWindow] = useState(WINDOWS[0].value);
+  const [timeWindow, setTimeWindow] = useState(WINDOWS[0].value);
   const [selectedClassroom, setSelectedClassroom] = useState("todas");
 
   return (
@@ -130,8 +130,8 @@ export default function CoordinatorDashboard() {
             <Button
               key={item.value}
               size="sm"
-              variant={window === item.value ? "primary" : "ghost"}
-              onClick={() => setWindow(item.value)}
+              variant={timeWindow === item.value ? "primary" : "ghost"}
+              onClick={() => setTimeWindow(item.value)}
             >
               {item.label}
             </Button>

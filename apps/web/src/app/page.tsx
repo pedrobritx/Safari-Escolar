@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { GlassPanel } from "@/components/ui/glass-panel";
-import Image from "next/image";
 import { APIStatus } from "@/components/APIStatus";
 
 export default function Home() {
@@ -22,15 +21,18 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="w-full flex flex-col gap-4">
+        <div className="w-full flex flex-col gap-3">
           <Button href="/teacher" size="lg" variant="accent" className="w-full">
-            Entrar como Professor
+            Portal do Professor
           </Button>
-          <Button href="/school" size="lg" variant="secondary" className="w-full">
-            Painel da Escola
+          <Button href="/coordinator" size="lg" variant="secondary" className="w-full">
+            Coordenação / Supervisão
           </Button>
-          <Button href="/parents" size="lg" variant="primary" className="w-full">
-            Área dos Pais
+          <Button href="/admin" size="lg" variant="primary" className="w-full">
+            Administração da Escola
+          </Button>
+          <Button href="/family" size="lg" variant="ghost" className="w-full">
+            Famílias e Responsáveis
           </Button>
         </div>
         

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import type { ReactNode } from "react";
 import { Card } from "@/components/ui/card";
 import { GlassPanel } from "@/components/ui/glass-panel";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,7 @@ import {
 } from "lucide-react";
 
 type TimelineItem = {
-  icon: React.ReactNode;
+  icon: ReactNode;
   title: string;
   detail: string;
   when: string;

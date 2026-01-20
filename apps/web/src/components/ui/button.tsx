@@ -2,7 +2,7 @@ import Link from "next/link";
 import React from "react";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "ghost" | "accent" | "outline";
+  variant?: "primary" | "secondary" | "ghost" | "accent" | "outline" | "destructive";
   size?: "sm" | "md" | "lg" | "icon";
   href?: string;
 }
@@ -32,6 +32,7 @@ export function Button({
     primary: "bg-[var(--primary)] text-[var(--primary-fg)] shadow-sm hover:brightness-105 active:brightness-95 active:shadow-inner border border-transparent",
     secondary: "bg-[var(--secondary)] text-[var(--secondary-fg)] shadow-sm hover:brightness-105 active:brightness-95 active:shadow-inner border border-transparent",
     accent: "bg-[var(--accent)] text-[var(--accent-fg)] shadow-md hover:brightness-105 active:brightness-95 active:shadow-inner border border-transparent",
+    destructive: "bg-red-500 text-white shadow-sm hover:bg-red-600 active:bg-red-700 active:shadow-inner border border-transparent",
     ghost: "bg-transparent text-[var(--text)] hover:bg-[var(--surface-glass)] active:bg-[var(--border)]",
     outline: "bg-transparent text-[var(--text)] border border-[var(--border)] hover:bg-[var(--surface-glass)] active:scale-[0.98]",
   };

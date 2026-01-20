@@ -98,6 +98,13 @@ export default function GradebookPage() {
     setEditingItem(null);
   };
 
+  const handleDeleteAssessment = (item: GradeItem) => {
+    if (window.confirm(`Tem certeza que deseja excluir a avaliação "${item.title}"? Esta ação não pode ser desfeita.`)) {
+        setItems(prev => prev.filter(i => i.id !== item.id));
+        setEntries(prev => prev.filter(e => e.grade_item !== item.id));
+    }
+  };
+
   const handleUpdateGrade = (studentId: string, itemId: string, score: number) => {
     setEntries(prev => {
         const existing = prev.find(e => e.student === studentId && e.grade_item === itemId);
@@ -146,6 +153,7 @@ export default function GradebookPage() {
         onClose={handleCloseModal}
         categories={MOCK_CATEGORIES}
         onSave={handleSaveAssessment}
+        onDelete={handleDeleteAssessment}
         editItem={editingItem}
       />
     </div>

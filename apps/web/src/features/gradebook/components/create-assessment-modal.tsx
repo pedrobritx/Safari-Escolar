@@ -12,6 +12,7 @@ interface AssessmentModalProps {
   onClose: () => void;
   categories: GradeCategory[];
   onSave: (item: Partial<GradeItem>) => void;
+  onDelete?: (item: GradeItem) => void;
   editItem?: GradeItem | null;
 }
 
@@ -20,6 +21,7 @@ export function AssessmentModal({
   onClose, 
   categories, 
   onSave,
+  onDelete,
   editItem 
 }: AssessmentModalProps) {
   const [title, setTitle] = useState("");
@@ -54,6 +56,13 @@ export function AssessmentModal({
       graded_at: date
     });
     onClose();
+  };
+
+  const handleDelete = () => {
+    if (onDelete && editItem) {
+        onDelete(editItem);
+        onClose();
+    }
   };
 
   return (
@@ -112,9 +121,16 @@ export function AssessmentModal({
             />
           </div>
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancelar</Button>
-          <Button onClick={handleSave} disabled={!title || !categoryId}>Salvar</Button>
+        <DialogFooter className={isEditMode ? "sm:justify-between" : ""}>
+          {isEditMode && (
+            <Button variant="destructive" onClick={handleDelete} className="mr-auto">
+                Excluir
+            </Button>
+          )}
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={onClose}>Cancelar</Button>
+            <Button onClick={handleSave} disabled={!title || !categoryId}>Salvar</Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
