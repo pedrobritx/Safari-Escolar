@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { GlassPanel } from "@/components/ui/glass-panel";
 import Image from "next/image";
+import { APIStatus } from "@/components/APIStatus";
 
 export default function Home() {
   return (
@@ -32,6 +33,8 @@ export default function Home() {
             Área dos Pais
           </Button>
         </div>
+        
+        <APIStatus />
       </GlassPanel>
     </main>
   );
