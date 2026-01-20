@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { GlassPanel } from "@/components/ui/glass-panel";
 import { X, Star, TrendingUp, TrendingDown, MessageSquare, FileText, BarChart3, User } from "lucide-react";
+import { ANIMAL_EMOJIS } from "@/features/teacher/constants";
 
 // Types
 interface Student {
@@ -33,9 +34,12 @@ interface StudentDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   student: Student | null;
+  onUpdate?: (updates: { animal_id?: string }) => void;
 }
 
 // Mock data
+// ... (rest of mock data remains the same, assuming it's stable)
+
 const MOCK_GRADES: GradeSummary[] = [
   { category: "Matemática", average: 8.5, maxScore: 10 },
   { category: "Português", average: 9.2, maxScore: 10 },
@@ -59,8 +63,9 @@ const MOCK_NOTES = [
 
 type TabKey = "overview" | "grades" | "feedback" | "notes";
 
-export function StudentDetailModal({ isOpen, onClose, student }: StudentDetailModalProps) {
+export function StudentDetailModal({ isOpen, onClose, student, onUpdate }: StudentDetailModalProps) {
   const [activeTab, setActiveTab] = useState<TabKey>("overview");
+  const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
 
   if (!student) return null;
 
@@ -87,9 +92,41 @@ export function StudentDetailModal({ isOpen, onClose, student }: StudentDetailMo
         </button>
 
         {/* Header */}
-        <DialogHeader className="pb-2">
+        <DialogHeader className="pb-2 relative">
           <div className="flex items-center gap-4">
-            <div className="text-5xl filter drop-shadow-md">{student.avatar}</div>
+            <div className="relative">
+                <button 
+                  onClick={() => setIsEmojiPickerOpen(!isEmojiPickerOpen)}
+                  className="text-5xl filter drop-shadow-md hover:scale-110 transition-transform cursor-pointer outline-none focus:scale-110"
+                  aria-label="Alterar emoji"
+                >
+                    {student.avatar}
+                </button>
+                
+                {/* Emoji Picker Popover */}
+                {isEmojiPickerOpen && (
+                    <>
+                        <div 
+                            className="fixed inset-0 z-10" 
+                            onClick={() => setIsEmojiPickerOpen(false)} 
+                        />
+                        <div className="absolute top-full left-0 mt-2 p-2 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-xl z-20 grid grid-cols-5 gap-1 w-[220px] animate-in fade-in zoom-in-95 data-[side=bottom]:slide-in-from-top-2">
+                             {ANIMAL_EMOJIS.map(emoji => (
+                                 <button
+                                    key={emoji}
+                                    onClick={() => {
+                                        onUpdate?.({ animal_id: emoji });
+                                        setIsEmojiPickerOpen(false);
+                                    }}
+                                    className="text-2xl p-2 hover:bg-[var(--bg)] rounded-lg transition-colors"
+                                 >
+                                    {emoji}
+                                 </button>
+                             ))}
+                        </div>
+                    </>
+                )}
+            </div>
             <div>
               <DialogTitle className="text-xl">{student.name}</DialogTitle>
               <p className="text-sm text-[var(--text-muted)]">Turma {student.class}</p>

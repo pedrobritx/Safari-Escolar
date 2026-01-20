@@ -24,8 +24,10 @@ interface Classroom {
   name: string;
 }
 
+import { ANIMAL_EMOJIS } from "@/features/teacher/constants";
+
 // Safari animal emojis
-const ANIMAL_EMOJIS = ["🦁", "🦒", "🦓", "🐘", "🐒", "🦜", "🐊", "🦩", "🦋", "🐢"];
+// const ANIMAL_EMOJIS = ["🦁", "🦒", "🦓", "🐘", "🐒", "🦜", "🐊", "🦩", "🦋", "🐢"];
 
 // Get avatar - use stored emoji or fallback to color-based
 function getAvatar(student: Student): string {
@@ -219,6 +221,33 @@ export default function StudentsPage() {
         isOpen={isDetailModalOpen}
         onClose={() => setIsDetailModalOpen(false)}
         student={selectedStudent}
+        onUpdate={(updates) => {
+             // If we're just updating the avatar/animal_id
+             if (updates.animal_id && selectedStudent) {
+                const updatedStudent = { ...selectedStudent, ...updates, avatar: updates.animal_id };
+                setSelectedStudent(updatedStudent);
+                
+                // Also update the main list
+                setStudents(prev => prev.map(s => 
+                    s.id === selectedStudent.id 
+                    ? { ...s, animal_id: updates.animal_id! } 
+                    : s
+                ));
+
+                // Persist
+                // We need to find the full student object from the 'students' list to save correctly.
+                const fullStudent = students.find(s => s.id === selectedStudent.id);
+                if (fullStudent) {
+                    handleSaveStudent({
+                        id: selectedStudent.id,
+                        display_name: selectedStudent.name,
+                        classroom: fullStudent.classroom, // Use ID from fullStudent
+                        color_hex: fullStudent.color_hex || "", // Use original values
+                        animal_id: updates.animal_id
+                    }).catch(console.error);
+                }
+             }
+        }}
       />
 
       {/* Student Form Modal (create/edit) */}
