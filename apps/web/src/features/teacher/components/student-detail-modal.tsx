@@ -129,7 +129,7 @@ export function StudentDetailModal({ isOpen, onClose, student, onUpdate }: Stude
             </div>
             <div>
               <DialogTitle className="text-xl">{student.name}</DialogTitle>
-              <p className="text-sm text-[var(--text-muted)]">Turma {student.class}</p>
+              <p className="text-sm text-[var(--text-muted)]">{student.class}</p>
             </div>
           </div>
         </DialogHeader>
