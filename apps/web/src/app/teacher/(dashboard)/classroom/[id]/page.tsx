@@ -117,14 +117,21 @@ export default function ClassDetail({ params }: { params: Promise<{ id: string }
     if (viewMode === "attendance") {
         setStudentStatus((prev) => {
             const currentStatus = prev[studentId];
+            
+            // If the student already has this status, toggle it
             if (currentStatus === attendanceMode) {
-                 // Toggle off if same status (optional, or stay same)
-                 // Let's just keep strict assignment for now or maybe toggle to 'present' if 'absent'?
-                 // The original code removed the key, effectively resetting?
-                 // Let's stick to assigning the current mode.
-                 if (currentStatus === attendanceMode) return prev; // No change?
-                 return { ...prev, [studentId]: attendanceMode };
+                 // If unselecting 'absent' or 'late', revert to 'present' (default)
+                 if (attendanceMode !== "present") {
+                     return { ...prev, [studentId]: "present" };
+                 }
+                 
+                 // If unselecting 'present', clear it to undefined/unselected
+                 const newStatus = { ...prev };
+                 delete newStatus[studentId];
+                 return newStatus;
             }
+            
+            // Otherwise, assign the new status
             return {
                 ...prev,
                 [studentId]: attendanceMode,
