@@ -11,7 +11,7 @@ class Student(models.Model):
     )
     display_name = models.CharField(max_length=100)
     preferred_name = models.CharField(max_length=100, blank=True, null=True)
-    animal_id = models.UUIDField(null=True, blank=True) # Placeholder
+    animal_id = models.CharField(max_length=10, default='🦁', blank=True)  # Stores emoji
     color_hex = models.CharField(max_length=7, default='#000000')
     status = models.CharField(max_length=20, default='ACTIVE')
     

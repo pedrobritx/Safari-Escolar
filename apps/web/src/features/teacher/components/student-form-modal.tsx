@@ -23,6 +23,7 @@ interface StudentFormData {
   preferred_name?: string;
   classroom: string;
   color_hex: string;
+  animal_id?: string;
 }
 
 interface StudentFormModalProps {
@@ -38,6 +39,9 @@ const COLOR_PRESETS = [
   "#FFEAA7", "#DDA0DD", "#98D8C8", "#F7DC6F",
 ];
 
+// Safari animal emojis
+const ANIMAL_EMOJIS = ["🦁", "🦒", "🦓", "🐘", "🐒", "🦜", "🐊", "🦩", "🦋", "🐢"];
+
 export function StudentFormModal({
   isOpen,
   onClose,
@@ -49,6 +53,7 @@ export function StudentFormModal({
   const [preferredName, setPreferredName] = useState("");
   const [classroomId, setClassroomId] = useState("");
   const [colorHex, setColorHex] = useState(COLOR_PRESETS[0]);
+  const [animalId, setAnimalId] = useState(ANIMAL_EMOJIS[0]);
   const [isLoading, setIsLoading] = useState(false);
 
   const isEditMode = !!editStudent;
@@ -59,11 +64,13 @@ export function StudentFormModal({
       setPreferredName(editStudent.preferred_name || "");
       setClassroomId(editStudent.classroom);
       setColorHex(editStudent.color_hex || COLOR_PRESETS[0]);
+      setAnimalId(editStudent.animal_id || ANIMAL_EMOJIS[0]);
     } else {
       setDisplayName("");
       setPreferredName("");
       setClassroomId(classrooms[0]?.id || "");
       setColorHex(COLOR_PRESETS[0]);
+      setAnimalId(ANIMAL_EMOJIS[0]);
     }
   }, [editStudent, isOpen, classrooms]);
 
@@ -78,6 +85,7 @@ export function StudentFormModal({
         preferred_name: preferredName || undefined,
         classroom: classroomId,
         color_hex: colorHex,
+        animal_id: animalId,
       });
       onClose();
     } catch (error) {
@@ -173,6 +181,27 @@ export function StudentFormModal({
                     style={{ backgroundColor: color }}
                     onClick={() => setColorHex(color)}
                   />
+                ))}
+              </div>
+            </div>
+
+            {/* Animal Emoji */}
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label className="text-right">Animal</Label>
+              <div className="col-span-3 flex gap-2 flex-wrap">
+                {ANIMAL_EMOJIS.map((emoji) => (
+                  <button
+                    key={emoji}
+                    type="button"
+                    className={`w-10 h-10 rounded-lg text-xl flex items-center justify-center transition-all bg-[var(--surface-glass)] border-2 ${
+                      animalId === emoji
+                        ? "border-[var(--primary)] ring-2 ring-offset-1 ring-[var(--primary)] scale-110"
+                        : "border-transparent hover:scale-105 hover:bg-[var(--surface)]"
+                    }`}
+                    onClick={() => setAnimalId(emoji)}
+                  >
+                    {emoji}
+                  </button>
                 ))}
               </div>
             </div>

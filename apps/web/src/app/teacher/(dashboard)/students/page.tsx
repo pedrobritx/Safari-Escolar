@@ -15,6 +15,7 @@ interface Student {
   classroom: string;
   classroom_name?: string;
   color_hex?: string;
+  animal_id?: string;
   status?: string;
 }
 
@@ -23,11 +24,15 @@ interface Classroom {
   name: string;
 }
 
-// Generate avatar from color
-function getAvatarFromColor(color?: string): string {
-  const emojis = ["🦁", "🦒", "🦓", "🐘", "🐒", "🦜", "🐊", "🦩", "🦋", "🐢"];
-  if (!color) return emojis[0];
-  const index = parseInt(color.replace("#", "").slice(0, 2), 16) % emojis.length;
+// Safari animal emojis
+const ANIMAL_EMOJIS = ["🦁", "🦒", "🦓", "🐘", "🐒", "🦜", "🐊", "🦩", "🦋", "🐢"];
+
+// Get avatar - use stored emoji or fallback to color-based
+function getAvatar(student: Student): string {
+  if (student.animal_id) return student.animal_id;
+  const emojis = ANIMAL_EMOJIS;
+  if (!student.color_hex) return emojis[0];
+  const index = parseInt(student.color_hex.replace("#", "").slice(0, 2), 16) % emojis.length;
   return emojis[index];
 }
 
@@ -84,7 +89,7 @@ export default function StudentsPage() {
     setSelectedStudent({
       id: student.id,
       name: student.display_name,
-      avatar: getAvatarFromColor(student.color_hex),
+      avatar: getAvatar(student),
       class: student.classroom_name || "",
     });
     setIsDetailModalOpen(true);
@@ -111,6 +116,7 @@ export default function StudentsPage() {
     preferred_name?: string;
     classroom: string;
     color_hex: string;
+    animal_id?: string;
   }) => {
     try {
       if (studentData.id) {
@@ -123,6 +129,7 @@ export default function StudentsPage() {
             preferred_name: studentData.preferred_name,
             classroom: studentData.classroom,
             color_hex: studentData.color_hex,
+            animal_id: studentData.animal_id,
           }),
           credentials: "include",
         });
@@ -137,6 +144,7 @@ export default function StudentsPage() {
             preferred_name: studentData.preferred_name,
             classroom: studentData.classroom,
             color_hex: studentData.color_hex,
+            animal_id: studentData.animal_id,
           }),
           credentials: "include",
         });
@@ -197,7 +205,7 @@ export default function StudentsPage() {
             <StudentTile
               key={s.id}
               name={s.display_name}
-              avatar={getAvatarFromColor(s.color_hex)}
+              avatar={getAvatar(s)}
               points={0}
               onClick={() => handleStudentClick(s)}
               onLongPress={() => handleEditClick(s)}
@@ -224,6 +232,7 @@ export default function StudentsPage() {
           preferred_name: editingStudent.preferred_name,
           classroom: editingStudent.classroom,
           color_hex: editingStudent.color_hex || "#FF6B6B",
+          animal_id: editingStudent.animal_id || "🦁",
         } : null}
         classrooms={classrooms}
       />
