@@ -37,6 +37,7 @@ export default function ClassDetail({ params }: { params: Promise<{ id: string }
   // Replaced mock generation with state and fetch
   const [currentStudents, setCurrentStudents] = useState<Student[]>([]);
   const [isLoadingStudents, setIsLoadingStudents] = useState(true);
+  const [classroomName, setClassroomName] = useState<string>("");
 
   // Attendance State
   const [attendanceMode, setAttendanceMode] = useState<AttendanceStatus>("present");
@@ -54,7 +55,7 @@ export default function ClassDetail({ params }: { params: Promise<{ id: string }
     const fetchStudents = async () => {
         setIsLoadingStudents(true);
         try {
-            const res = await fetch(`/api/students/?classroom=${id}`, {
+            const res = await fetch(`/api/students?classroom=${id}`, {
               credentials: "include",
             });
             if (res.ok) {
@@ -71,6 +72,7 @@ export default function ClassDetail({ params }: { params: Promise<{ id: string }
                 const initialStatus: Record<number, AttendanceStatus> = {};
                 mapped.forEach((s: any) => initialStatus[s.id] = "present");
                 setStudentStatus(initialStatus);
+            setStudentStatus(initialStatus);
             }
         } catch (error) {
             console.error("Failed to fetch students", error);
@@ -78,7 +80,23 @@ export default function ClassDetail({ params }: { params: Promise<{ id: string }
             setIsLoadingStudents(false);
         }
     };
+
+    const fetchClassroomDetails = async () => {
+        try {
+            const res = await fetch(`/api/classrooms/${id}`, {
+                credentials: "include",
+            });
+            if (res.ok) {
+                const data = await res.json();
+                setClassroomName(data.name);
+            }
+        } catch (error) {
+            console.error("Failed to fetch classroom details", error);
+        }
+    };
+
     fetchStudents();
+    fetchClassroomDetails();
   }, [id]);
 
   // Template Management Handlers
@@ -163,7 +181,7 @@ export default function ClassDetail({ params }: { params: Promise<{ id: string }
 
       <GlassPanel className="p-4 flex justify-between items-center rounded-[var(--radius-lg)]">
         <div>
-           <h2 className="font-bold text-xl">Turma {id}</h2>
+           <h2 className="font-bold text-xl">Turma {classroomName || id}</h2>
            <p className="text-sm text-[var(--text-muted)]">
                {viewMode === 'attendance' ? 'Chamada em andamento' : 'Enviar Feedback'}
            </p>
