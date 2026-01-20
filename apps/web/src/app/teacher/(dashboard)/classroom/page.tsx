@@ -4,9 +4,11 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { CreateClassroomModal } from "@/features/teacher/components/create-classroom-modal";
 
 export default function ClassroomList() {
+  const router = useRouter();
   const [classes, setClasses] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -18,6 +20,12 @@ export default function ClassroomList() {
       const res = await fetch("/api/classrooms/", {
         credentials: "include",
       });
+      
+      if (res.status === 401 || res.status === 403) {
+        router.push("/teacher/login");
+        return;
+      }
+
       if (res.ok) {
         const data = await res.json();
         const mapped = data.map((c: any) => ({

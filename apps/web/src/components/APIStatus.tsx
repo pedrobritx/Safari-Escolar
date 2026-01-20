@@ -7,7 +7,7 @@ export function APIStatus() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/docs/")
+    fetch("/api/docs/")
       .then((res) => {
         if (res.ok) {
           setStatus("connected");

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { DashboardStatCard } from "@/features/teacher/components/dashboard-stat-card";
 import { BookOpen, Calendar, AlertCircle, Clock } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface Classroom {
   id: string;
@@ -21,6 +22,7 @@ interface Student {
 }
 
 export default function TeacherDashboard() {
+  const router = useRouter();
   const [classrooms, setClassrooms] = useState<Classroom[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -34,6 +36,11 @@ export default function TeacherDashboard() {
           fetch("/api/classrooms/", { credentials: "include" }),
           fetch("/api/students/", { credentials: "include" }),
         ]);
+
+        if (classroomsRes.status === 401 || classroomsRes.status === 403 || studentsRes.status === 401 || studentsRes.status === 403) {
+           router.push("/teacher/login");
+           return;
+        }
 
         if (!classroomsRes.ok) throw new Error("Falha ao carregar turmas");
         if (!studentsRes.ok) throw new Error("Falha ao carregar alunos");
@@ -216,4 +223,3 @@ export default function TeacherDashboard() {
     </div>
   );
 }
-

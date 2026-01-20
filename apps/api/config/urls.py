@@ -27,6 +27,8 @@ urlpatterns = [
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    # No slash versions for Next.js proxy compatibility
+    path('api/docs', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui-noslash'),
 
     # With trailing slash
     path('api/auth/', include('accounts.urls')),
@@ -37,4 +39,3 @@ urlpatterns = [
     path('api/classrooms', include('classrooms.urls')),
     path('api/students', include('students.urls')),
 ]
-

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { GlassPanel } from "@/components/ui/glass-panel";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -33,8 +33,33 @@ const MOCK_ENTRIES: GradeEntry[] = [
 export default function GradebookPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [items, setItems] = useState<GradeItem[]>(MOCK_ITEMS);
-  const [entries, setEntries] = useState<GradeEntry[]>(MOCK_ENTRIES);
+  const [entries, setEntries] = useState<GradeEntry[]>([]); // Start empty
+  const [students, setStudents] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [editingItem, setEditingItem] = useState<GradeItem | null>(null);
+
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        const res = await fetch("/api/students/", { credentials: "include" });
+        if (res.ok) {
+          const data = await res.json();
+          // Map to format expected by grid: { id, name, avatar? }
+          const mapped = data.map((s: any) => ({
+            id: s.id,
+            name: s.display_name,
+            avatar: s.animal_id
+          }));
+          setStudents(mapped);
+        }
+      } catch (error) {
+        console.error("Failed to fetch students", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchStudents();
+  }, []);
 
   const handleSaveAssessment = (newItem: Partial<GradeItem>) => {
     if (newItem.id) {
@@ -102,14 +127,18 @@ export default function GradebookPage() {
       </div>
 
       <GlassPanel className="p-4 rounded-[var(--radius-xl)]">
-        <GradebookGrid
-            students={MOCK_STUDENTS}
-            categories={MOCK_CATEGORIES}
-            items={items}
-            entries={entries}
-            onUpdateGrade={handleUpdateGrade}
-            onEditItem={handleEditItem}
-        />
+        {isLoading ? (
+            <div className="text-center py-8 text-[var(--text-muted)]">Carregando alunos...</div>
+        ) : (
+            <GradebookGrid
+                students={students}
+                categories={MOCK_CATEGORIES}
+                items={items}
+                entries={entries}
+                onUpdateGrade={handleUpdateGrade}
+                onEditItem={handleEditItem}
+            />
+        )}
       </GlassPanel>
 
       <AssessmentModal

@@ -28,7 +28,7 @@ interface Student {
     avatar: string;
 }
 
-const AVATARS = ["🦒", "🦁", "zebra", "🐘", "🐒", "🦜", "🐊", "🐢", "🦊", "🐼"];
+
 
 export default function ClassDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -61,10 +61,10 @@ export default function ClassDetail({ params }: { params: Promise<{ id: string }
             if (res.ok) {
                 const data = await res.json();
                 // Map backend student to UI Student
-                const mapped = data.map((s: any, idx: number) => ({
+                const mapped = data.map((s: any) => ({
                     id: s.id,
                     name: s.display_name,
-                    avatar: AVATARS[idx % AVATARS.length] // Deterministic avatar based on index
+                    avatar: s.animal_id || "🦁" // Use backend avatar or fallback
                 }));
                 setCurrentStudents(mapped);
                 
