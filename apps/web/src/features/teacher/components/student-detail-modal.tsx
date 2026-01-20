@@ -40,13 +40,7 @@ interface StudentDetailModalProps {
 // Mock data
 // ... (rest of mock data remains the same, assuming it's stable)
 
-const MOCK_GRADES: GradeSummary[] = [
-  { category: "Matemática", average: 8.5, maxScore: 10 },
-  { category: "Português", average: 9.2, maxScore: 10 },
-  { category: "Ciências", average: 7.8, maxScore: 10 },
-  { category: "História", average: 8.0, maxScore: 10 },
-  { category: "Artes", average: 9.5, maxScore: 10 },
-];
+const MOCK_GRADES: GradeSummary[] = [];
 
 const MOCK_FEEDBACK: FeedbackHistoryItem[] = [
   { id: "1", type: "positive", label: "Participação", icon: "🙋", points: 5, date: "19/01/2026" },
@@ -199,22 +193,29 @@ export function StudentDetailModal({ isOpen, onClose, student, onUpdate }: Stude
           {/* Grades Tab */}
           {activeTab === "grades" && (
             <div className="space-y-3 animate-in fade-in slide-in-from-right-2">
-              {MOCK_GRADES.map((grade) => (
-                <GlassPanel key={grade.category} className="p-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="font-medium">{grade.category}</span>
-                    <span className={`font-bold ${grade.average >= 7 ? "text-[var(--secondary)]" : "text-[var(--accent)]"}`}>
-                      {grade.average.toFixed(1)}
-                    </span>
+              {MOCK_GRADES.length === 0 ? (
+                  <div className="text-center py-8 text-[var(--text-muted)]">
+                    <BarChart3 size={32} className="mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">Nenhuma nota lançada</p>
                   </div>
-                  <div className="h-2 bg-[var(--bg)] rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all ${grade.average >= 7 ? "bg-[var(--secondary)]" : "bg-[var(--accent)]"}`}
-                      style={{ width: `${(grade.average / grade.maxScore) * 100}%` }}
-                    />
-                  </div>
-                </GlassPanel>
-              ))}
+              ) : (
+                MOCK_GRADES.map((grade) => (
+                  <GlassPanel key={grade.category} className="p-4">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="font-medium">{grade.category}</span>
+                      <span className={`font-bold ${grade.average >= 7 ? "text-[var(--secondary)]" : "text-[var(--accent)]"}`}>
+                        {grade.average.toFixed(1)}
+                      </span>
+                    </div>
+                    <div className="h-2 bg-[var(--bg)] rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all ${grade.average >= 7 ? "bg-[var(--secondary)]" : "bg-[var(--accent)]"}`}
+                        style={{ width: `${(grade.average / grade.maxScore) * 100}%` }}
+                      />
+                    </div>
+                  </GlassPanel>
+                ))
+              )}
             </div>
           )}
 
