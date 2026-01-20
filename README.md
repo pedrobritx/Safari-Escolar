@@ -58,6 +58,7 @@ Normative architectural decisions live in `ARCH.md` and `DECISIONS.md`.
 ## Repository documentation map
 
 - `SPEC.md` — Product scope, roles, key flows, non-goals, success criteria
+- `TUTORIAL.md` — Step-by-step copy-paste guide to run the project
 - `ARCH.md` — Architecture decisions (stack, folders, patterns)
 - `DATA.md` — Schema, relationships, invariants, examples
 - `API.md` — Endpoint list / service interfaces with request/response examples
