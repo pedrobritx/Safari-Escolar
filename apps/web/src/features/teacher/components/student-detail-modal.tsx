@@ -110,7 +110,7 @@ export function StudentDetailModal({ isOpen, onClose, student, onUpdate }: Stude
                             className="fixed inset-0 z-10" 
                             onClick={() => setIsEmojiPickerOpen(false)} 
                         />
-                        <div className="absolute top-full left-0 mt-2 p-2 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-xl z-20 grid grid-cols-5 gap-1 w-[220px] animate-in fade-in zoom-in-95 data-[side=bottom]:slide-in-from-top-2">
+<div className="absolute top-full left-0 mt-2 p-2 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-xl z-20 grid grid-cols-5 gap-1 w-[280px] max-h-[300px] overflow-y-auto animate-in fade-in zoom-in-95 data-[side=bottom]:slide-in-from-top-2">
                              {ANIMAL_EMOJIS.map(emoji => (
                                  <button
                                     key={emoji}
