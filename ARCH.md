@@ -1,4 +1,4 @@
-# ARCH.md — Safari Escolar
+# ARCH.md — Architecture decisions (stack, folders, patterns)
 
 > **Governance Policy:** Architectural decisions in this document are normative. The team **shall not** deviate from them without (i) updating this file and (ii) creating or materially revising an Architecture Decision Record (ADR) in `docs/adr/`. Architectural drift without documentation is treated as a defect.
 
@@ -328,4 +328,4 @@ For any deviation:
 
 1. Update `ARCH.md`
 2. Create/update the relevant ADR
-3. Update `SPEC.md` when scope or flows are affected
+3. Update `docs/SPEC.md` when scope or flows are affected

@@ -1,4 +1,4 @@
-# SPEC.md — Safari Escolar
+# SPEC.md — Product specification
 
 ## 1. Overview
 

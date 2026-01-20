@@ -1,4 +1,4 @@
-# GLOSSARY.md — Safari Escolar (Internationalisation and Canonical Terminology)
+# GLOSSARY.md — i18n and canonical terminology
 
 > **Purpose:** This document defines (i) the normative internationalisation (i18n) contract for Safari Escolar and (ii) the canonical bilingual lexicon that governs user-facing language. Its function is to prevent semantic drift, maintain cross-locale consistency, and ensure localisation remains observable, testable, and operationally accountable.
 

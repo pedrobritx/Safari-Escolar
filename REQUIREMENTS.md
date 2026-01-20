@@ -1,6 +1,6 @@
-# REQUIREMENTS.md — Safari Escolar
+# REQUIREMENTS.md — Product and system requirements
 
-> **Normative status:** This document specifies product and system requirements using RFC-style keywords (**MUST**, **SHOULD**, **MAY**). Requirements are traceable to implementation work in `TASKS.md` and enforced by constraints in `CONSTRAINTS.md`. Deviations require an explicit superseding entry in `DECISIONS.md`.
+> **Normative status:** This document specifies product and system requirements using RFC-style keywords (**MUST**, **SHOULD**, **MAY**). Requirements are traceable to implementation work in `TASKS.md` and enforced by constraints in `docs/CONSTRAINTS.md`. Deviations require an explicit superseding entry in `docs/adr/0000-log.md`.
 
 ---
 
@@ -141,7 +141,7 @@ Safari Escolar is a classroom management web application optimised for Brazilian
 ### 6.1 Performance
 
 - Attendance interactions MUST provide perceptible feedback within **100ms** (optimistic UI permitted).
-- Teacher-critical routes MUST meet web-vital and latency budgets as specified in `CONSTRAINTS.md`.
+- Teacher-critical routes MUST meet web-vital and latency budgets as specified in `docs/CONSTRAINTS.md`.
 
 ### 6.2 Accessibility
 

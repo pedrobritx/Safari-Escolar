@@ -1,10 +1,11 @@
-# Safari Escolar Tutorial
+# TUTORIAL.md — Step-by-step run guide
 
 This guide provides step-by-step copy-paste instructions to get the Safari Escolar application running locally.
 
 ## Prerequisites
 
 Ensure you have the following installed:
+
 - Node.js (LTS)
 - Python (3.x)
 - PostgreSQL
@@ -54,5 +55,5 @@ The frontend application will be available at `http://localhost:3000`.
 
 ## Step 3: Accessing the App
 
-1.  Open your browser and navigate to [http://localhost:3000](http://localhost:3000).
-2.  Use the credentials listed in `CREDENTIALS.md` to log in.
+1. Open your browser and navigate to [http://localhost:3000](http://localhost:3000).
+2. Use the credentials listed in `CREDENTIALS.md` to log in.

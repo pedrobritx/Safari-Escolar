@@ -1,5 +1,5 @@
 <!-- markdownlint-disable MD024 -->
-# API.md — Safari Escolar
+# API Reference — Endpoints and contracts
 
 > **Governance Policy:** This document is the authoritative, human-readable statement of the Safari Escolar HTTP API. The canonical machine-readable contract is the OpenAPI specification at `docs/api/openapi.yaml`. The system SHALL NOT introduce endpoints, alter payload shapes, or change behavioral semantics without updating **both** artifacts. Undocumented API drift is treated as a defect.
 

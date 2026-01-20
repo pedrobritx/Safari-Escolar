@@ -1,6 +1,6 @@
-# TASKS.md — Safari Escolar (Prioritised Backlog)
+# TASKS.md — Prioritised product backlog
 
-> **Normative status:** This backlog is an operational specification that SHALL be interpreted as binding with respect to product scope (`SPEC.md`), system constraints (`CONSTRAINTS.md`), and architectural commitments (`ARCH.md`). Prioritisation is derived from the teacher core loop. Any material deviation in scope, contract, or governance MUST be captured as a superseding entry in `DECISIONS.md` and propagated to all affected specifications.
+> **Normative status:** This backlog is an operational specification that SHALL be interpreted as binding with respect to product scope (`docs/SPEC.md`), system constraints (`docs/CONSTRAINTS.md`), and architectural commitments (`ARCH.md`). Prioritisation is derived from the teacher core loop. Any material deviation in scope, contract, or governance MUST be captured as a superseding entry in `docs/adr/0000-log.md` and propagated to all affected specifications.
 
 ---
 
@@ -22,7 +22,7 @@ A task SHALL be considered complete only when all applicable conditions below ar
 - **Offline-first correctness:** Where required (attendance, feedback), offline functionality is implemented via WAL + replay with safe convergence.
 - **Contract compliance:** API errors conform to the canonical envelope; idempotency is implemented for resilience-critical writes.
 - **Verification:** Unit and API tests exist where relevant; end-to-end smoke coverage exists for core flows; CI passes.
-- **Spec synchronisation:** Any change to contracts, tokens, or repository paths updates `API.md` / `DATA.md` / `UI.md` as applicable and triggers regeneration of `TREE.md`.
+- **Spec synchronisation:** Any change to contracts, tokens, or repository paths updates `docs/api/index.md` / `docs/DATA.md` / `docs/UI.md` as applicable and triggers regeneration of `TREE.md`.
 
 ---
 

@@ -40,7 +40,7 @@ The system centres the teacher’s operational loop:
 - **Offline-first classroom operations:** attendance and feedback remain functional without network.
 - **Performance and usability budgets:** Attendance marking must provide perceptible feedback within 100ms.
 
-See `CONSTRAINTS.md` for the complete list of hard constraints.
+See `docs/CONSTRAINTS.md` for the complete list of hard constraints.
 
 ---
 
@@ -51,24 +51,23 @@ See `CONSTRAINTS.md` for the complete list of hard constraints.
 - **Database:** PostgreSQL
 - **Auth:** HttpOnly cookies (access + refresh) with refresh rotation
 
-Normative architectural decisions live in `ARCH.md` and `DECISIONS.md`.
+Normative architectural decisions live in `ARCH.md` and `docs/adr/0000-log.md`.
 
 ---
 
 ## Repository documentation map
 
-- `SPEC.md` — Product scope, roles, key flows, non-goals, success criteria
-- `TUTORIAL.md` — Step-by-step copy-paste guide to run the project
 - `ARCH.md` — Architecture decisions (stack, folders, patterns)
-- `DATA.md` — Schema, relationships, invariants, examples
-- `API.md` — Endpoint list / service interfaces with request/response examples
-- `UI.md` — Design tokens, allowed components, layout rules
-- `CONSTRAINTS.md` — Performance budgets, auth rules, invariants, forbidden outcomes
-- `DECISIONS.md` — ADR-lite decision log
-- `TASKS.md` — Prioritised backlog with acceptance criteria
-- `GLOSSARY.md` — i18n contract and canonical terminology (pt-BR, en-GB)
-- `CREDENTIALS.md` — Local dev/test identities (synthetic; non-production)
-- `TREE.md` — Canonical repo tree (machine-generated)
+- `REQUIREMENTS.md` — Product and system requirements
+- `TASKS.md` — Prioritised product backlog
+- `TUTORIAL.md` — Step-by-step run guide
+- `docs/CONSTRAINTS.md` — Hard budgets and system invariants
+- `docs/DATA.md` — Domain schema and relationships
+- `docs/GLOSSARY.md` — i18n and canonical terminology
+- `docs/SPEC.md` — Product specification
+- `docs/UI.md` — Design tokens and UI rules
+- `docs/adr/0000-log.md` — Record of architectural decisions
+- `docs/api/index.md` — Endpoints and contracts
 
 ---
 
@@ -140,14 +139,14 @@ Synthetic accounts for local dev/testing are listed in `CREDENTIALS.md`.
 - Default: `pt-BR`
 - Fallback: `en-GB → pt-BR` with **no silent fallback in production** (missing keys MUST be logged/flagged)
 
-See `GLOSSARY.md` for governance rules and canonical terminology.
+See `docs/GLOSSARY.md` for governance rules and canonical terminology.
 
 ---
 
 ## Contribution and change control
 
-- Architectural or contract changes require updates to the corresponding docs (`ARCH.md`, `DATA.md`, `API.md`, `UI.md`, `CONSTRAINTS.md`).
-- Any reversal of a binding decision MUST be captured as a superseding entry in `DECISIONS.md`.
+- Architectural or contract changes require updates to the corresponding docs (`ARCH.md`, `docs/DATA.md`, `docs/api/index.md`, `docs/UI.md`, `docs/CONSTRAINTS.md`).
+- Any reversal of a binding decision MUST be captured as a superseding entry in `docs/adr/0000-log.md`.
 - Any file additions/renames require regenerating `TREE.md`.
 
 ---
@@ -160,4 +159,4 @@ Safari Escolar treats privacy and scope enforcement as first-order requirements.
 - Audit events for sensitive mutations
 - Guardian scoping and messaging constraints are non-negotiable
 
-See `CONSTRAINTS.md` for forbidden outcomes and required enforcement.
+See `docs/CONSTRAINTS.md` for forbidden outcomes and required enforcement.

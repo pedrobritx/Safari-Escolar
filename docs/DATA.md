@@ -1,4 +1,4 @@
-# DATA.md — Safari Escolar
+# DATA.md — Domain schema and relationships
 
 > **Governance Policy:** This document specifies the canonical logical data model for Safari Escolar. Any modification to entities, relationships, invariants, retention semantics, or externally visible payload shapes requires (i) updating this document and (ii) creating or revising an ADR when the change is architectural (e.g., scoping model, event semantics, offline synchronization contract).
 

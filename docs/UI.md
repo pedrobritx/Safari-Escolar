@@ -1,4 +1,4 @@
-# UI.md — Safari Escolar
+# UI.md — Design tokens and UI rules
 
 > **Governance Policy:** This document constitutes the normative specification for Safari Escolar’s user-interface system. Design tokens, component taxonomies, interaction primitives, and layout constraints defined herein are **binding**. Introducing new visual primitives, interaction patterns, or component variants—whether via ad hoc CSS, bespoke UI elements, or library substitutions—SHALL NOT occur without updating this document and, where architectural in scope, recording the rationale and consequences in an ADR.
 

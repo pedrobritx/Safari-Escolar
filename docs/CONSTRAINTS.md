@@ -1,6 +1,6 @@
-# CONSTRAINTS.md — Safari Escolar
+# CONSTRAINTS.md — Hard budgets and system invariants
 
-> **Governance Policy:** This document specifies **hard, non-negotiable constraints** for Safari Escolar. Any violation constitutes a defect and triggers stop-the-line remediation. Constraints are enforced through architecture, database invariants, authorization middleware, UI system rules, automated tests, and operational monitoring. No feature SHALL be implemented if it requires breaking a constraint unless (i) a superseding decision is recorded in `DECISIONS.md`, (ii) all affected specifications (`DATA.md`, `API.md`, `UI.md`, `ARCH.md`) are updated, and (iii) an explicit migration and risk mitigation plan is approved and implemented.
+> **Governance Policy:** This document specifies **hard, non-negotiable constraints** for Safari Escolar. Any violation constitutes a defect and triggers stop-the-line remediation. Constraints are enforced through architecture, database invariants, authorization middleware, UI system rules, automated tests, and operational monitoring. No feature SHALL be implemented if it requires breaking a constraint unless (i) a superseding decision is recorded in `adr/0000-log.md`, (ii) all affected specifications (`DATA.md`, `api/index.md`, `UI.md`, `../ARCH.md`) are updated, and (iii) an explicit migration and risk mitigation plan is approved and implemented.
 
 ---
 
@@ -232,6 +232,6 @@ The system MUST NEVER:
 Any change that affects constraints MUST:
 
 - update this file
-- update corresponding specs (`DATA.md`, `API.md`, `UI.md`, `ARCH.md`)
-- add a superseding entry in `DECISIONS.md`
+- update corresponding specs (`DATA.md`, `api/index.md`, `UI.md`, `../ARCH.md`)
+- add a superseding entry in `adr/0000-log.md`
 - include a migration plan when data contracts change

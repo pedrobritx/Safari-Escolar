@@ -23,9 +23,9 @@ export function DashboardStatCard({
 }: DashboardStatCardProps) {
   const variantStyles = {
     default: "bg-[var(--surface)] border-[var(--border)]",
-    warning: "bg-[var(--orange-50)] border-[var(--orange-200)]",
-    success: "bg-[var(--green-50)] border-[var(--green-200)]",
-    info: "bg-[var(--blue-50)] border-[var(--blue-200)]",
+    warning: "bg-[var(--color-orange-50)] border-[var(--border)]",
+    success: "bg-[var(--color-green-50)] border-[var(--border)]",
+    info: "bg-[var(--surface-glass-strong)] border-[var(--border)]",
   };
 
   const Content = (
