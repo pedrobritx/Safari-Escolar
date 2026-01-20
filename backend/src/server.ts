@@ -10,6 +10,7 @@ import feedbackRoutes from './routes/feedbackRoutes';
 import dashboardRoutes from './routes/dashboardRoutes';
 import familyRoutes from './routes/familyRoutes';
 import exportRoutes from './routes/exportRoutes';
+import exportUsers from './routes/usersRoutes';
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.use('/api/feedback', feedbackRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/family', familyRoutes);
 app.use('/api/export', exportRoutes);
+app.use('/api/users', exportUsers);
 
 // Health check
 app.get('/api/health', (req, res) => {

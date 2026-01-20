@@ -9,12 +9,13 @@ import FeedbackEditorModal from '@/components/FeedbackEditorModal';
 import StudentDetailModal from '@/components/StudentDetailModal';
 import StudentFormModal from '@/components/StudentFormModal';
 import Calendar from '@/components/Calendar';
-import { LayoutGrid, List, Plus, Trash, Download } from 'lucide-react';
+import { LayoutGrid, List, Plus, Trash, Download, GraduationCap } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { toast } from 'sonner';
 import { useDashboard } from '@/hooks/useDashboard';
 import { StudentCard } from '@/components/StudentCard';
+import { ManageClassTeachersModal } from '@/components/ManageClassTeachersModal';
 
 const DEFAULT_POSITIVE_FEEDBACKS: FeedbackItem[] = [
   { id: 'task_ok', label: 'Tarefa em Dia', icon: '📝', points: 1 },
@@ -36,6 +37,7 @@ export default function DashboardPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortOption, setSortOption] = useState<'firstNameAsc' | 'firstNameDesc' | 'lastNameAsc' | 'lastNameDesc'>('firstNameAsc');
   const [currentDashboardData,setCurrentDashboardData] = useState<DashboardData | null>(null)
+  const [isManageTeachersModalOpen, setIsManageTeachersModalOpen] = useState(false);
 
   // Custom Hook
   const { 
@@ -381,6 +383,18 @@ export default function DashboardPage() {
               >
                 <Trash size={20} />
               </Button>
+
+              {user?.role && ['COORDINATOR','ADMIN'].includes(user.role) && (
+                  <Button
+                    variant="ghost"
+                    onClick={() => setIsManageTeachersModalOpen(true)}
+                    className="mb-[2px] px-4 py-3 text-primary hover:bg-primary/10"
+                    title="Vincular professores na turma"
+                  >
+                    <GraduationCap size={20}/>
+                  </Button>
+                )}
+
             </div>
           </div>
         )}
@@ -551,6 +565,14 @@ export default function DashboardPage() {
             onDelete={handleDeleteStudent}
         />
       )}
+
+      <ManageClassTeachersModal
+        classId={selectedClass?.id ? selectedClass.id : ""}
+        isOpen={isManageTeachersModalOpen}
+        onClose={() => setIsManageTeachersModalOpen(false)}
+      />
     </div>
+
+    
   );
 }
