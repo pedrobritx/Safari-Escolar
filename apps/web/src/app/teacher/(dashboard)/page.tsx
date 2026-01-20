@@ -24,26 +24,28 @@ export default function TeacherDashboard() {
   const [classrooms, setClassrooms] = useState<Classroom[]>([]);
   const [students, setStudents] = useState<Student[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setError(null);
         const [classroomsRes, studentsRes] = await Promise.all([
           fetch("/api/classrooms/", { credentials: "include" }),
           fetch("/api/students/", { credentials: "include" }),
         ]);
 
-        if (classroomsRes.ok) {
-          const classroomsData = await classroomsRes.json();
-          setClassrooms(classroomsData);
-        }
+        if (!classroomsRes.ok) throw new Error("Falha ao carregar turmas");
+        if (!studentsRes.ok) throw new Error("Falha ao carregar alunos");
 
-        if (studentsRes.ok) {
-          const studentsData = await studentsRes.json();
-          setStudents(studentsData);
-        }
+        const classroomsData = await classroomsRes.json();
+        const studentsData = await studentsRes.json();
+        
+        setClassrooms(classroomsData);
+        setStudents(studentsData);
       } catch (error) {
         console.error("Failed to fetch dashboard data:", error);
+        setError("Não foi possível carregar os dados. Verifique sua conexão.");
       } finally {
         setIsLoading(false);
       }
@@ -56,6 +58,21 @@ export default function TeacherDashboard() {
   const getStudentCount = (classroomId: string) => {
     return students.filter((s) => s.classroom === classroomId).length;
   };
+
+  if (error) {
+    return (
+      <div className="flex flex-col gap-6 pb-24 text-center pt-10">
+        <div className="p-6 bg-red-50 text-red-600 rounded-lg border border-red-200 inline-block mx-auto">
+          <AlertCircle size={48} className="mx-auto mb-2" />
+          <p className="font-bold">{error}</p>
+          <Button variant="outline" className="mt-4 border-red-200 hover:bg-red-100" onClick={() => window.location.reload()}>
+            Tentar Novamente
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
 
   // Get the next/current class (first classroom for now)
   const nextClass = classrooms[0];

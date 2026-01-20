@@ -9,9 +9,12 @@ import { CreateClassroomModal } from "@/features/teacher/components/create-class
 export default function ClassroomList() {
   const [classes, setClasses] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchClasses = async () => {
     try {
+      setIsLoading(true);
+      setError(null);
       const res = await fetch("/api/classrooms/", {
         credentials: "include",
       });
@@ -25,9 +28,12 @@ export default function ClassroomList() {
           room: c.grade_level || "101", // Use grade as room or placeholder
         }));
         setClasses(mapped);
+      } else {
+        throw new Error("Failed to fetch");
       }
     } catch (error) {
       console.error("Failed to fetch classes", error);
+      setError("Falha ao carregar turmas. Tente novamente.");
     } finally {
       setIsLoading(false);
     }
@@ -48,6 +54,20 @@ export default function ClassroomList() {
             <h1 className="text-2xl font-bold text-[var(--primary)]">Minhas Turmas</h1>
          </div>
          <div className="p-8 text-center text-[var(--text-muted)]">Carregando turmas...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col gap-6 pt-2 pb-24">
+         <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold text-[var(--primary)]">Minhas Turmas</h1>
+         </div>
+         <div className="p-8 text-center text-red-500 bg-red-50 rounded-lg border border-red-200">
+           <p className="font-bold mb-2">{error}</p>
+           <Button onClick={fetchClasses} variant="outline" className="border-red-200">Tentar novamente</Button>
+         </div>
       </div>
     );
   }
