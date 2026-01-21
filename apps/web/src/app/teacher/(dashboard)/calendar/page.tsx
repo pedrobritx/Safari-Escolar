@@ -121,7 +121,12 @@ export default function CalendarPage() {
     const res = await apiFetch(
       `/api/calendar/?classroom_id=${classId}&from=${encodeURIComponent(dateRange.from)}&to=${encodeURIComponent(dateRange.to)}`
     );
-    if (!res.ok) throw new Error("Falha ao carregar eventos");
+    if (!res.ok) {
+      // Log the error but don't throw - just show empty state
+      console.warn("Calendar API error:", res.status);
+      setEvents([]);
+      return;
+    }
     const data: CalendarEvent[] = await res.json();
     setEvents(data);
   };
