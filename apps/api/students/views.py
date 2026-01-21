@@ -6,11 +6,14 @@ class StudentViewSet(viewsets.ModelViewSet):
     serializer_class = StudentSerializer
     def dispatch(self, request, *args, **kwargs):
         print("DEBUG: StudentViewSet dispatch")
-        print(f"DEBUG: User: {request.user}")
-        print(f"DEBUG: Auth: {request.auth}")
-        print(f"DEBUG: Cookies Keys: {request.COOKIES.keys()}")
-        print(f"DEBUG: Path: {request.path}")
-        print(f"DEBUG: Method: {request.method}")
+        try:
+            print(f"DEBUG: User: {request.user}")
+            # print(f"DEBUG: Auth: {request.auth}") # This fails on WSGIRequest
+            print(f"DEBUG: Cookies Keys: {request.COOKIES.keys()}")
+            print(f"DEBUG: Path: {request.path}")
+            print(f"DEBUG: Method: {request.method}")
+        except Exception as e:
+            print(f"DEBUG: Error logging: {e}")
         return super().dispatch(request, *args, **kwargs)
 
     permission_classes = [permissions.IsAuthenticated]
