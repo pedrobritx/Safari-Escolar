@@ -12,6 +12,8 @@ export default function ClassroomList() {
   const [classes, setClasses] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | null>(null);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const fetchClasses = async () => {
     try {
@@ -84,8 +86,38 @@ export default function ClassroomList() {
     <div className="flex flex-col gap-6 pt-2 pb-24">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-[var(--primary)]">Minhas Turmas</h1>
-        <div className="flex gap-2">
-            <Button variant="ghost" size="sm">Filtros 🔽</Button>
+        <div className="flex gap-2 relative">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => setIsFilterOpen(!isFilterOpen)}
+            >
+              Filtros 🔽
+            </Button>
+            {isFilterOpen && (
+              <div className="absolute top-full right-0 mt-2 w-56 bg-[var(--surface)] border border-[var(--border)] rounded-md shadow-lg z-10 backdrop-blur-sm">
+                <div className="py-1">
+                  <button
+                    className="block w-full text-left px-4 py-2 text-sm hover:bg-[var(--surface-hover)] transition-colors"
+                    onClick={() => {
+                      setSortOrder('asc');
+                      setIsFilterOpen(false);
+                    }}
+                  >
+                    Ordem Alfabética (A-Z)
+                  </button>
+                  <button
+                    className="block w-full text-left px-4 py-2 text-sm hover:bg-[var(--surface-hover)] transition-colors"
+                    onClick={() => {
+                      setSortOrder('desc');
+                      setIsFilterOpen(false);
+                    }}
+                  >
+                    Ordem Alfabética (Z-A)
+                  </button>
+                </div>
+              </div>
+            )}
             <CreateClassroomModal onClassroomCreated={handleClassCreated} />
         </div>
       </div>
@@ -97,7 +129,16 @@ export default function ClassroomList() {
         </div>
       ) : (
         <div className="grid gap-4">
-          {classes.map((cls) => (
+          {[...classes]
+            .sort((a, b) => {
+              if (sortOrder === 'asc') {
+                return a.name.localeCompare(b.name);
+              } else if (sortOrder === 'desc') {
+                return b.name.localeCompare(a.name);
+              }
+              return 0;
+            })
+            .map((cls) => (
             <Link key={cls.id} href={`/teacher/classroom/${cls.id}`}>
                <Card className="hover:border-[var(--primary)] transition-colors cursor-pointer active:scale-[0.99] flex flex-col gap-3">
                  <div className="flex justify-between items-start">
