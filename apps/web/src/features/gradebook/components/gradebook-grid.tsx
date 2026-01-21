@@ -98,6 +98,7 @@ export function GradebookGrid({
                                     }}
                                     max={item.max_score}
                                     min={0}
+                                    step="0.1"
                                 />
                                 {showButton && (
                                     <Button

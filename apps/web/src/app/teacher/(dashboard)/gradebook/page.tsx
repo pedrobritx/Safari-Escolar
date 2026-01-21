@@ -228,12 +228,15 @@ export default function GradebookPage() {
             body: JSON.stringify(payload)
         });
 
-        if (!res.ok) throw new Error("Failed to save grade");
+        if (!res.ok) {
+             const errText = await res.text();
+             throw new Error(`Failed to save grade: ${res.status} ${res.statusText}\n${errText}`);
+        }
         
         // Success
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error saving grade:", error);
-        alert("Erro ao salvar nota. Tente novamente.");
+        alert(`Erro ao salvar nota: ${error.message}`);
     }
   };
 
