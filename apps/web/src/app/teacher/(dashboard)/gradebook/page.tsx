@@ -3,33 +3,12 @@
 import { useState, useEffect } from "react";
 import { GlassPanel } from "@/components/ui/glass-panel";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Download, Plus } from "lucide-react";
 import { GradebookGrid } from "@/features/gradebook/components/gradebook-grid";
 import { AssessmentModal } from "@/features/gradebook/components/create-assessment-modal";
 import { GradeCategory, GradeItem, GradeEntry } from "@/features/gradebook/types";
 import { getCookie } from "@/lib/utils";
-
-// Mock Data matching the new schema
-const MOCK_CATEGORIES: GradeCategory[] = [
-  { id: "cat-1", name: "Provas", classroom_id: "class-1", weight: 60 },
-  { id: "cat-2", name: "Trabalhos", classroom_id: "class-1", weight: 40 },
-];
-
-const MOCK_ITEMS: GradeItem[] = [
-  { id: "item-1", category: "cat-1", title: "Prova 1", max_score: 10, graded_at: "2026-02-15" },
-  { id: "item-2", category: "cat-2", title: "Trabalho em Grupo", max_score: 10, graded_at: "2026-02-20" },
-];
-
-const MOCK_STUDENTS = [
-  { id: "1", name: "Ana Clara" },
-  { id: "2", name: "Bernardo" },
-  { id: "3", name: "Carla" },
-];
-
-const MOCK_ENTRIES: GradeEntry[] = [
-  { id: "entry-1", grade_item: "item-1", student: "1", score: 9.5 },
-  { id: "entry-2", grade_item: "item-1", student: "2", score: 8.0 },
-];
+import { Student } from "@/features/teacher/types";
 
 import { ManageCategoriesModal } from "@/features/gradebook/components/manage-categories-modal";
 
@@ -39,37 +18,46 @@ export default function GradebookPage() {
   const [categories, setCategories] = useState<GradeCategory[]>([]);
   const [items, setItems] = useState<GradeItem[]>([]);
   const [entries, setEntries] = useState<GradeEntry[]>([]); 
-  const [students, setStudents] = useState<any[]>([]);
+  const [students, setStudents] = useState<Student[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [editingItem, setEditingItem] = useState<GradeItem | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
+
+  const getActiveClassroomId = () => students[0]?.classroom;
+
+  const loadGradebook = async (classId: string) => {
+    const resGrid = await fetch(`/api/grades/gradebook/grid?classroom_id=${classId}`, { credentials: "include" });
+    if (!resGrid.ok) {
+      const message = await resGrid.text();
+      throw new Error(message || "Failed to load gradebook data");
+    }
+    const gridData = await resGrid.json();
+    setCategories(gridData.categories || []);
+    setItems(gridData.items || []);
+    setEntries(gridData.entries || []);
+  };
 
   const fetchData = async () => {
+    setIsLoading(true);
     try {
-      // 1. Fetch Students
       const resStudents = await fetch("/api/students", { credentials: "include" });
       if (!resStudents.ok) throw new Error("Failed to fetch students");
-      const studentsData = await resStudents.json();
+      const studentsData: (Student & { animal_id?: string })[] = await resStudents.json();
       
-      // Map students
-      const mappedStudents = studentsData.map((s: any) => ({
-          id: s.id,
-          name: s.display_name,
+      const mappedStudents = studentsData.map((s) => ({
+          ...s,
+          name: s.display_name || s.name || "",
           avatar: s.animal_id,
-          classroom: s.classroom
       }));
       setStudents(mappedStudents);
 
-      // 2. Fetch Gradebook Grid Data (using the first student's class for now)
       const classId = mappedStudents[0]?.classroom;
-      
       if (classId) {
-          const resGrid = await fetch(`/api/grades/gradebook/grid?classroom_id=${classId}`, { credentials: "include" });
-          if (resGrid.ok) {
-              const gridData = await resGrid.json();
-              setCategories(gridData.categories || []);
-              setItems(gridData.items || []);
-              setEntries(gridData.entries || []);
-          }
+        await loadGradebook(classId);
+      } else {
+        setCategories([]);
+        setItems([]);
+        setEntries([]);
       }
     } catch (error) {
       console.error("Failed to load gradebook data", error);
@@ -83,53 +71,33 @@ export default function GradebookPage() {
   }, []);
 
   const handleCreateCategory = async (name: string, weight: number) => {
-    const classId = students[0]?.classroom;
+    const classId = getActiveClassroomId();
     if (!classId) return;
 
     try {
-        const csrfToken = getCookie("csrftoken") || "";
-        console.log("CSRF Token found:", csrfToken ? "Yes (hidden)" : "No");
+      const res = await fetch("/api/grades/categories", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken") || ""
+        },
+        credentials: "include",
+        body: JSON.stringify({
+            name,
+            weight,
+            classroom: classId
+        })
+      });
 
-        const res = await fetch("/api/grades/categories", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": csrfToken
-            },
-            body: JSON.stringify({
-                name,
-                weight,
-                classroom: classId
-            })
-        });
+      if (!res.ok) {
+        const message = await res.text();
+        throw new Error(message || "Erro ao criar categoria");
+      }
 
-        if (res.ok) {
-            // Reload data to reflect changes
-             const resGrid = await fetch(`/api/grades/gradebook/grid?classroom_id=${classId}`);
-             if (resGrid.ok) {
-                 const gridData = await resGrid.json();
-                 setCategories(gridData.categories || []);
-             }
-        } else {
-             let errorMessage = "Erro desconhecido";
-             try {
-                 const text = await res.text();
-                 try {
-                     const errorData = JSON.parse(text);
-                     console.error("Server JSON error:", errorData);
-                     errorMessage = JSON.stringify(errorData);
-                 } catch (e) {
-                     console.error("Server Text error:", text);
-                     errorMessage = text || res.statusText;
-                 }
-             } catch (e: any) {
-                 errorMessage = e.message;
-             }
-             alert(`Erro ao criar categoria: ${errorMessage}`);
-        }
+      await loadGradebook(classId);
     } catch (error: any) {
-        console.error("Failed to create category (catch):", error);
-        alert(`Erro de conexão/rede: ${error.message}`);
+      console.error("Failed to create category:", error);
+      alert(`Erro ao criar categoria: ${error.message}`);
     }
   };
 
@@ -139,11 +107,17 @@ export default function GradebookPage() {
             method: "DELETE",
             headers: {
                 "X-CSRFToken": getCookie("csrftoken") || ""
-            }
+            },
+            credentials: "include"
         });
 
         if (res.ok) {
-             setCategories(prev => prev.filter(c => c.id !== id));
+             const classId = getActiveClassroomId();
+             if (classId) {
+                 await loadGradebook(classId);
+             } else {
+                 setCategories(prev => prev.filter(c => c.id !== id));
+             }
         } else {
              alert("Erro ao excluir categoria (pode estar em uso)");
         }
@@ -155,6 +129,8 @@ export default function GradebookPage() {
 
   const handleSaveAssessment = async (newItem: Partial<GradeItem>) => {
     const csrfToken = getCookie("csrftoken") || "";
+    const classId = getActiveClassroomId();
+    if (!classId) throw new Error("No classroom found");
     
     try {
         if (newItem.id && !newItem.id.startsWith("item-")) {
@@ -165,27 +141,21 @@ export default function GradebookPage() {
                     "Content-Type": "application/json",
                     "X-CSRFToken": csrfToken
                 },
+                credentials: "include",
                 body: JSON.stringify(newItem)
             });
             
             if (!res.ok) throw new Error("Failed to update assessment");
-            const updated: GradeItem = await res.json();
-            
-            setItems(prev => prev.map(item => 
-                item.id === updated.id ? updated : item
-            ));
+            await loadGradebook(classId);
         } else {
             // Create new item
-            // We need to ensure classroom is set.
-            const classId = students[0]?.classroom;
-            if (!classId) throw new Error("No classroom found");
-
             const res = await fetch("/api/grades/items", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "X-CSRFToken": csrfToken
                 },
+                credentials: "include",
                 body: JSON.stringify({
                     ...newItem,
                     classroom: classId
@@ -196,8 +166,7 @@ export default function GradebookPage() {
                 const err = await res.text();
                 throw new Error(`Failed to create assessment: ${err}`);
             }
-            const created: GradeItem = await res.json();
-            setItems(prev => [...prev, created]);
+            await loadGradebook(classId);
         }
         setEditingItem(null);
         setIsModalOpen(false);
@@ -222,10 +191,35 @@ export default function GradebookPage() {
     setEditingItem(null);
   };
 
-  const handleDeleteAssessment = (item: GradeItem) => {
-    if (window.confirm(`Tem certeza que deseja excluir a avaliação "${item.title}"? Esta ação não pode ser desfeita.`)) {
-        setItems(prev => prev.filter(i => i.id !== item.id));
-        setEntries(prev => prev.filter(e => e.grade_item !== item.id));
+  const handleDeleteAssessment = async (item: GradeItem) => {
+    if (!window.confirm(`Tem certeza que deseja excluir a avaliação "${item.title}"? Esta ação não pode ser desfeita.`)) {
+        return;
+    }
+
+    const classId = getActiveClassroomId();
+    try {
+        const res = await fetch(`/api/grades/items/${item.id}`, {
+            method: "DELETE",
+            headers: {
+                "X-CSRFToken": getCookie("csrftoken") || ""
+            },
+            credentials: "include"
+        });
+
+        if (!res.ok) {
+            const message = await res.text();
+            throw new Error(message || "Erro ao excluir avaliação");
+        }
+
+        if (classId) {
+            await loadGradebook(classId);
+        } else {
+            setItems(prev => prev.filter(i => i.id !== item.id));
+            setEntries(prev => prev.filter(e => e.grade_item !== item.id));
+        }
+    } catch (error: any) {
+        console.error("Failed to delete assessment", error);
+        alert(error.message);
     }
   };
 
@@ -246,7 +240,8 @@ export default function GradebookPage() {
 
   const handleSaveGrade = async (studentId: string, itemId: string) => {
     const entry = entries.find(e => e.student === studentId && e.grade_item === itemId);
-    if (!entry) return;
+    const classId = getActiveClassroomId();
+    if (!entry || !classId) return;
 
     try {
         const payload = [{
@@ -255,12 +250,13 @@ export default function GradebookPage() {
             score: entry.score
         }];
 
-        const res = await fetch("/api/grades/entries/bulk_update_grades/", {
+        const res = await fetch("/api/grades/entries/bulk_update_grades", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
                 "X-CSRFToken": getCookie("csrftoken") || ""
             },
+            credentials: "include",
             body: JSON.stringify(payload)
         });
 
@@ -269,10 +265,45 @@ export default function GradebookPage() {
              throw new Error(`Failed to save grade: ${res.status} ${res.statusText}\n${errText}`);
         }
         
-        // Success
+        await loadGradebook(classId);
     } catch (error: any) {
         console.error("Error saving grade:", error);
         alert(`Erro ao salvar nota: ${error.message}`);
+    }
+  };
+
+  const handleExport = async () => {
+    const classId = getActiveClassroomId();
+    if (!classId) {
+        alert("Nenhuma turma ativa para exportar.");
+        return;
+    }
+
+    setIsExporting(true);
+    try {
+        const res = await fetch(`/api/grades/gradebook/export?classroom_id=${classId}`, {
+            credentials: "include"
+        });
+
+        if (!res.ok) {
+            const errText = await res.text();
+            throw new Error(errText || "Falha ao exportar dados");
+        }
+
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `gradebook-${classId}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+    } catch (error: any) {
+        console.error("Export error:", error);
+        alert(`Erro ao exportar: ${error.message}`);
+    } finally {
+        setIsExporting(false);
     }
   };
 
@@ -283,10 +314,21 @@ export default function GradebookPage() {
            <h1 className="text-2xl font-bold">Diário de Classe</h1>
            <p className="text-[var(--text-muted)]">Gerencie notas e avaliações</p>
         </div>
-        <Button onClick={handleOpenCreateModal} className="gap-2">
-            <Plus size={18} />
-            Nova Avaliação
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            onClick={handleExport}
+            className="gap-2"
+            disabled={isExporting}
+          >
+            <Download size={16} />
+            {isExporting ? "Exportando..." : "Exportar"}
+          </Button>
+          <Button onClick={handleOpenCreateModal} className="gap-2">
+              <Plus size={18} />
+              Nova Avaliação
+          </Button>
+        </div>
       </div>
 
       <GlassPanel className="p-4 rounded-[var(--radius-xl)]">

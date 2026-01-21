@@ -2,7 +2,8 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import GradeCategoryViewSet, GradeItemViewSet, GradeEntryViewSet, GradebookViewSet
 
-router = DefaultRouter(trailing_slash=False)
+# Accept both with/without trailing slash to be forgiving with client requests.
+router = DefaultRouter(trailing_slash='/?')
 router.register(r'categories', GradeCategoryViewSet)
 router.register(r'items', GradeItemViewSet)
 router.register(r'entries', GradeEntryViewSet)

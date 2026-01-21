@@ -126,7 +126,8 @@ export function StudentDetailModal({ isOpen, onClose, student, onUpdate }: Stude
       try {
           const res = await fetch(`/api/feedback/${id}`, {
               method: "DELETE",
-              headers: { "X-CSRFToken": getCookie("csrftoken") || "" }
+              headers: { "X-CSRFToken": getCookie("csrftoken") || "" },
+              credentials: "include"
           });
           if (res.ok) {
               setFeedbackHistory(prev => prev.filter(f => f.id !== id));
@@ -145,12 +146,13 @@ export function StudentDetailModal({ isOpen, onClose, student, onUpdate }: Stude
       if (newNote === null) return; // Cancelled
       
       try {
-          const res = await fetch(`/api/feedback/${item.id}/`, {
+          const res = await fetch(`/api/feedback/${item.id}`, {
               method: "PATCH",
               headers: { 
                   "Content-Type": "application/json",
                   "X-CSRFToken": getCookie("csrftoken") || "" 
               },
+              credentials: "include",
               body: JSON.stringify({ note: newNote })
           });
           if (res.ok) {
@@ -171,9 +173,9 @@ export function StudentDetailModal({ isOpen, onClose, student, onUpdate }: Stude
     setIsLoadingGrades(true);
     try {
       const [catsRes, itemsRes, entriesRes] = await Promise.all([
-        fetch(`/api/grades/categories/?classroom_id=${student.classId}`),
-        fetch(`/api/grades/items/?classroom_id=${student.classId}`),
-        fetch(`/api/grades/entries/?student_id=${student.id}`)
+        fetch(`/api/grades/categories?classroom_id=${student.classId}`, { credentials: "include" }),
+        fetch(`/api/grades/items?classroom_id=${student.classId}`, { credentials: "include" }),
+        fetch(`/api/grades/entries?student_id=${student.id}`, { credentials: "include" })
       ]);
 
       if (catsRes.ok && itemsRes.ok && entriesRes.ok) {
@@ -216,16 +218,20 @@ export function StudentDetailModal({ isOpen, onClose, student, onUpdate }: Stude
         score: score
       }));
 
-      const res = await fetch("/api/grades/entries/bulk_update_grades/", {
+      const res = await fetch("/api/grades/entries/bulk_update_grades", {
         method: "POST",
         headers: { 
             "Content-Type": "application/json",
             "X-CSRFToken": getCookie("csrftoken") || "" // Need a way to get CSRF
         },
+        credentials: "include",
         body: JSON.stringify(payload)
       }); 
 
-      if (!res.ok) throw new Error("Failed to save grades");
+      if (!res.ok) {
+        const message = await res.text();
+        throw new Error(message || "Failed to save grades");
+      }
       
       // Optionally show success toast
     } catch (error) {
@@ -532,5 +538,3 @@ export function StudentDetailModal({ isOpen, onClose, student, onUpdate }: Stude
     </Dialog>
   );
 }
-
-
