@@ -2,6 +2,7 @@ import csv
 import hashlib
 import io
 import json
+from datetime import datetime, time
 
 from django.db import transaction
 from django.http import HttpResponse
@@ -12,6 +13,7 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.response import Response
 
 from audit.utils import record_audit
+from school_calendar.models import CalendarEvent
 from classrooms.models import Classroom
 from feedback.models import Feedback
 from students.models import Student
@@ -66,6 +68,21 @@ class GradeItemViewSet(viewsets.ModelViewSet):
         if category and category.classroom_id != classroom.id:
             raise ValidationError({"category": "Category must belong to the same classroom."})
         instance = serializer.save()
+        graded_at_dt = datetime.combine(instance.graded_at, time.min)
+        CalendarEvent.objects.update_or_create(
+            source_type="grade_item",
+            source_id=str(instance.id),
+            defaults={
+                "classroom": instance.classroom,
+                "title": instance.title,
+                "type": "assignment_due",
+                "start": graded_at_dt,
+                "end": graded_at_dt,
+                "visibility": "teacher",
+                "created_by": self.request.user,
+                "updated_by": self.request.user,
+            },
+        )
         record_audit(
             action="GRADE_ITEM_CREATED",
             actor=self.request.user,
@@ -82,6 +99,21 @@ class GradeItemViewSet(viewsets.ModelViewSet):
         if category and category.classroom_id != classroom.id:
             raise ValidationError({"category": "Category must belong to the same classroom."})
         instance = serializer.save()
+        graded_at_dt = datetime.combine(instance.graded_at, time.min)
+        CalendarEvent.objects.update_or_create(
+            source_type="grade_item",
+            source_id=str(instance.id),
+            defaults={
+                "classroom": instance.classroom,
+                "title": instance.title,
+                "type": "assignment_due",
+                "start": graded_at_dt,
+                "end": graded_at_dt,
+                "visibility": "teacher",
+                "updated_by": self.request.user,
+                "created_by": instance.created_by or self.request.user,
+            },
+        )
         record_audit(
             action="GRADE_ITEM_UPDATED",
             actor=self.request.user,
@@ -101,6 +133,7 @@ class GradeItemViewSet(viewsets.ModelViewSet):
             entity_id=instance.id,
             metadata=metadata,
         )
+        CalendarEvent.objects.filter(source_type="grade_item", source_id=str(instance.id)).delete()
         super().perform_destroy(instance)
 
 class GradeEntryViewSet(viewsets.ModelViewSet):

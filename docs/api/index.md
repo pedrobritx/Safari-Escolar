@@ -182,6 +182,14 @@ Resilience-critical write operations (notably attendance and feedback) SHOULD be
 - `POST /exports`
 - `GET  /exports/{export_id}`
 
+### 2.12 Calendar
+
+- `GET    /calendar?classroom_id=...&from=...&to=...&type=...`
+- `POST   /calendar` (create teacher-scoped events)
+- `PATCH  /calendar/{event_id}`
+- `DELETE /calendar/{event_id}`
+- `GET    /calendar/ics?classroom_id=...` (ICS export)
+
 ### 2.12 Coordinator (v1)
 
 - `GET  /coordinator/at-risk?classroom_id=...&window_days=...`
@@ -702,6 +710,52 @@ CSV export of grades + feedback for the classroom (teacher-scoped). Returns `tex
   "file_url": "https://files.example.com/exports/export-uuid.csv"
 }
 ```
+
+---
+
+## 3.9 Calendar
+
+### GET /api/v1/calendar?classroom_id=&from=&to=&type=
+
+List events for the authenticated teacher (optionally filtered by classroom, date window, and type).
+
+#### Response (200)
+
+```json
+[
+  {
+    "id": "event-uuid",
+    "title": "Prova 1",
+    "type": "exam",
+    "start": "2026-03-02T10:00:00Z",
+    "end": "2026-03-02T11:00:00Z",
+    "classroom": "b49b58e8-2ed9-47ad-ae2c-1a6a7e8b9c10",
+    "source_type": "grade_item",
+    "source_id": "grade-item-uuid"
+  }
+]
+```
+
+### POST /api/v1/calendar
+
+Create an event (meetings, breaks, exams). Classroom must belong to the teacher.
+
+#### Request
+
+```json
+{
+  "title": "Reunião com responsáveis",
+  "type": "meeting",
+  "start": "2026-03-05T18:00:00Z",
+  "end": "2026-03-05T19:00:00Z",
+  "classroom": "b49b58e8-2ed9-47ad-ae2c-1a6a7e8b9c10",
+  "description": "Pauta: desempenho e apoio em casa"
+}
+```
+
+### GET /api/v1/calendar/ics?classroom_id=...
+
+Returns an ICS feed containing the teacher’s events (optionally scoped to a classroom). Content-Type: `text/calendar`.
 
 ---
 
