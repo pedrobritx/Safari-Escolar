@@ -5,7 +5,7 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { CalendarRange, Clock } from "lucide-react";
 
-const typeLabels: Record<string, string> = {
+export const calendarTypeLabels: Record<CalendarEvent["type"], string> = {
   assignment_due: "Entrega",
   exam: "Prova",
   meeting: "Reunião",
@@ -13,7 +13,7 @@ const typeLabels: Record<string, string> = {
   other: "Outro",
 };
 
-const typeColors: Record<string, string> = {
+export const calendarTypeColors: Record<CalendarEvent["type"], string> = {
   assignment_due: "bg-[var(--primary)]/10 text-[var(--primary)]",
   exam: "bg-[var(--accent)]/10 text-[var(--accent)]",
   meeting: "bg-[var(--secondary)]/10 text-[var(--secondary)]",
@@ -46,8 +46,8 @@ export function CalendarAgenda({ events }: { events: CalendarEvent[] }) {
             <div className="flex-1 space-y-1">
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className={typeColors[event.type] || ""}>
-                    {typeLabels[event.type] || "Evento"}
+                  <Badge variant="secondary" className={calendarTypeColors[event.type] || ""}>
+                    {calendarTypeLabels[event.type] || "Evento"}
                   </Badge>
                   <span className="font-semibold text-sm">{event.title}</span>
                 </div>
