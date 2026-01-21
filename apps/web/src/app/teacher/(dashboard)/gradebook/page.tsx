@@ -46,7 +46,7 @@ export default function GradebookPage() {
   const fetchData = async () => {
     try {
       // 1. Fetch Students
-      const resStudents = await fetch("/api/students/", { credentials: "include" });
+      const resStudents = await fetch("/api/students", { credentials: "include" });
       if (!resStudents.ok) throw new Error("Failed to fetch students");
       const studentsData = await resStudents.json();
       
@@ -63,7 +63,7 @@ export default function GradebookPage() {
       const classId = mappedStudents[0]?.classroom;
       
       if (classId) {
-          const resGrid = await fetch(`/api/grades/gradebook/grid?classroom_id=${classId}`);
+          const resGrid = await fetch(`/api/grades/gradebook/grid?classroom_id=${classId}`, { credentials: "include" });
           if (resGrid.ok) {
               const gridData = await resGrid.json();
               setCategories(gridData.categories || []);
@@ -90,7 +90,7 @@ export default function GradebookPage() {
         const csrfToken = getCookie("csrftoken") || "";
         console.log("CSRF Token found:", csrfToken ? "Yes (hidden)" : "No");
 
-        const res = await fetch("/api/grades/categories/", {
+        const res = await fetch("/api/grades/categories", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -135,7 +135,7 @@ export default function GradebookPage() {
 
   const handleDeleteCategory = async (id: string) => {
     try {
-        const res = await fetch(`/api/grades/categories/${id}/`, {
+        const res = await fetch(`/api/grades/categories/${id}`, {
             method: "DELETE",
             headers: {
                 "X-CSRFToken": getCookie("csrftoken") || ""
