@@ -44,12 +44,12 @@ export default function TeacherDashboardLayout({
          <div className="relative" ref={profileRef}>
             <button
               onClick={() => setIsProfileOpen((open) => !open)}
-              className="flex items-center gap-3 rounded-full border border-[var(--border)] bg-[var(--surface)]/80 px-3 py-2 shadow-sm transition hover:-translate-y-[1px] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+              className="flex items-center gap-3 rounded-full border border-[var(--border)] bg-[var(--surface)]/80 px-2 py-2 lg:px-3 shadow-sm transition hover:-translate-y-[1px] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] flex-shrink-0"
             >
-              <div className="h-10 w-10 rounded-full bg-[var(--primary)]/15 flex items-center justify-center text-lg">
+              <div className="h-10 w-10 rounded-full bg-[var(--primary)]/15 flex items-center justify-center text-lg flex-shrink-0">
                 <UserRound size={18} className="text-[var(--primary)]" />
               </div>
-              <div className="text-left leading-tight">
+              <div className="text-left leading-tight hidden lg:block">
                 <div className="text-sm font-semibold text-[var(--text)]">{teacherProfile.name}</div>
                 <div className="text-[11px] text-[var(--text-muted)]">{teacherProfile.email}</div>
               </div>
