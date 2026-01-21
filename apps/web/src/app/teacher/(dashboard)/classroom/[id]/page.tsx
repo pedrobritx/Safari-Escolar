@@ -12,6 +12,7 @@ import { FeedbackCategory, FeedbackTemplate } from "@/features/teacher/types/fee
 import { FeedbackBottomBar } from "@/features/teacher/components/feedback-bottom-bar";
 import { StudentFeedbackModal } from "@/features/teacher/components/student-feedback-modal";
 import { FeedbackTemplateManager } from "@/features/teacher/components/feedback-template-manager";
+import { getCookie } from "@/lib/utils";
 
 const INITIAL_TEMPLATES: FeedbackTemplate[] = [
   { id: "1", label: "Participação", icon: "✋", points: 1, category: "positive" },
@@ -143,13 +144,37 @@ export default function ClassDetail({ params }: { params: Promise<{ id: string }
     }
   };
 
-  const handleApplyFeedback = (template: FeedbackTemplate, note?: string) => {
+  const handleApplyFeedback = async (template: FeedbackTemplate, note?: string) => {
     if (selectedStudentId) {
-        setStudentPoints(prev => ({
-            ...prev,
-            [selectedStudentId]: (prev[selectedStudentId] || 0) + template.points
-        }));
-        console.log(`Applied ${template.label} to student ${selectedStudentId}${note ? ` with note: ${note}` : ''}`);
+        try {
+            const res = await fetch("/api/feedback", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCookie("csrftoken") || "",
+                },
+                body: JSON.stringify({
+                    student: selectedStudentId,
+                    type: template.category, // 'positive' | 'improvement'
+                    label: template.label,
+                    icon: template.icon,
+                    points: template.points,
+                    note: note
+                })
+            });
+
+            if (res.ok) {
+                 setStudentPoints(prev => ({
+                    ...prev,
+                    [selectedStudentId]: (prev[selectedStudentId] || 0) + template.points
+                }));
+                 console.log(`Applied ${template.label} to student ${selectedStudentId}`);
+            } else {
+                console.error("Failed to save feedback");
+            }
+        } catch (error) {
+            console.error("Error creating feedback", error);
+        }
     }
   };
 

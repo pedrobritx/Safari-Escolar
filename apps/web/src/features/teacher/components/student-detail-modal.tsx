@@ -44,7 +44,7 @@ interface FeedbackHistoryItem {
   label: string;
   icon: string;
   points: number;
-  date: string;
+  date: string; // ISO string
   note?: string;
 }
 
@@ -61,13 +61,7 @@ interface StudentDetailModalProps {
 // Mock data
 // ... (rest of mock data remains the same, assuming it's stable)
 
-const MOCK_FEEDBACK: FeedbackHistoryItem[] = [
-  { id: "1", type: "positive", label: "Participação", icon: "🙋", points: 5, date: "19/01/2026" },
-  { id: "2", type: "positive", label: "Trabalho em equipe", icon: "🤝", points: 10, date: "18/01/2026" },
-  { id: "3", type: "improvement", label: "Atenção", icon: "👀", points: -5, date: "17/01/2026", note: "Precisa focar mais nas atividades" },
-  { id: "4", type: "positive", label: "Criatividade", icon: "🎨", points: 10, date: "16/01/2026" },
-  { id: "5", type: "improvement", label: "Organização", icon: "📚", points: -5, date: "15/01/2026" },
-];
+
 
 const MOCK_NOTES = [
   { id: "1", date: "19/01/2026", content: "Demonstrou grande interesse na atividade de ciências." },
@@ -86,6 +80,89 @@ export function StudentDetailModal({ isOpen, onClose, student, onUpdate }: Stude
   const [entries, setEntries] = useState<Record<string, number>>({}); // itemId -> score
   const [isLoadingGrades, setIsLoadingGrades] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Feedback State
+  const [feedbackHistory, setFeedbackHistory] = useState<FeedbackHistoryItem[]>([]);
+  const [isLoadingFeedback, setIsLoadingFeedback] = useState(false);
+  
+  // Feedback total points calculated from history
+  const totalPoints = feedbackHistory.reduce((sum, f) => sum + f.points, 0);
+
+  // Fetch feedback
+  const fetchFeedback = useCallback(async () => {
+    if (!student?.id) return;
+    setIsLoadingFeedback(true);
+    try {
+        const res = await fetch(`/api/feedback?student_id=${student.id}`, { credentials: "include" });
+        if (res.ok) {
+            const data = await res.json();
+            // Map API data to UI format
+            const mapped = data.map((f: any) => ({
+                id: f.id,
+                type: f.type,
+                label: f.label,
+                icon: f.icon,
+                points: f.points,
+                date: new Date(f.created_at).toLocaleDateString('pt-BR'),
+                note: f.note
+            }));
+            setFeedbackHistory(mapped);
+        }
+    } catch (error) {
+        console.error("Failed to fetch feedback:", error);
+    } finally {
+        setIsLoadingFeedback(false);
+    }
+  }, [student?.id]);
+
+  useEffect(() => {
+     if (isOpen && student?.id) {
+         fetchFeedback();
+     }
+  }, [isOpen, student?.id, fetchFeedback]);
+
+  const handleDeleteFeedback = async (id: string) => {
+      if (!confirm("Tem certeza que deseja excluir este feedback?")) return;
+      try {
+          const res = await fetch(`/api/feedback/${id}`, {
+              method: "DELETE",
+              headers: { "X-CSRFToken": getCookie("csrftoken") || "" }
+          });
+          if (res.ok) {
+              setFeedbackHistory(prev => prev.filter(f => f.id !== id));
+          } else {
+              alert("Erro ao excluir feedback");
+          }
+      } catch (e) {
+          console.error("Error deleting feedback", e);
+      }
+  };
+
+  // Simple edit: for now just allow deleting to correct mistakes, or maybe prompt for new note?
+  // The user asked for "edit/delete". Let's implemented a simple prompt for note update to verify "Edit".
+  const handleEditNote = async (item: FeedbackHistoryItem) => {
+      const newNote = prompt("Editar anotação:", item.note || "");
+      if (newNote === null) return; // Cancelled
+      
+      try {
+          const res = await fetch(`/api/feedback/${item.id}/`, {
+              method: "PATCH",
+              headers: { 
+                  "Content-Type": "application/json",
+                  "X-CSRFToken": getCookie("csrftoken") || "" 
+              },
+              body: JSON.stringify({ note: newNote })
+          });
+          if (res.ok) {
+              setFeedbackHistory(prev => prev.map(f => f.id === item.id ? { ...f, note: newNote } : f));
+          } else {
+              alert("Erro ao editar feedback");
+          }
+      } catch (e) {
+          console.error("Error editing feedback", e);
+      }
+  };
+
 
   // Fetch grades when tab is active and we have student/class data
   const fetchGrades = useCallback(async () => {
@@ -161,8 +238,10 @@ export function StudentDetailModal({ isOpen, onClose, student, onUpdate }: Stude
 
   if (!student) return null;
 
-  // Calculate total points from feedback
-  const totalPoints = MOCK_FEEDBACK.reduce((sum, f) => sum + f.points, 0);
+  if (!student) return null;
+
+  // Total points now calculated in state definition
+
   // const overallGradeAverage = MOCK_GRADES.reduce((sum, g) => sum + g.average, 0) / MOCK_GRADES.length; 
   // Calculate real average? For now, leave it or calculate from real entries if possible.
   // Let's placeholder it
@@ -274,18 +353,20 @@ export function StudentDetailModal({ isOpen, onClose, student, onUpdate }: Stude
                 </div>
               </GlassPanel>
               <GlassPanel className="p-4 flex flex-col gap-2">
-                <span className="text-xs font-bold uppercase text-[var(--text-muted)]">Últimos Feedbacks</span>
+                  <span className="text-xs font-bold uppercase text-[var(--text-muted)]">Últimos Feedbacks</span>
                 <div className="flex gap-2">
-                  {MOCK_FEEDBACK.slice(0, 4).map((f) => (
+                  {feedbackHistory.slice(0, 4).map((f) => (
                     <div
                       key={f.id}
                       className={`flex items-center justify-center w-10 h-10 rounded-full text-lg ${
                         f.type === "positive" ? "bg-[var(--green-50)]" : "bg-[var(--orange-50)]"
                       }`}
+                      title={`${f.label} (${f.points})`}
                     >
                       {f.icon}
                     </div>
                   ))}
+                  {feedbackHistory.length === 0 && <span className="text-sm text-[var(--text-muted)]">Nenhum feedback.</span>}
                 </div>
               </GlassPanel>
             </div>
@@ -370,10 +451,11 @@ export function StudentDetailModal({ isOpen, onClose, student, onUpdate }: Stude
           {/* Feedback Tab */}
           {activeTab === "feedback" && (
             <div className="space-y-3 animate-in fade-in slide-in-from-right-2">
-              {MOCK_FEEDBACK.map((feedback) => (
+            <div className="space-y-3 animate-in fade-in slide-in-from-right-2">
+              {feedbackHistory.map((feedback) => (
                 <GlassPanel
                   key={feedback.id}
-                  className={`p-3 flex items-start gap-3 border-l-4 ${
+                  className={`p-3 flex items-start gap-3 border-l-4 group relative ${
                     feedback.type === "positive"
                       ? "border-l-[var(--secondary)] bg-[var(--green-50)]"
                       : "border-l-[var(--accent)] bg-[var(--orange-50)]"
@@ -398,13 +480,33 @@ export function StudentDetailModal({ isOpen, onClose, student, onUpdate }: Stude
                     )}
                     <p className="text-xs text-[var(--text-muted)] mt-1">{feedback.date}</p>
                   </div>
-                  {feedback.type === "positive" ? (
-                    <TrendingUp size={16} className="text-[var(--secondary)] flex-shrink-0" />
-                  ) : (
-                    <TrendingDown size={16} className="text-[var(--accent)] flex-shrink-0" />
-                  )}
+
+                  {/* Actions */}
+                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity absolute right-2 top-2 bg-white/50 rounded-md p-1 shadow-sm backdrop-blur-sm">
+                      <button 
+                        onClick={() => handleEditNote(feedback)}
+                        className="p-1 hover:bg-black/10 rounded" 
+                        title="Editar anotação"
+                      >
+                         <FileText size={14} className="text-[var(--text-secondary)]" />
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteFeedback(feedback.id)}
+                        className="p-1 hover:bg-red-100 rounded text-red-600"
+                        title="Excluir"
+                      >
+                         <X size={14} />
+                      </button>
+                  </div>
                 </GlassPanel>
               ))}
+              {feedbackHistory.length === 0 && (
+                  <div className="text-center py-8 text-[var(--text-muted)]">
+                    <MessageSquare size={32} className="mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">Nenhum feedback registrado.</p>
+                  </div>
+              )}
+            </div>
             </div>
           )}
 
