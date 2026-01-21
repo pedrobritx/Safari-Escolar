@@ -10,7 +10,7 @@ interface AssessmentModalProps {
   isOpen: boolean;
   onClose: () => void;
   categories: GradeCategory[];
-  onSave: (item: Partial<GradeItem>) => void;
+  onSave: (item: Partial<GradeItem>) => Promise<void> | void;
   onDelete?: (item: GradeItem) => void;
   editItem?: GradeItem | null;
   onManageCategories?: () => void;
@@ -48,15 +48,25 @@ export function AssessmentModal({
     }
   }, [editItem, isOpen]);
 
-  const handleSave = () => {
-    onSave({
-      id: editItem?.id, // Include id when editing
-      title,
-      category: categoryId,
-      max_score: parseFloat(maxScore),
-      graded_at: date
-    });
-    onClose();
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+        await onSave({
+            id: editItem?.id, // Include id when editing
+            title,
+            category: categoryId,
+            max_score: parseFloat(maxScore),
+            graded_at: date
+        });
+        // Parent handles closing on success via isOpen prop
+    } catch (e) {
+        // Parent should handle errors, but if not caught:
+        console.error(e);
+    } finally {
+        setIsSaving(false);
+    }
   };
 
   const handleDelete = () => {
@@ -141,8 +151,10 @@ export function AssessmentModal({
             </Button>
           )}
           <div className="flex gap-2">
-            <Button variant="outline" onClick={onClose}>Cancelar</Button>
-            <Button onClick={handleSave} disabled={!title || !categoryId}>Salvar</Button>
+            <Button variant="outline" onClick={onClose} disabled={isSaving}>Cancelar</Button>
+            <Button onClick={handleSave} disabled={!title || !categoryId || isSaving}>
+                {isSaving ? "Salvando..." : "Salvar"}
+            </Button>
           </div>
         </DialogFooter>
       </DialogContent>

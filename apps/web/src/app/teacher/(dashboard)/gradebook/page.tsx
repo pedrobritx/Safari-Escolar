@@ -153,22 +153,58 @@ export default function GradebookPage() {
   };
 
 
-  const handleSaveAssessment = (newItem: Partial<GradeItem>) => {
-    if (newItem.id) {
-      setItems(prev => prev.map(item => 
-        item.id === newItem.id ? { ...item, ...newItem } as GradeItem : item
-      ));
-    } else {
-      const item: GradeItem = {
-        id: `item-${Date.now()}`,
-        category: newItem.category!,
-        title: newItem.title!,
-        max_score: newItem.max_score!,
-        graded_at: newItem.graded_at!,
-      };
-      setItems([...items, item]);
+  const handleSaveAssessment = async (newItem: Partial<GradeItem>) => {
+    const csrfToken = getCookie("csrftoken") || "";
+    
+    try {
+        if (newItem.id && !newItem.id.startsWith("item-")) {
+            // Edit existing item
+            const res = await fetch(`/api/grades/items/${newItem.id}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
+                },
+                body: JSON.stringify(newItem)
+            });
+            
+            if (!res.ok) throw new Error("Failed to update assessment");
+            const updated: GradeItem = await res.json();
+            
+            setItems(prev => prev.map(item => 
+                item.id === updated.id ? updated : item
+            ));
+        } else {
+            // Create new item
+            // We need to ensure classroom is set.
+            const classId = students[0]?.classroom;
+            if (!classId) throw new Error("No classroom found");
+
+            const res = await fetch("/api/grades/items", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken
+                },
+                body: JSON.stringify({
+                    ...newItem,
+                    classroom: classId
+                })
+            });
+
+            if (!res.ok) {
+                const err = await res.text();
+                throw new Error(`Failed to create assessment: ${err}`);
+            }
+            const created: GradeItem = await res.json();
+            setItems(prev => [...prev, created]);
+        }
+        setEditingItem(null);
+        setIsModalOpen(false);
+    } catch (error: any) {
+        console.error("Save assessment error:", error);
+        alert(error.message);
     }
-    setEditingItem(null);
   };
 
   const handleEditItem = (item: GradeItem) => {
