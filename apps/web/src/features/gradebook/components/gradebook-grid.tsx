@@ -1,10 +1,10 @@
-"use client";
-
 import { useState } from "react";
 import { GlassPanel } from "@/components/ui/glass-panel";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Student } from "@/features/teacher/types";
 import { GradeCategory, GradeItem, GradeEntry } from "../types";
+import { Check, Loader2 } from "lucide-react";
 
 interface GradebookGridProps {
   students: Student[];
@@ -13,6 +13,7 @@ interface GradebookGridProps {
   entries: GradeEntry[];
   onUpdateGrade: (studentId: string, itemId: string, score: number) => void;
   onEditItem?: (item: GradeItem) => void;
+  onSaveGrade?: (studentId: string, itemId: string) => Promise<void>;
 }
 
 export function GradebookGrid({
@@ -21,12 +22,26 @@ export function GradebookGrid({
   items,
   entries,
   onUpdateGrade,
-  onEditItem
+  onEditItem,
+  onSaveGrade
 }: GradebookGridProps) {
+  const [savingCells, setSavingCells] = useState<Record<string, boolean>>({});
   
   const getScore = (studentId: string, itemId: string) => {
     const entry = entries.find(e => e.student === studentId && e.grade_item === itemId);
     return entry ? entry.score : "";
+  };
+
+  const handleSave = async (studentId: string, itemId: string) => {
+    if (!onSaveGrade) return;
+    
+    const cellId = `${studentId}-${itemId}`;
+    setSavingCells(prev => ({ ...prev, [cellId]: true }));
+    try {
+        await onSaveGrade(studentId, itemId);
+    } finally {
+        setSavingCells(prev => ({ ...prev, [cellId]: false }));
+    }
   };
 
   return (
@@ -40,7 +55,7 @@ export function GradebookGrid({
             {items.map((item) => (
               <th 
                 key={item.id} 
-                className={`px-4 py-3 min-w-[100px] text-center border-l border-[var(--border)] ${onEditItem ? 'cursor-pointer hover:bg-[var(--surface-hover)] transition-colors group' : ''}`}
+                className={`px-4 py-3 min-w-[120px] text-center border-l border-[var(--border)] ${onEditItem ? 'cursor-pointer hover:bg-[var(--surface-hover)] transition-colors group' : ''}`}
                 onClick={() => onEditItem?.(item)}
               >
                 <div className="font-bold text-[var(--text)] flex items-center justify-center gap-1">
@@ -63,23 +78,46 @@ export function GradebookGrid({
                     <td className="px-4 py-3 font-medium sticky left-0 bg-[var(--background)] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)]">
                         {student.name}
                     </td>
-                    {items.map((item) => (
-                    <td key={item.id} className="px-2 py-2 border-l border-[var(--border)] text-center">
-                        <Input 
-                            type="number"
-                            className="bg-transparent border-0 text-center h-8 focus:ring-1 focus:ring-[var(--primary)] px-1"
-                            value={getScore(studentId, item.id)}
-                            onChange={(e) => {
-                                const val = parseFloat(e.target.value);
-                                if (!isNaN(val)) {
-                                    onUpdateGrade(studentId, item.id, val);
-                                }
-                            }}
-                            max={item.max_score}
-                            min={0}
-                        />
-                    </td>
-                    ))}
+                    {items.map((item) => {
+                        const cellId = `${studentId}-${item.id}`;
+                        const isSaving = savingCells[cellId];
+                        const showButton = onSaveGrade; // Always show if save function is provided
+                        
+                        return (
+                        <td key={item.id} className="px-2 py-2 border-l border-[var(--border)] text-center">
+                            <div className="flex items-center justify-center gap-1">
+                                <Input 
+                                    type="number"
+                                    className="bg-transparent border-0 text-center h-8 focus:ring-1 focus:ring-[var(--primary)] px-1 w-16"
+                                    value={getScore(studentId, item.id)}
+                                    onChange={(e) => {
+                                        const val = parseFloat(e.target.value);
+                                        if (!isNaN(val)) {
+                                            onUpdateGrade(studentId, item.id, val);
+                                        }
+                                    }}
+                                    max={item.max_score}
+                                    min={0}
+                                />
+                                {showButton && (
+                                    <Button
+                                        size="icon"
+                                        variant="ghost"
+                                        className="h-8 w-8 hover:bg-[var(--surface-active)] hover:text-[var(--primary)] text-[var(--text-muted)] rounded-full"
+                                        onClick={() => handleSave(studentId, item.id)}
+                                        disabled={isSaving}
+                                    >
+                                        {isSaving ? (
+                                            <Loader2 size={14} className="animate-spin" />
+                                        ) : (
+                                            <Check size={14} />
+                                        )}
+                                    </Button>
+                                )}
+                            </div>
+                        </td>
+                        );
+                    })}
                     <td className="px-4 py-3 font-bold text-center border-l border-[var(--border)]">
                         {/* Calculate Total */}
                         {items.reduce((acc, item) => {

@@ -7,6 +7,7 @@ import { Plus } from "lucide-react";
 import { GradebookGrid } from "@/features/gradebook/components/gradebook-grid";
 import { AssessmentModal } from "@/features/gradebook/components/create-assessment-modal";
 import { GradeCategory, GradeItem, GradeEntry } from "@/features/gradebook/types";
+import { getCookie } from "@/lib/utils";
 
 // Mock Data matching the new schema
 const MOCK_CATEGORIES: GradeCategory[] = [
@@ -30,47 +31,134 @@ const MOCK_ENTRIES: GradeEntry[] = [
   { id: "entry-2", grade_item: "item-1", student: "2", score: 8.0 },
 ];
 
+import { ManageCategoriesModal } from "@/features/gradebook/components/manage-categories-modal";
+
 export default function GradebookPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [items, setItems] = useState<GradeItem[]>(MOCK_ITEMS);
-  const [entries, setEntries] = useState<GradeEntry[]>([]); // Start empty
+  const [isCategoryManagerOpen, setIsCategoryManagerOpen] = useState(false);
+  const [categories, setCategories] = useState<GradeCategory[]>([]);
+  const [items, setItems] = useState<GradeItem[]>([]);
+  const [entries, setEntries] = useState<GradeEntry[]>([]); 
   const [students, setStudents] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [editingItem, setEditingItem] = useState<GradeItem | null>(null);
 
-  useEffect(() => {
-    const fetchStudents = async () => {
-      try {
-        const res = await fetch("/api/students/", { credentials: "include" });
-        if (res.ok) {
-          const data = await res.json();
-          // Map to format expected by grid: { id, name, avatar? }
-          const mapped = data.map((s: any) => ({
-            id: s.id,
-            name: s.display_name,
-            avatar: s.animal_id
-          }));
-          setStudents(mapped);
-        }
-      } catch (error) {
-        console.error("Failed to fetch students", error);
-      } finally {
-        setIsLoading(false);
+  const fetchData = async () => {
+    try {
+      // 1. Fetch Students
+      const resStudents = await fetch("/api/students/", { credentials: "include" });
+      if (!resStudents.ok) throw new Error("Failed to fetch students");
+      const studentsData = await resStudents.json();
+      
+      // Map students
+      const mappedStudents = studentsData.map((s: any) => ({
+          id: s.id,
+          name: s.display_name,
+          avatar: s.animal_id,
+          classroom: s.classroom
+      }));
+      setStudents(mappedStudents);
+
+      // 2. Fetch Gradebook Grid Data (using the first student's class for now)
+      const classId = mappedStudents[0]?.classroom;
+      
+      if (classId) {
+          const resGrid = await fetch(`/api/grades/gradebook/grid?classroom_id=${classId}`);
+          if (resGrid.ok) {
+              const gridData = await resGrid.json();
+              setCategories(gridData.categories || []);
+              setItems(gridData.items || []);
+              setEntries(gridData.entries || []);
+          }
       }
-    };
-    fetchStudents();
+    } catch (error) {
+      console.error("Failed to load gradebook data", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
   }, []);
+
+  const handleCreateCategory = async (name: string, weight: number) => {
+    const classId = students[0]?.classroom;
+    if (!classId) return;
+
+    try {
+        const csrfToken = getCookie("csrftoken") || "";
+        console.log("CSRF Token found:", csrfToken ? "Yes (hidden)" : "No");
+
+        const res = await fetch("/api/grades/categories/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken
+            },
+            body: JSON.stringify({
+                name,
+                weight,
+                classroom: classId
+            })
+        });
+
+        if (res.ok) {
+            // Reload data to reflect changes
+             const resGrid = await fetch(`/api/grades/gradebook/grid?classroom_id=${classId}`);
+             if (resGrid.ok) {
+                 const gridData = await resGrid.json();
+                 setCategories(gridData.categories || []);
+             }
+        } else {
+             let errorMessage = "Erro desconhecido";
+             try {
+                 const text = await res.text();
+                 try {
+                     const errorData = JSON.parse(text);
+                     console.error("Server JSON error:", errorData);
+                     errorMessage = JSON.stringify(errorData);
+                 } catch (e) {
+                     console.error("Server Text error:", text);
+                     errorMessage = text || res.statusText;
+                 }
+             } catch (e: any) {
+                 errorMessage = e.message;
+             }
+             alert(`Erro ao criar categoria: ${errorMessage}`);
+        }
+    } catch (error: any) {
+        console.error("Failed to create category (catch):", error);
+        alert(`Erro de conexão/rede: ${error.message}`);
+    }
+  };
+
+  const handleDeleteCategory = async (id: string) => {
+    try {
+        const res = await fetch(`/api/grades/categories/${id}/`, {
+            method: "DELETE",
+            headers: {
+                "X-CSRFToken": getCookie("csrftoken") || ""
+            }
+        });
+
+        if (res.ok) {
+             setCategories(prev => prev.filter(c => c.id !== id));
+        } else {
+             alert("Erro ao excluir categoria (pode estar em uso)");
+        }
+    } catch (error) {
+        console.error("Failed to delete category", error);
+    }
+  };
+
 
   const handleSaveAssessment = (newItem: Partial<GradeItem>) => {
     if (newItem.id) {
-      // Editing existing item
       setItems(prev => prev.map(item => 
-        item.id === newItem.id 
-          ? { ...item, ...newItem } as GradeItem
-          : item
+        item.id === newItem.id ? { ...item, ...newItem } as GradeItem : item
       ));
     } else {
-      // Creating new item
       const item: GradeItem = {
         id: `item-${Date.now()}`,
         category: newItem.category!,
@@ -112,12 +200,41 @@ export default function GradebookPage() {
             return prev.map(e => e.id === existing.id ? { ...e, score } : e);
         }
         return [...prev, {
-            id: `entry-${Date.now()}`,
+            id: `temp-${Date.now()}`, // Temporary ID until saved
             grade_item: itemId,
             student: studentId,
             score
         }];
     });
+  };
+
+  const handleSaveGrade = async (studentId: string, itemId: string) => {
+    const entry = entries.find(e => e.student === studentId && e.grade_item === itemId);
+    if (!entry) return;
+
+    try {
+        const payload = [{
+            student: studentId,
+            grade_item: itemId,
+            score: entry.score
+        }];
+
+        const res = await fetch("/api/grades/entries/bulk_update_grades/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCookie("csrftoken") || ""
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) throw new Error("Failed to save grade");
+        
+        // Success
+    } catch (error) {
+        console.error("Error saving grade:", error);
+        alert("Erro ao salvar nota. Tente novamente.");
+    }
   };
 
   return (
@@ -135,15 +252,23 @@ export default function GradebookPage() {
 
       <GlassPanel className="p-4 rounded-[var(--radius-xl)]">
         {isLoading ? (
-            <div className="text-center py-8 text-[var(--text-muted)]">Carregando alunos...</div>
+            <div className="flex justify-center py-12">
+               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--primary)]"></div>
+            </div>
+        ) : items.length === 0 ? (
+             <div className="text-center py-12 text-[var(--text-muted)]">
+                <p>Nenhuma avaliação cadastrada para esta turma.</p>
+                <Button variant="ghost" onClick={handleOpenCreateModal}>Criar primeira avaliação</Button>
+             </div>
         ) : (
             <GradebookGrid
                 students={students}
-                categories={MOCK_CATEGORIES}
+                categories={categories}
                 items={items}
                 entries={entries}
                 onUpdateGrade={handleUpdateGrade}
                 onEditItem={handleEditItem}
+                onSaveGrade={handleSaveGrade}
             />
         )}
       </GlassPanel>
@@ -151,10 +276,19 @@ export default function GradebookPage() {
       <AssessmentModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        categories={MOCK_CATEGORIES}
+        categories={categories}
         onSave={handleSaveAssessment}
         onDelete={handleDeleteAssessment}
         editItem={editingItem}
+        onManageCategories={() => setIsCategoryManagerOpen(true)}
+      />
+
+      <ManageCategoriesModal
+        isOpen={isCategoryManagerOpen}
+        onClose={() => setIsCategoryManagerOpen(false)}
+        categories={categories}
+        onCreate={handleCreateCategory}
+        onDelete={handleDeleteCategory}
       />
     </div>
   );

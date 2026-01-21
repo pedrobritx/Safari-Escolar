@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { X, TrendingUp, TrendingDown, MessageSquare, FileText, BarChart3, User, Save, Loader2 } from "lucide-react";
 import { ANIMAL_EMOJIS } from "@/features/teacher/constants";
+import { getCookie } from "@/lib/utils";
 
 // Types
 interface Student {
@@ -430,10 +431,4 @@ export function StudentDetailModal({ isOpen, onClose, student, onUpdate }: Stude
   );
 }
 
-function getCookie(name: string): string | null {
-  if (typeof document === "undefined") return null;
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop()?.split(";").shift() || null;
-  return null;
-}
+

@@ -22,6 +22,21 @@ class GradeCategoryViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(classroom_id=classroom_id)
         return queryset
 
+    def perform_create(self, serializer):
+        # Automatically set school_id from the related classroom
+        classroom = serializer.validated_data.get('classroom')
+        if classroom:
+             # Ensure we have the school_id
+             if hasattr(classroom, 'school_id'):
+                serializer.save(school_id=classroom.school_id)
+             else:
+                # This should not happen given the model, but fallback just in case
+                import uuid
+                serializer.save(school_id=uuid.uuid4())
+        else:
+             import uuid
+             serializer.save(school_id=uuid.uuid4())
+
 class GradeItemViewSet(viewsets.ModelViewSet):
     queryset = GradeItem.objects.all()
     serializer_class = GradeItemSerializer

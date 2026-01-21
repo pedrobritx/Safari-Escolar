@@ -35,7 +35,7 @@ urlpatterns = [
     path('api/grades/', include('grades.urls')),
     path('api/classrooms/', include('classrooms.urls')),
     path('api/students/', include('students.urls')),
-    # Without trailing slash (for Next.js compatibility)
     path('api/classrooms', include('classrooms.urls')),
     path('api/students', include('students.urls')),
+    path('api/grades', include('grades.urls')),
 ]

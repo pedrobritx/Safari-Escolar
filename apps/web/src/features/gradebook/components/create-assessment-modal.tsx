@@ -1,11 +1,10 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { GradeCategory, GradeItem } from "../types";
+import { Settings } from "lucide-react";
 
 interface AssessmentModalProps {
   isOpen: boolean;
@@ -14,6 +13,7 @@ interface AssessmentModalProps {
   onSave: (item: Partial<GradeItem>) => void;
   onDelete?: (item: GradeItem) => void;
   editItem?: GradeItem | null;
+  onManageCategories?: () => void;
 }
 
 export function AssessmentModal({ 
@@ -22,7 +22,8 @@ export function AssessmentModal({
   categories, 
   onSave,
   onDelete,
-  editItem 
+  editItem,
+  onManageCategories
 }: AssessmentModalProps) {
   const [title, setTitle] = useState("");
   const [categoryId, setCategoryId] = useState<string>("");
@@ -84,10 +85,10 @@ export function AssessmentModal({
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="category" className="text-right">Categoria</Label>
-            <div className="col-span-3">
+            <div className="col-span-3 flex gap-2">
                <select
                 id="category"
-                className="flex h-11 w-full rounded-md border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm ring-offset-[var(--bg)] placeholder:text-[var(--text-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 text-[var(--text)] transition-colors appearance-none"
+                className="flex h-11 w-full rounded-md border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm ring-offset-[var(--bg)] placeholder:text-[var(--text-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 text-[var(--text)] transition-colors appearance-none flex-1"
                 value={categoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
               >
@@ -98,6 +99,18 @@ export function AssessmentModal({
                   </option>
                 ))}
               </select>
+              {onManageCategories && (
+                  <Button 
+                    type="button"
+                    variant="outline" 
+                    size="icon" 
+                    onClick={onManageCategories}
+                    title="Gerenciar Categorias"
+                    className="h-11 w-11 shrink-0"
+                  >
+                    <Settings size={18} className="text-[var(--text-muted)]" />
+                  </Button>
+              )}
             </div>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">

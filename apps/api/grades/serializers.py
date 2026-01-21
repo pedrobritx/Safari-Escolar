@@ -2,6 +2,8 @@ from rest_framework import serializers
 from .models import GradeCategory, GradeItem, GradeEntry
 
 class GradeCategorySerializer(serializers.ModelSerializer):
+    school_id = serializers.UUIDField(read_only=True)
+    
     class Meta:
         model = GradeCategory
         fields = '__all__'
