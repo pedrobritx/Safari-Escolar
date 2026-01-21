@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { X, TrendingUp, TrendingDown, MessageSquare, FileText, BarChart3, User, Save, Loader2 } from "lucide-react";
 import { ANIMAL_EMOJIS } from "@/features/teacher/constants";
 import { getCookie } from "@/lib/utils";
+import { apiFetch } from "@/lib/api";
 
 // Types
 interface Student {
@@ -93,7 +94,7 @@ export function StudentDetailModal({ isOpen, onClose, student, onUpdate }: Stude
     if (!student?.id) return;
     setIsLoadingFeedback(true);
     try {
-        const res = await fetch(`/api/feedback?student_id=${student.id}`, { credentials: "include" });
+        const res = await apiFetch(`/api/feedback?student_id=${student.id}`);
         if (res.ok) {
             const data = await res.json();
             // Map API data to UI format
@@ -124,10 +125,9 @@ export function StudentDetailModal({ isOpen, onClose, student, onUpdate }: Stude
   const handleDeleteFeedback = async (id: string) => {
       if (!confirm("Tem certeza que deseja excluir este feedback?")) return;
       try {
-          const res = await fetch(`/api/feedback/${id}`, {
+          const res = await apiFetch(`/api/feedback/${id}`, {
               method: "DELETE",
-              headers: { "X-CSRFToken": getCookie("csrftoken") || "" },
-              credentials: "include"
+              headers: { "X-CSRFToken": getCookie("csrftoken") || "" }
           });
           if (res.ok) {
               setFeedbackHistory(prev => prev.filter(f => f.id !== id));
@@ -146,13 +146,12 @@ export function StudentDetailModal({ isOpen, onClose, student, onUpdate }: Stude
       if (newNote === null) return; // Cancelled
       
       try {
-          const res = await fetch(`/api/feedback/${item.id}`, {
+          const res = await apiFetch(`/api/feedback/${item.id}`, {
               method: "PATCH",
               headers: { 
                   "Content-Type": "application/json",
                   "X-CSRFToken": getCookie("csrftoken") || "" 
               },
-              credentials: "include",
               body: JSON.stringify({ note: newNote })
           });
           if (res.ok) {
@@ -173,9 +172,9 @@ export function StudentDetailModal({ isOpen, onClose, student, onUpdate }: Stude
     setIsLoadingGrades(true);
     try {
       const [catsRes, itemsRes, entriesRes] = await Promise.all([
-        fetch(`/api/grades/categories?classroom_id=${student.classId}`, { credentials: "include" }),
-        fetch(`/api/grades/items?classroom_id=${student.classId}`, { credentials: "include" }),
-        fetch(`/api/grades/entries?student_id=${student.id}`, { credentials: "include" })
+        apiFetch(`/api/grades/categories?classroom_id=${student.classId}`),
+        apiFetch(`/api/grades/items?classroom_id=${student.classId}`),
+        apiFetch(`/api/grades/entries?student_id=${student.id}`)
       ]);
 
       if (catsRes.ok && itemsRes.ok && entriesRes.ok) {
@@ -218,13 +217,12 @@ export function StudentDetailModal({ isOpen, onClose, student, onUpdate }: Stude
         score: score
       }));
 
-      const res = await fetch("/api/grades/entries/bulk_update_grades", {
+      const res = await apiFetch("/api/grades/entries/bulk_update_grades", {
         method: "POST",
         headers: { 
             "Content-Type": "application/json",
             "X-CSRFToken": getCookie("csrftoken") || "" // Need a way to get CSRF
         },
-        credentials: "include",
         body: JSON.stringify(payload)
       }); 
 

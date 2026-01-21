@@ -7,8 +7,8 @@ import { Download, Plus } from "lucide-react";
 import { GradebookGrid } from "@/features/gradebook/components/gradebook-grid";
 import { AssessmentModal } from "@/features/gradebook/components/create-assessment-modal";
 import { GradeCategory, GradeItem, GradeEntry } from "@/features/gradebook/types";
-import { getCookie } from "@/lib/utils";
-import { Student } from "@/features/teacher/types";
+import { apiFetch } from "@/lib/api";
+import { Student, Classroom } from "@/features/teacher/types";
 
 import { ManageCategoriesModal } from "@/features/gradebook/components/manage-categories-modal";
 
@@ -19,14 +19,16 @@ export default function GradebookPage() {
   const [items, setItems] = useState<GradeItem[]>([]);
   const [entries, setEntries] = useState<GradeEntry[]>([]); 
   const [students, setStudents] = useState<Student[]>([]);
+  const [classrooms, setClassrooms] = useState<Classroom[]>([]);
+  const [activeClassroomId, setActiveClassroomId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [editingItem, setEditingItem] = useState<GradeItem | null>(null);
   const [isExporting, setIsExporting] = useState(false);
 
-  const getActiveClassroomId = () => students[0]?.classroom;
+  const getActiveClassroomId = () => activeClassroomId;
 
   const loadGradebook = async (classId: string) => {
-    const resGrid = await fetch(`/api/grades/gradebook/grid?classroom_id=${classId}`, { credentials: "include" });
+    const resGrid = await apiFetch(`/api/grades/gradebook/grid?classroom_id=${classId}`);
     if (!resGrid.ok) {
       const message = await resGrid.text();
       throw new Error(message || "Failed to load gradebook data");
@@ -37,27 +39,36 @@ export default function GradebookPage() {
     setEntries(gridData.entries || []);
   };
 
+  const loadStudents = async (classId: string) => {
+    const resStudents = await apiFetch(`/api/students?classroom=${classId}`);
+    if (!resStudents.ok) throw new Error("Failed to fetch students");
+    const studentsData: (Student & { animal_id?: string; display_name?: string; name?: string })[] = await resStudents.json();
+    const mappedStudents = studentsData.map((s) => ({
+        ...s,
+        name: s.display_name || s.name || "",
+        avatar: (s as any).animal_id,
+    }));
+    setStudents(mappedStudents);
+  };
+
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const resStudents = await fetch("/api/students", { credentials: "include" });
-      if (!resStudents.ok) throw new Error("Failed to fetch students");
-      const studentsData: (Student & { animal_id?: string })[] = await resStudents.json();
-      
-      const mappedStudents = studentsData.map((s) => ({
-          ...s,
-          name: s.display_name || s.name || "",
-          avatar: s.animal_id,
-      }));
-      setStudents(mappedStudents);
+      const resClassrooms = await apiFetch("/api/classrooms");
+      if (!resClassrooms.ok) throw new Error("Failed to fetch classrooms");
+      const classroomsData: Classroom[] = await resClassrooms.json();
+      setClassrooms(classroomsData);
 
-      const classId = mappedStudents[0]?.classroom;
-      if (classId) {
-        await loadGradebook(classId);
+      const initialClass = activeClassroomId || classroomsData[0]?.id || null;
+      setActiveClassroomId(initialClass);
+
+      if (initialClass) {
+        await Promise.all([loadStudents(initialClass), loadGradebook(initialClass)]);
       } else {
         setCategories([]);
         setItems([]);
         setEntries([]);
+        setStudents([]);
       }
     } catch (error) {
       console.error("Failed to load gradebook data", error);
@@ -70,23 +81,34 @@ export default function GradebookPage() {
     fetchData();
   }, []);
 
+  const handleClassroomChange = async (classId: string) => {
+    setActiveClassroomId(classId);
+    setIsLoading(true);
+    try {
+        await Promise.all([loadStudents(classId), loadGradebook(classId)]);
+    } catch (error) {
+        console.error("Failed to switch classroom", error);
+        setCategories([]);
+        setItems([]);
+        setEntries([]);
+        setStudents([]);
+    } finally {
+        setIsLoading(false);
+    }
+  };
+
   const handleCreateCategory = async (name: string, weight: number) => {
     const classId = getActiveClassroomId();
     if (!classId) return;
 
     try {
-      const res = await fetch("/api/grades/categories", {
+      const res = await apiFetch("/api/grades/categories", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRFToken": getCookie("csrftoken") || ""
-        },
-        credentials: "include",
         body: JSON.stringify({
-            name,
-            weight,
-            classroom: classId
-        })
+          name,
+          weight,
+          classroom: classId,
+        }),
       });
 
       if (!res.ok) {
@@ -103,12 +125,8 @@ export default function GradebookPage() {
 
   const handleDeleteCategory = async (id: string) => {
     try {
-        const res = await fetch(`/api/grades/categories/${id}`, {
+        const res = await apiFetch(`/api/grades/categories/${id}`, {
             method: "DELETE",
-            headers: {
-                "X-CSRFToken": getCookie("csrftoken") || ""
-            },
-            credentials: "include"
         });
 
         if (res.ok) {
@@ -128,20 +146,14 @@ export default function GradebookPage() {
 
 
   const handleSaveAssessment = async (newItem: Partial<GradeItem>) => {
-    const csrfToken = getCookie("csrftoken") || "";
     const classId = getActiveClassroomId();
     if (!classId) throw new Error("No classroom found");
     
     try {
         if (newItem.id && !newItem.id.startsWith("item-")) {
             // Edit existing item
-            const res = await fetch(`/api/grades/items/${newItem.id}`, {
+            const res = await apiFetch(`/api/grades/items/${newItem.id}`, {
                 method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": csrfToken
-                },
-                credentials: "include",
                 body: JSON.stringify(newItem)
             });
             
@@ -149,13 +161,8 @@ export default function GradebookPage() {
             await loadGradebook(classId);
         } else {
             // Create new item
-            const res = await fetch("/api/grades/items", {
+            const res = await apiFetch("/api/grades/items", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": csrfToken
-                },
-                credentials: "include",
                 body: JSON.stringify({
                     ...newItem,
                     classroom: classId
@@ -198,12 +205,8 @@ export default function GradebookPage() {
 
     const classId = getActiveClassroomId();
     try {
-        const res = await fetch(`/api/grades/items/${item.id}`, {
+        const res = await apiFetch(`/api/grades/items/${item.id}`, {
             method: "DELETE",
-            headers: {
-                "X-CSRFToken": getCookie("csrftoken") || ""
-            },
-            credentials: "include"
         });
 
         if (!res.ok) {
@@ -250,13 +253,8 @@ export default function GradebookPage() {
             score: entry.score
         }];
 
-        const res = await fetch("/api/grades/entries/bulk_update_grades", {
+        const res = await apiFetch("/api/grades/entries/bulk_update_grades", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": getCookie("csrftoken") || ""
-            },
-            credentials: "include",
             body: JSON.stringify(payload)
         });
 
@@ -281,8 +279,8 @@ export default function GradebookPage() {
 
     setIsExporting(true);
     try {
-        const res = await fetch(`/api/grades/gradebook/export?classroom_id=${classId}`, {
-            credentials: "include"
+        const res = await apiFetch(`/api/grades/gradebook/export?classroom_id=${classId}`, {
+            csrf: false
         });
 
         if (!res.ok) {
@@ -315,6 +313,21 @@ export default function GradebookPage() {
            <p className="text-[var(--text-muted)]">Gerencie notas e avaliações</p>
         </div>
         <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
+            {classrooms.length > 0 ? (
+              <select
+                className="h-10 rounded-md border border-[var(--border)] bg-[var(--surface)] px-3 text-sm"
+                value={activeClassroomId || ""}
+                onChange={(e) => handleClassroomChange(e.target.value)}
+              >
+                {classrooms.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
+            ) : (
+              <span className="text-sm text-[var(--text-muted)]">Nenhuma turma</span>
+            )}
+          </div>
           <Button 
             variant="outline" 
             onClick={handleExport}
@@ -336,6 +349,14 @@ export default function GradebookPage() {
             <div className="flex justify-center py-12">
                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--primary)]"></div>
             </div>
+        ) : !activeClassroomId ? (
+             <div className="text-center py-12 text-[var(--text-muted)]">
+                <p>Selecione ou crie uma turma para começar.</p>
+             </div>
+        ) : students.length === 0 ? (
+             <div className="text-center py-12 text-[var(--text-muted)]">
+                <p>Nenhum aluno nesta turma ainda.</p>
+             </div>
         ) : items.length === 0 ? (
              <div className="text-center py-12 text-[var(--text-muted)]">
                 <p>Nenhuma avaliação cadastrada para esta turma.</p>

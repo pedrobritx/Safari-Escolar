@@ -1,5 +1,7 @@
 import csv
+import hashlib
 import io
+import json
 
 from django.db import transaction
 from django.http import HttpResponse
@@ -9,11 +11,12 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.response import Response
 
+from audit.utils import record_audit
 from classrooms.models import Classroom
 from feedback.models import Feedback
 from students.models import Student
 
-from .models import GradeCategory, GradeItem, GradeEntry
+from .models import GradeCategory, GradeItem, GradeEntry, GradeBulkRequest
 from .serializers import (
     GradeCategorySerializer,
     GradeItemSerializer,
@@ -22,6 +25,7 @@ from .serializers import (
 )
 
 class GradeCategoryViewSet(viewsets.ModelViewSet):
+    queryset = GradeCategory.objects.all()
     serializer_class = GradeCategorySerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -41,6 +45,7 @@ class GradeCategoryViewSet(viewsets.ModelViewSet):
         serializer.save(school_id=classroom.school_id)
 
 class GradeItemViewSet(viewsets.ModelViewSet):
+    queryset = GradeItem.objects.all()
     serializer_class = GradeItemSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -60,7 +65,14 @@ class GradeItemViewSet(viewsets.ModelViewSet):
             raise PermissionDenied("Cannot create assessments for a different teacher.")
         if category and category.classroom_id != classroom.id:
             raise ValidationError({"category": "Category must belong to the same classroom."})
-        serializer.save()
+        instance = serializer.save()
+        record_audit(
+            action="GRADE_ITEM_CREATED",
+            actor=self.request.user,
+            entity_type="GradeItem",
+            entity_id=instance.id,
+            metadata={"classroom": str(classroom.id), "title": instance.title},
+        )
 
     def perform_update(self, serializer):
         classroom = serializer.validated_data.get('classroom', serializer.instance.classroom)
@@ -69,9 +81,30 @@ class GradeItemViewSet(viewsets.ModelViewSet):
             raise PermissionDenied("Cannot update assessments for a different teacher.")
         if category and category.classroom_id != classroom.id:
             raise ValidationError({"category": "Category must belong to the same classroom."})
-        serializer.save()
+        instance = serializer.save()
+        record_audit(
+            action="GRADE_ITEM_UPDATED",
+            actor=self.request.user,
+            entity_type="GradeItem",
+            entity_id=instance.id,
+            metadata={"classroom": str(classroom.id), "title": instance.title},
+        )
+
+    def perform_destroy(self, instance):
+        if instance.classroom.teacher_id != self.request.user.id:
+            raise PermissionDenied("Cannot delete assessments for a different teacher.")
+        metadata = {"classroom": str(instance.classroom_id), "title": instance.title}
+        record_audit(
+            action="GRADE_ITEM_DELETED",
+            actor=self.request.user,
+            entity_type="GradeItem",
+            entity_id=instance.id,
+            metadata=metadata,
+        )
+        super().perform_destroy(instance)
 
 class GradeEntryViewSet(viewsets.ModelViewSet):
+    queryset = GradeEntry.objects.all()
     serializer_class = GradeEntrySerializer
     permission_classes = [permissions.IsAuthenticated]
     
@@ -104,6 +137,22 @@ class GradeEntryViewSet(viewsets.ModelViewSet):
                 {"error": "Payload must be a list of grade entries."}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+        idempotency_key = request.headers.get("Idempotency-Key")
+        payload_hash = hashlib.sha256(json.dumps(data, sort_keys=True).encode("utf-8")).hexdigest()
+
+        if idempotency_key:
+            existing = GradeBulkRequest.objects.filter(
+                idempotency_key=idempotency_key,
+                user=request.user
+            ).first()
+            if existing:
+                if existing.request_hash != payload_hash:
+                    return Response(
+                        {"error": "Idempotency-Key conflict: payload differs from original request."},
+                        status=status.HTTP_409_CONFLICT
+                    )
+                return Response(existing.response_snapshot, status=status.HTTP_200_OK)
             
         saved_entries = []
         errors = []
@@ -151,14 +200,41 @@ class GradeEntryViewSet(viewsets.ModelViewSet):
                 if serializer.is_valid():
                     entry = serializer.save(graded_by_user=request.user)
                     saved_entries.append(GradeEntrySerializer(entry).data)
+                    record_audit(
+                        action="GRADE_SET",
+                        actor=request.user,
+                        entity_type="GradeEntry",
+                        entity_id=entry.id,
+                        metadata={
+                            "grade_item": str(entry.grade_item_id),
+                            "student": str(entry.student_id),
+                            "score": float(entry.score),
+                        },
+                    )
                 else:
                     errors.append({"error": serializer.errors, "data": entry_data})
 
             if errors:
-                raise ValidationError({"errors": errors})
+                transaction.set_rollback(True)
+                return Response({"errors": errors}, status=status.HTTP_400_BAD_REQUEST)
+
+        raw_payload = {
+            "updated_count": len(saved_entries),
+            "entries": saved_entries
+        }
+        response_payload = json.loads(json.dumps(raw_payload, default=str))
+        if idempotency_key:
+            GradeBulkRequest.objects.update_or_create(
+                idempotency_key=idempotency_key,
+                user=request.user,
+                defaults={
+                    "request_hash": payload_hash,
+                    "response_snapshot": response_payload
+                }
+            )
             
         return Response(
-            {"updated_count": len(saved_entries), "entries": saved_entries}, 
+            response_payload, 
             status=status.HTTP_200_OK
         )
 
@@ -169,7 +245,18 @@ class GradeEntryViewSet(viewsets.ModelViewSet):
             raise PermissionDenied("Cannot grade outside your classrooms.")
         if student.classroom_id != grade_item.classroom_id:
             raise ValidationError({"student": "Student must belong to this classroom."})
-        serializer.save(graded_by_user=self.request.user)
+        entry = serializer.save(graded_by_user=self.request.user)
+        record_audit(
+            action="GRADE_SET",
+            actor=self.request.user,
+            entity_type="GradeEntry",
+            entity_id=entry.id,
+            metadata={
+                "grade_item": str(entry.grade_item_id),
+                "student": str(entry.student_id),
+                "score": float(entry.score),
+            },
+        )
 
     def perform_update(self, serializer):
         grade_item = serializer.validated_data.get('grade_item', serializer.instance.grade_item)
@@ -178,7 +265,35 @@ class GradeEntryViewSet(viewsets.ModelViewSet):
             raise PermissionDenied("Cannot grade outside your classrooms.")
         if student.classroom_id != grade_item.classroom_id:
             raise ValidationError({"student": "Student must belong to this classroom."})
-        serializer.save(graded_by_user=self.request.user)
+        entry = serializer.save(graded_by_user=self.request.user)
+        record_audit(
+            action="GRADE_UPDATED",
+            actor=self.request.user,
+            entity_type="GradeEntry",
+            entity_id=entry.id,
+            metadata={
+                "grade_item": str(entry.grade_item_id),
+                "student": str(entry.student_id),
+                "score": float(entry.score),
+            },
+        )
+
+    def perform_destroy(self, instance):
+        if instance.grade_item.classroom.teacher_id != self.request.user.id:
+            raise PermissionDenied("Cannot delete grades outside your classrooms.")
+        metadata = {
+            "grade_item": str(instance.grade_item_id),
+            "student": str(instance.student_id),
+            "score": float(instance.score),
+        }
+        record_audit(
+            action="GRADE_DELETED",
+            actor=self.request.user,
+            entity_type="GradeEntry",
+            entity_id=instance.id,
+            metadata=metadata,
+        )
+        super().perform_destroy(instance)
 
 class GradebookViewSet(viewsets.ViewSet):
     """

@@ -14,7 +14,7 @@
 
 ### 1.2 Authentication and Session Model
 
-- Authentication is implemented as JWT-bearing **HttpOnly cookies** (access + refresh).
+- Authentication is session-based; successful login issues an HttpOnly session cookie.
 - All protected resources require an authenticated principal.
 - Authorization is enforced exclusively on the server; no endpoint relies on client-side filtering to satisfy scoping constraints.
 
@@ -168,10 +168,13 @@ Resilience-critical write operations (notably attendance and feedback) SHOULD be
 
 ### 2.10 Grades (v1)
 
-- `GET  /classrooms/{classroom_id}/gradebook`
-- `POST /classrooms/{classroom_id}/grade-categories`
-- `POST /classrooms/{classroom_id}/grade-items`
-- `PUT  /grade-items/{grade_item_id}/entries/bulk`
+- `GET    /grades/categories?classroom_id=...`
+- `POST   /grades/categories`
+- `GET    /grades/items?classroom_id=...`
+- `POST   /grades/items`
+- `POST   /grades/entries/bulk_update_grades` (idempotent with `Idempotency-Key`)
+- `GET    /grades/gradebook/grid?classroom_id=...`
+- `GET    /grades/gradebook/export?classroom_id=...`
 
 ### 2.11 Audit and Exports
 
@@ -552,9 +555,9 @@ Create or return an existing student-scoped thread.
 
 ## 3.7 Grades (v1)
 
-### GET /api/v1/classrooms/{classroom_id}/gradebook
+### GET /api/v1/grades/gradebook/grid?classroom_id=UUID
 
-Returns grade structure + entries (teacher view).
+Returns grade categories, items, and entries for a classroom (teacher-scoped).
 
 #### Response (200)
 
@@ -562,30 +565,87 @@ Returns grade structure + entries (teacher view).
 {
   "categories": [{"id": "cat-uuid", "name": "Tarefas", "weight": 0.4}],
   "items": [{"id": "item-uuid", "title": "Tarefa 1", "max_score": 10, "graded_at": "2026-02-01"}],
-  "entries": [{"grade_item_id": "item-uuid", "student_id": "0c7c...", "score": 8.5}]
+  "entries": [{"grade_item": "item-uuid", "student": "0c7c...", "score": 8.5}]
 }
 ```
 
-### PUT /api/v1/grade-items/{grade_item_id}/entries/bulk
+### POST /api/v1/grades/categories
+
+Create a category for a classroom (teacher-owned).
 
 #### Request
 
 ```json
 {
-  "entries": [
-    {"student_id": "0c7cdb6d-9c2a-41cc-9c5f-8b1e2b6a3d2f", "score": 8.5},
-    {"student_id": "11111111-2222-3333-4444-555555555555", "score": 10}
-  ]
+  "name": "Provas",
+  "weight": 60,
+  "classroom": "b49b58e8-2ed9-47ad-ae2c-1a6a7e8b9c10"
 }
+```
+
+#### Response (201)
+
+```json
+{
+  "id": "cat-uuid",
+  "name": "Provas",
+  "weight": 60,
+  "classroom": "b49b58e8-2ed9-47ad-ae2c-1a6a7e8b9c10",
+  "school_id": "school-uuid"
+}
+```
+
+### POST /api/v1/grades/items
+
+Create a grade item (assessment) within a classroom and category.
+
+#### Request
+
+```json
+{
+  "title": "Prova 1",
+  "category": "cat-uuid",
+  "max_score": 10,
+  "graded_at": "2026-02-15",
+  "classroom": "b49b58e8-2ed9-47ad-ae2c-1a6a7e8b9c10"
+}
+```
+
+### POST /api/v1/grades/entries/bulk_update_grades
+
+Bulk upsert grades. Supports retries with `Idempotency-Key` header; repeated payloads return the original response, differing payloads with the same key return `409 CONFLICT`.
+
+#### Request
+
+```json
+[
+  {"student": "0c7cdb6d-9c2a-41cc-9c5f-8b1e2b6a3d2f", "grade_item": "item-uuid", "score": 8.5},
+  {"student": "11111111-2222-3333-4444-555555555555", "grade_item": "item-uuid", "score": 10}
+]
 ```
 
 #### Response (200)
 
 ```json
 {
-  "updated": 2
+  "updated_count": 2,
+  "entries": [
+    {"id": "entry-uuid", "student": "0c7c...", "grade_item": "item-uuid", "score": 8.5}
+  ]
 }
 ```
+
+#### Response (409) – conflicting idempotency key
+
+```json
+{
+  "error": "Idempotency-Key conflict: payload differs from original request."
+}
+```
+
+### GET /api/v1/grades/gradebook/export?classroom_id=UUID
+
+CSV export of grades + feedback for the classroom (teacher-scoped). Returns `text/csv` with columns: `student_id, student_name, grade_item, category, score, max_score, graded_at, feedback`.
 
 ---
 
