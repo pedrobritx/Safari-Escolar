@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { Modal } from './ui/Modal';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
+import { getAnimalAvatar } from '@/utils/getAnimalAvatar';
 
 interface StudentDetailModalProps {
   isOpen: boolean;
@@ -29,7 +30,7 @@ export default function StudentDetailModal({
 
   // Contact Form State
   const [name, setName] = useState('');
-  const [animalAvatar, setAnimalAvatar] = useState('🦁');
+  const [animalAvatar, setAnimalAvatar] = useState('Leão');
   const [avatarColor, setAvatarColor] = useState('#FFFFFF');
   const [whatsapp, setWhatsapp] = useState('');
   const [email, setEmail] = useState('');
@@ -131,7 +132,7 @@ export default function StudentDetailModal({
                     className="w-28 h-28 rounded-full border-4 border-white shadow-xl flex items-center justify-center text-6xl bg-white"
                     style={{ backgroundColor: avatarColor }}
                   >
-                    {animalAvatar}
+                    {getAnimalAvatar(animalAvatar)}
                   </div>
                   <div className="absolute -bottom-3 -right-2 bg-white px-3 py-1 rounded-full shadow-md text-xs font-bold text-[var(--safari-green)]">
                     Mudar

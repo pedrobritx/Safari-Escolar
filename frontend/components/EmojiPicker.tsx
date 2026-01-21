@@ -1,13 +1,6 @@
-import React from 'react';
+import { animalAvatarMap } from "@/utils/animalAvatarMap";
 
-const ANIMAL_EMOJIS = [
-  '🦁', '🐯', '🐘', '🦒', '🦓', '🐒', '🦍', '🦧', '🐶', '🐺', '🦊', '🦝', '🐱', '🐈', 
-  '🦄', '🐴', '🐷', '🐗', '🐭', '🐹', '🐰', '🐻', '🐨', '🐼', '🦥', '🦦', '🦨', '🦘', 
-  '🦡', '🐾', '🦃', '🐔', '🐓', '🐣', '🐤', '🐥', '🐦', '🐧', '🕊️', '🦅', '🦆', '🦢', 
-  '🦉', '🦩', '🦚', '🦜', '🐸', '🐊', '🐢', '🦎', '🐍', '🐲', '🦕', '🦖', '🐳', '🐋', 
-  '🐬', '🐟', '🐠', '🐡', '🦈', '🐙', '🐚', '🐌', '🦋', '🐛', '🐜', '🐝', '🐞', '🦗',
-  '🕷️', '🦂', '🦟', '🦠', '🐎', '🐂', '🐃', '🐄', '🐖', '🐏', '🐑', '🐐', '🐪', '🐫',
-];
+const ANIMAL_EMOJIS = Object.entries(animalAvatarMap).map(([label,emoji]) => ({label, emoji}))
 
 const BG_COLORS = [
   '#FFFFFF', '#FEF3C7', '#D1FAE5', '#DBEAFE', '#FEE2E2', '#F3E8FF', '#FFEDD5'
@@ -48,10 +41,10 @@ export default function EmojiPicker({ onSelectEmoji, onSelectColor, onClose, cur
       <div>
         <p className="text-xs font-bold text-gray-500 mb-2 uppercase">Animal</p>
         <div className="grid grid-cols-5 gap-2 max-h-48 overflow-y-auto custom-scrollbar">
-          {ANIMAL_EMOJIS.map((emoji) => (
+          {ANIMAL_EMOJIS.map(({label, emoji}) => (
             <button
-              key={emoji}
-              onClick={() => onSelectEmoji(emoji)}
+              key={label}
+              onClick={() => onSelectEmoji(label)}
               className="text-2xl hover:bg-gray-100 rounded-lg p-1 transition-colors"
             >
               {emoji}

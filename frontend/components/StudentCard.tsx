@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/Button';
 import { Student } from '@/lib/types';
 import { Pencil, ChevronDown } from 'lucide-react';
+import { getAnimalAvatar } from '@/utils/getAnimalAvatar';
 
 interface StudentCardProps {
   student: Student;
@@ -19,15 +20,6 @@ export const StudentCard: React.FC<StudentCardProps> = ({
   onOpenFeedback 
 }) => {
   
-  const getAvatarEmoji = (avatar: string) => {
-    const map: Record<string, string> = {
-      'Leão': '🦁', 'Tigre': '🐯', 'Elefante': '🐘', 'Girafa': '🦒', 'Zebra': '🦓', 
-      'Macaco': '🐒', 'Urso': '🐻', 'Lobo': '🐺', 'Raposa': '🦊', 'Coelho': '🐰', 
-      'Panda': '🐼', 'Koala': '🐨'
-    };
-    return map[avatar] || avatar; 
-  };
-
   return (
     <div 
       className={viewMode === 'list' 
@@ -42,7 +34,7 @@ export const StudentCard: React.FC<StudentCardProps> = ({
               className={`flex items-center justify-center border-2 border-[var(--neu-border-color)] rounded-full shadow-sm cursor-pointer ${viewMode === 'list' ? 'w-12 h-12 text-2xl' : 'w-24 h-24 text-5xl mb-1'}`}
               style={{ backgroundColor: student.avatarColor || '#FFFFFF' }}
             >
-              {getAvatarEmoji(student.animalAvatar)}
+              {getAnimalAvatar(student.animalAvatar)}
             </div>
             
             {/* Edit Overlay */}
