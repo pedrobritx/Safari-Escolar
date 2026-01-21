@@ -28,7 +28,7 @@ export default function GradebookPage() {
   const getActiveClassroomId = () => activeClassroomId;
 
   const loadGradebook = async (classId: string) => {
-    const resGrid = await apiFetch(`/api/grades/gradebook/grid?classroom_id=${classId}`);
+    const resGrid = await apiFetch(`/api/grades/gradebook/grid/?classroom_id=${classId}`);
     if (!resGrid.ok) {
       const message = await resGrid.text();
       throw new Error(message || "Failed to load gradebook data");
@@ -40,7 +40,7 @@ export default function GradebookPage() {
   };
 
   const loadStudents = async (classId: string) => {
-    const resStudents = await apiFetch(`/api/students?classroom=${classId}`);
+    const resStudents = await apiFetch(`/api/students/?classroom=${classId}`);
     if (!resStudents.ok) throw new Error("Failed to fetch students");
     const studentsData: (Student & { animal_id?: string; display_name?: string; name?: string })[] = await resStudents.json();
     const mappedStudents = studentsData.map((s) => ({
@@ -54,7 +54,7 @@ export default function GradebookPage() {
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const resClassrooms = await apiFetch("/api/classrooms");
+      const resClassrooms = await apiFetch("/api/classrooms/");
       if (!resClassrooms.ok) throw new Error("Failed to fetch classrooms");
       const classroomsData: Classroom[] = await resClassrooms.json();
       setClassrooms(classroomsData);
@@ -102,7 +102,7 @@ export default function GradebookPage() {
     if (!classId) return;
 
     try {
-      const res = await apiFetch("/api/grades/categories", {
+      const res = await apiFetch("/api/grades/categories/", {
         method: "POST",
         body: JSON.stringify({
           name,
@@ -125,7 +125,7 @@ export default function GradebookPage() {
 
   const handleDeleteCategory = async (id: string) => {
     try {
-        const res = await apiFetch(`/api/grades/categories/${id}`, {
+        const res = await apiFetch(`/api/grades/categories/${id}/`, {
             method: "DELETE",
         });
 
@@ -152,7 +152,7 @@ export default function GradebookPage() {
     try {
         if (newItem.id && !newItem.id.startsWith("item-")) {
             // Edit existing item
-            const res = await apiFetch(`/api/grades/items/${newItem.id}`, {
+            const res = await apiFetch(`/api/grades/items/${newItem.id}/`, {
                 method: "PATCH",
                 body: JSON.stringify(newItem)
             });
@@ -161,7 +161,7 @@ export default function GradebookPage() {
             await loadGradebook(classId);
         } else {
             // Create new item
-            const res = await apiFetch("/api/grades/items", {
+            const res = await apiFetch("/api/grades/items/", {
                 method: "POST",
                 body: JSON.stringify({
                     ...newItem,
@@ -205,7 +205,7 @@ export default function GradebookPage() {
 
     const classId = getActiveClassroomId();
     try {
-        const res = await apiFetch(`/api/grades/items/${item.id}`, {
+        const res = await apiFetch(`/api/grades/items/${item.id}/`, {
             method: "DELETE",
         });
 
@@ -253,7 +253,7 @@ export default function GradebookPage() {
             score: entry.score
         }];
 
-        const res = await apiFetch("/api/grades/entries/bulk_update_grades", {
+        const res = await apiFetch("/api/grades/entries/bulk_update_grades/", {
             method: "POST",
             body: JSON.stringify(payload)
         });
@@ -279,7 +279,7 @@ export default function GradebookPage() {
 
     setIsExporting(true);
     try {
-        const res = await apiFetch(`/api/grades/gradebook/export?classroom_id=${classId}`, {
+        const res = await apiFetch(`/api/grades/gradebook/export/?classroom_id=${classId}`, {
             csrf: false
         });
 

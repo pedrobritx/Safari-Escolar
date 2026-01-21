@@ -157,6 +157,45 @@ class GradeEntryViewSet(viewsets.ModelViewSet):
         saved_entries = []
         errors = []
         
+        # 1. Collect IDs to pre-fetch
+        item_ids = set()
+        student_ids = set()
+        
+        for entry_data in data:
+            if entry_data.get('grade_item'):
+                item_ids.add(entry_data.get('grade_item'))
+            if entry_data.get('student'):
+                student_ids.add(entry_data.get('student'))
+        
+        # 2. Pre-fetch GradeItems
+        # Filter by teacher to ensure authz
+        grade_items_qs = GradeItem.objects.select_related('classroom').filter(
+            id__in=item_ids,
+            classroom__teacher=request.user
+        )
+        grade_items_map = {str(item.id): item for item in grade_items_qs}
+        
+        # 3. Pre-fetch Students
+        # We need to verify students belong to the correct classroom later,
+        # but for now just fetch them if they exist.
+        students_qs = Student.objects.filter(id__in=student_ids)
+        students_map = {str(student.id): student for student in students_qs}
+        
+        # 4. Pre-fetch existing GradeEntries
+        # We look for existing entries matching the pairs in the payload
+        # To do this efficiently in one query is tricky without a composite key lookup,
+        # but we can filter by the set of items and students.
+        existing_entries_qs = GradeEntry.objects.filter(
+            grade_item_id__in=item_ids,
+            student_id__in=student_ids
+        )
+        
+        # Create a lookup key: (grade_item_id, student_id) -> GradeEntry
+        existing_entries_map = {
+            (str(entry.grade_item_id), str(entry.student_id)): entry 
+            for entry in existing_entries_qs
+        }
+
         with transaction.atomic():
             for entry_data in data:
                 student_id = entry_data.get('student')
@@ -167,24 +206,25 @@ class GradeEntryViewSet(viewsets.ModelViewSet):
                     errors.append({"error": "Missing fields", "data": entry_data})
                     continue
 
-                try:
-                    grade_item = GradeItem.objects.select_related('classroom').get(
-                        id=item_id,
-                        classroom__teacher=request.user
-                    )
-                except GradeItem.DoesNotExist:
+                # O(1) Lookup for GradeItem
+                grade_item = grade_items_map.get(str(item_id))
+                if not grade_item:
                     errors.append({"error": "Grade item not found or unauthorized", "data": entry_data})
                     continue
 
-                student = Student.objects.filter(id=student_id, classroom=grade_item.classroom).first()
+                # O(1) Lookup for Student
+                student = students_map.get(str(student_id))
                 if not student:
+                    errors.append({"error": "Student not found", "data": entry_data})
+                    continue
+                
+                # Check classroom mismatch (previously done by querying student with classroom filter)
+                if student.classroom_id != grade_item.classroom_id:
                     errors.append({"error": "Student not found in this classroom", "data": entry_data})
                     continue
 
-                instance = GradeEntry.objects.filter(
-                    grade_item=grade_item,
-                    student=student
-                ).first()
+                # O(1) Lookup for existing Entry
+                instance = existing_entries_map.get((str(item_id), str(student_id)))
 
                 serializer = GradeEntrySerializer(
                     instance,
@@ -200,8 +240,11 @@ class GradeEntryViewSet(viewsets.ModelViewSet):
                 if serializer.is_valid():
                     entry = serializer.save(graded_by_user=request.user)
                     saved_entries.append(GradeEntrySerializer(entry).data)
+                    
+                    action_type = "GRADE_UPDATED" if instance else "GRADE_SET"
+                    
                     record_audit(
-                        action="GRADE_SET",
+                        action=action_type,
                         actor=request.user,
                         entity_type="GradeEntry",
                         entity_id=entry.id,
