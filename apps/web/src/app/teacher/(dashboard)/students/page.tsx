@@ -93,6 +93,7 @@ export default function StudentsPage() {
       name: student.display_name,
       avatar: getAvatar(student),
       class: student.classroom_name || "",
+      classId: student.classroom, // Pass the ID for fetching data
     });
     setIsDetailModalOpen(true);
   };

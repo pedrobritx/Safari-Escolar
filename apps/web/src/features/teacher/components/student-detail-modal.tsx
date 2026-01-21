@@ -1,23 +1,40 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { GlassPanel } from "@/components/ui/glass-panel";
-import { X, Star, TrendingUp, TrendingDown, MessageSquare, FileText, BarChart3, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { X, TrendingUp, TrendingDown, MessageSquare, FileText, BarChart3, User, Save, Loader2 } from "lucide-react";
 import { ANIMAL_EMOJIS } from "@/features/teacher/constants";
 
 // Types
 interface Student {
-  id: number;
+  id: string; // Changed to string (UUID)
   name: string;
   avatar: string;
   class: string;
+  classId?: string; // ID for fetching data
 }
 
-interface GradeSummary {
-  category: string;
-  average: number;
-  maxScore: number;
+interface GradeCategory {
+  id: string;
+  name: string;
+  weight: number;
+}
+
+interface GradeItem {
+  id: string;
+  title: string;
+  max_score: number;
+  category: string; // category ID
+}
+
+interface GradeEntry {
+  id: string;
+  grade_item: string;
+  score: number;
 }
 
 interface FeedbackHistoryItem {
@@ -40,7 +57,8 @@ interface StudentDetailModalProps {
 // Mock data
 // ... (rest of mock data remains the same, assuming it's stable)
 
-const MOCK_GRADES: GradeSummary[] = [];
+// Mock data
+// ... (rest of mock data remains the same, assuming it's stable)
 
 const MOCK_FEEDBACK: FeedbackHistoryItem[] = [
   { id: "1", type: "positive", label: "Participação", icon: "🙋", points: 5, date: "19/01/2026" },
@@ -61,11 +79,93 @@ export function StudentDetailModal({ isOpen, onClose, student, onUpdate }: Stude
   const [activeTab, setActiveTab] = useState<TabKey>("overview");
   const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
 
+  // Gradebook State
+  const [categories, setCategories] = useState<GradeCategory[]>([]);
+  const [items, setItems] = useState<GradeItem[]>([]);
+  const [entries, setEntries] = useState<Record<string, number>>({}); // itemId -> score
+  const [isLoadingGrades, setIsLoadingGrades] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Fetch grades when tab is active and we have student/class data
+  const fetchGrades = useCallback(async () => {
+    if (!student?.classId || !student?.id) return;
+    
+    setIsLoadingGrades(true);
+    try {
+      const [catsRes, itemsRes, entriesRes] = await Promise.all([
+        fetch(`/api/grades/categories/?classroom_id=${student.classId}`),
+        fetch(`/api/grades/items/?classroom_id=${student.classId}`),
+        fetch(`/api/grades/entries/?student_id=${student.id}`)
+      ]);
+
+      if (catsRes.ok && itemsRes.ok && entriesRes.ok) {
+        const catsData = await catsRes.json();
+        const itemsData = await itemsRes.json();
+        const entriesData = await entriesRes.json();
+
+        setCategories(catsData);
+        setItems(itemsData);
+        
+        // Map entries to manageable state
+        const entriesMap: Record<string, number> = {};
+        entriesData.forEach((e: GradeEntry) => {
+          entriesMap[e.grade_item] = parseFloat(e.score.toString());
+        });
+        setEntries(entriesMap);
+      }
+    } catch (error) {
+      console.error("Failed to fetch grades:", error);
+    } finally {
+      setIsLoadingGrades(false);
+    }
+  }, [student?.classId, student?.id]);
+
+  useEffect(() => {
+    if (activeTab === "grades" && student?.classId && student?.id) {
+       fetchGrades();
+    }
+  }, [activeTab, student, fetchGrades]);
+
+  const handleSaveGrades = async () => {
+    if (!student?.id) return;
+    setIsSaving(true);
+    
+    try {
+      // Prepare payload
+      const payload = Object.entries(entries).map(([itemId, score]) => ({
+        student: student.id,
+        grade_item: itemId,
+        score: score
+      }));
+
+      const res = await fetch("/api/grades/entries/bulk_update_grades/", {
+        method: "POST",
+        headers: { 
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken") || "" // Need a way to get CSRF
+        },
+        body: JSON.stringify(payload)
+      }); 
+
+      if (!res.ok) throw new Error("Failed to save grades");
+      
+      // Optionally show success toast
+    } catch (error) {
+        console.error("Error saving grades:", error);
+    } finally {
+        setIsSaving(false);
+    }
+  };
+
+
   if (!student) return null;
 
   // Calculate total points from feedback
   const totalPoints = MOCK_FEEDBACK.reduce((sum, f) => sum + f.points, 0);
-  const overallGradeAverage = MOCK_GRADES.reduce((sum, g) => sum + g.average, 0) / MOCK_GRADES.length;
+  // const overallGradeAverage = MOCK_GRADES.reduce((sum, g) => sum + g.average, 0) / MOCK_GRADES.length; 
+  // Calculate real average? For now, leave it or calculate from real entries if possible.
+  // Let's placeholder it
+  const overallGradeAverage = 0;
 
   const tabs: { key: TabKey; label: string; icon: React.ReactNode }[] = [
     { key: "overview", label: "Geral", icon: <User size={16} /> },
@@ -192,30 +292,77 @@ export function StudentDetailModal({ isOpen, onClose, student, onUpdate }: Stude
 
           {/* Grades Tab */}
           {activeTab === "grades" && (
-            <div className="space-y-3 animate-in fade-in slide-in-from-right-2">
-              {MOCK_GRADES.length === 0 ? (
-                  <div className="text-center py-8 text-[var(--text-muted)]">
+            <div className="space-y-4 animate-in fade-in slide-in-from-right-2 h-full flex flex-col">
+               <div className="flex justify-between items-center px-1">
+                  <h3 className="text-sm font-medium text-[var(--text-muted)]">Boletim Escolar</h3>
+                  <Button 
+                    size="sm" 
+                    onClick={handleSaveGrades}
+                    disabled={isSaving}
+                    className="gap-2"
+                  >
+                    {isSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                    Salvar Notas
+                  </Button>
+               </div>
+
+               {isLoadingGrades ? (
+                   <div className="flex justify-center py-12">
+                       <Loader2 className="animate-spin text-[var(--primary)]" />
+                   </div>
+               ) : categories.length === 0 ? (
+                  <div className="text-center py-8 text-[var(--text-muted)] border-2 border-dashed border-[var(--border)] rounded-xl">
                     <BarChart3 size={32} className="mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">Nenhuma nota lançada</p>
+                    <p className="text-sm">Nenhuma categoria de nota configurada para esta turma.</p>
                   </div>
-              ) : (
-                MOCK_GRADES.map((grade) => (
-                  <GlassPanel key={grade.category} className="p-4">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="font-medium">{grade.category}</span>
-                      <span className={`font-bold ${grade.average >= 7 ? "text-[var(--secondary)]" : "text-[var(--accent)]"}`}>
-                        {grade.average.toFixed(1)}
-                      </span>
-                    </div>
-                    <div className="h-2 bg-[var(--bg)] rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full transition-all ${grade.average >= 7 ? "bg-[var(--secondary)]" : "bg-[var(--accent)]"}`}
-                        style={{ width: `${(grade.average / grade.maxScore) * 100}%` }}
-                      />
-                    </div>
-                  </GlassPanel>
-                ))
-              )}
+               ) : (
+                   <div className="space-y-6 pb-4">
+                       {categories.map(cat => {
+                           const catItems = items.filter(i => i.category === cat.id);
+                           if (catItems.length === 0) return null;
+
+                           return (
+                               <div key={cat.id} className="space-y-2">
+                                   <h4 className="text-xs font-bold uppercase text-[var(--text-muted)] tracking-wider ml-1">
+                                       {cat.name} {cat.weight ? `(${cat.weight}%)` : ''}
+                                   </h4>
+                                   <GlassPanel className="p-1 overflow-hidden divide-y divide-[var(--border)]">
+                                       {catItems.map(item => (
+                                           <div key={item.id} className="flex items-center justify-between p-3 hover:bg-[var(--bg)] transition-colors">
+                                               <div className="flex flex-col">
+                                                   <span className="font-medium text-sm">{item.title}</span>
+                                                   <span className="text-xs text-[var(--text-muted)]">Máx: {item.max_score}</span>
+                                               </div>
+                                               <div className="flex items-center gap-2">
+                                                   <Input 
+                                                       type="number" 
+                                                       min="0"
+                                                       max={item.max_score}
+                                                       step="0.1"
+                                                       className="w-20 text-right h-9 bg-[var(--surface)]"
+                                                       value={entries[item.id] !== undefined ? entries[item.id] : ''}
+                                                       onChange={(e) => {
+                                                           const val = e.target.value === '' ? undefined : parseFloat(e.target.value);
+                                                           if (val !== undefined && (val < 0 || val > item.max_score)) return; // Simple validation
+                                                           
+                                                           if (val !== undefined) {
+                                                               setEntries(prev => ({ ...prev, [item.id]: val }));
+                                                           } else {
+                                                               const newEntries = { ...entries };
+                                                               delete newEntries[item.id];
+                                                               setEntries(newEntries);
+                                                           }
+                                                       }}
+                                                   />
+                                               </div>
+                                           </div>
+                                       ))}
+                                   </GlassPanel>
+                               </div>
+                           );
+                       })}
+                   </div>
+               )}
             </div>
           )}
 
@@ -281,4 +428,12 @@ export function StudentDetailModal({ isOpen, onClose, student, onUpdate }: Stude
       </DialogContent>
     </Dialog>
   );
+}
+
+function getCookie(name: string): string | null {
+  if (typeof document === "undefined") return null;
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop()?.split(";").shift() || null;
+  return null;
 }
