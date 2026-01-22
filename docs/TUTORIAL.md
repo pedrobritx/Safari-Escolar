@@ -85,7 +85,7 @@ _Aguarde aparecer: `Ready in ...`_
 ### Acessar a Aplicação
 
 Abra seu navegador e vá para:
-👉 **http://localhost:3000**
+👉 **[http://localhost:3000](http://localhost:3000)**
 
 ---
 
@@ -95,7 +95,7 @@ Abra seu navegador e vá para:
 
 - **Email:** `joao.professor@escola.com`
 - **Senha:** `password123`
-  _(Veja `CREDENTIALS.md` para mais opções)_
+  _*(Veja [`CREDENTIALS.md`](./CREDENTIALS.md) para mais opções)*_
 
 **O banco de dados sumiu?**
 Se precisar resetar tudo e começar do zero:

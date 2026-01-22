@@ -32,7 +32,7 @@ O público-alvo (professores de escolas públicas) frequentemente utiliza dispos
 
 - **Idioma:** Toda a interface e documentação devem estar em **Português do Brasil (pt-BR)**.
 - **Público:** Focado exclusivamente no ensino público brasileiro (modelagem de dados segue o padrão escolar local: Turmas, Séries, Bimestres).
-- **Licença:** O uso é gratuito apenas para escolas públicas. Uso comercial é bloqueado salvo autorização expressa (ver `LICENSE.md`).
+- **Licença:** O uso é gratuito apenas para escolas públicas. Uso comercial é bloqueado salvo autorização expressa (ver [`LICENSE.md`](../LICENSE.md)).
 
 ## 4. Segurança e Dados
 

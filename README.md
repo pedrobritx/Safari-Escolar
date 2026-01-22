@@ -12,11 +12,11 @@ O aplicativo parte de um princípio simples: **menos burocracia, mais tempo para
 
 Professores da rede pública enfrentam:
 
-* Sobrecarga administrativa
-* Falta de ferramentas digitais integradas
-* Dificuldade de engajar alunos
-* Comunicação fragmentada com famílias
-* Pouca visibilidade de dados para coordenação
+- Sobrecarga administrativa
+- Falta de ferramentas digitais integradas
+- Dificuldade de engajar alunos
+- Comunicação fragmentada com famílias
+- Pouca visibilidade de dados para coordenação
 
 Esses fatores consomem tempo, energia e afetam diretamente a qualidade do ensino.
 
@@ -26,11 +26,11 @@ Esses fatores consomem tempo, energia e afetam diretamente a qualidade do ensino
 
 O Safari Escolar centraliza, em um único sistema:
 
-* Controle de presença
-* Registro de comportamento e atividades
-* Gamificação leve (pontuação + avatar animal)
-* Comunicação estruturada com famílias
-* Visão estratégica para coordenação
+- Controle de presença
+- Registro de comportamento e atividades
+- Gamificação leve (pontuação + avatar animal)
+- Comunicação estruturada com famílias
+- Visão estratégica para coordenação
 
 Tudo com uma interface simples, amigável e pensada para a realidade da escola pública.
 
@@ -38,10 +38,10 @@ Tudo com uma interface simples, amigável e pensada para a realidade da escola p
 
 ## Público-Alvo
 
-* **Professor(a)**: usuário principal
-* **Coordenação**: visão macro e acompanhamento
-* **Família/Responsável**: acesso às informações do próprio aluno
-* **Administrador**: gestão do sistema
+- **Professor(a)**: usuário principal
+- **Coordenação**: visão macro e acompanhamento
+- **Família/Responsável**: acesso às informações do próprio aluno
+- **Administrador**: gestão do sistema
 
 ---
 
@@ -49,36 +49,35 @@ Tudo com uma interface simples, amigável e pensada para a realidade da escola p
 
 ### 👩‍🏫 Professor(a)
 
-* Login seguro
-* Criação e seleção de turmas
-* Cadastro de alunos
-* Atribuição de avatar animal por aluno
-* Lista de presença (Presente / Atrasado / Ausente)
-* Registro de eventos de comportamento (+ / − pontos + motivo)
-* Histórico por aluno e por turma
-* Envio de mensagens para famílias
-* Visualização de histórico de mensagens
+- Login seguro
+- Criação e seleção de turmas
+- Cadastro de alunos
+- Atribuição de avatar animal por aluno
+- Lista de presença (Presente / Atrasado / Ausente)
+- Registro de eventos de comportamento (+ / − pontos + motivo)
+- Histórico por aluno e por turma
+- Envio de mensagens para famílias
+- Visualização de histórico de mensagens
 
 ### 👨‍👩‍👧 Família
 
-* Acesso apenas ao(s) aluno(s) vinculado(s)
-* Visualização de:
-
-  * Presença
-  * Pontuação
-  * Histórico de mensagens
+- Acesso apenas ao(s) aluno(s) vinculado(s)
+- Visualização de:
+  - Presença
+  - Pontuação
+  - Histórico de mensagens
 
 ### 🧑‍💼 Coordenação
 
-* Visualização de turmas e professores
-* Acompanhamento de frequência e comportamento
-* Identificação de padrões (ex.: faltas recorrentes)
-* Envio de mensagens para professores
+- Visualização de turmas e professores
+- Acompanhamento de frequência e comportamento
+- Identificação de padrões (ex.: faltas recorrentes)
+- Envio de mensagens para professores
 
 ### 👩‍💻 Administrador
 
-* CRUD de usuários (professor, aluno, coordenação, admin)
-* Configurações gerais do sistema
+- CRUD de usuários (professor, aluno, coordenação, admin)
+- Configurações gerais do sistema
 
 ---
 
@@ -86,8 +85,8 @@ Tudo com uma interface simples, amigável e pensada para a realidade da escola p
 
 Cada aluno é representado por:
 
-* 🐯 Um **animal-avatar**
-* 🎯 Um sistema simples de **pontuação positiva ou negativa**
+- 🐯 Um **animal-avatar**
+- 🎯 Um sistema simples de **pontuação positiva ou negativa**
 
 O objetivo não é punição, mas **engajamento e feedback visual rápido**.
 
@@ -112,23 +111,23 @@ O objetivo não é punição, mas **engajamento e feedback visual rápido**.
 
 Exemplos possíveis:
 
-* Frontend: React / Vue / Svelte
-* Backend: Node.js / Django / Firebase
-* Banco de dados: PostgreSQL / SQLite / Firestore
-* Design: Figma
-* Deploy: Vercel / Render / Railway
+- Frontend: React / Vue / Svelte
+- Backend: Node.js / Django / Firebase
+- Banco de dados: PostgreSQL / SQLite / Firestore
+- Design: Figma
+- Deploy: Vercel / Render / Railway
 
 ---
 
 ## Manual de Instalação (Ambiente de Desenvolvimento)
 
-Este repositório já contém um *scaffold funcional* dividido em **frontend** e **backend**, pensado para facilitar testes, demonstrações e evolução do MVP.
+Este repositório já contém um _scaffold funcional_ dividido em **frontend** e **backend**, pensado para facilitar testes, demonstrações e evolução do MVP.
 
 ### Pré-requisitos
 
-* Node.js 18+
-* npm ou yarn
-* Git
+- Node.js 18+
+- npm ou yarn
+- Git
 
 ---
 
@@ -142,9 +141,9 @@ npx prisma generate
 npm run dev
 ```
 
-* **Health check:** `GET http://localhost:4000/health`
-* **Base da API:** `http://localhost:4000/api`
-* As rotas de demonstração utilizam dados em memória (ideal para o MVP).
+- **Health check:** `GET http://localhost:4000/health`
+- **Base da API:** `http://localhost:4000/api`
+- As rotas de demonstração utilizam dados em memória (ideal para o MVP).
 
 #### Banco de dados (opcional para MVP)
 
@@ -159,11 +158,11 @@ npx prisma db seed
 
 ### Credenciais de Demonstração
 
-* **Senha padrão:** `demo123` (ou variável `DEMO_PASSWORD` no `.env`)
-* **Professor:** `marina@safari-escolar.demo`
-* **Coordenação:** `coordenacao@safari-escolar.demo`
-* **Família:** `familia.joao@safari-escolar.demo`
-* **Administrador:** `admin@safari-escolar.demo`
+- **Senha padrão:** `demo123` (ou variável `DEMO_PASSWORD` no `.env`)
+- **Professor:** `marina@safari-escolar.demo`
+- **Coordenação:** `coordenacao@safari-escolar.demo`
+- **Família:** `familia.joao@safari-escolar.demo`
+- **Administrador:** `admin@safari-escolar.demo`
 
 Endpoint auxiliar:
 
@@ -181,14 +180,14 @@ npm install
 npm run dev
 ```
 
-* Aplicação disponível em: `http://localhost:3000`
-* Arquivo inicial: `frontend/src/app/page.tsx`
+- Aplicação disponível em: `http://localhost:3000`
+- Arquivo inicial: `frontend/src/app/page.tsx`
 
 ---
 
 ### Observação Importante
 
-O foco do MVP é **demonstração funcional**. Caso o backend não esteja ativo, o frontend pode utilizar *stubs* ou dados mockados, desde que o fluxo principal esteja claro no vídeo de apresentação.
+O foco do MVP é **demonstração funcional**. Caso o backend não esteja ativo, o frontend pode utilizar _stubs_ ou dados mockados, desde que o fluxo principal esteja claro no vídeo de apresentação.
 
 ---
 
@@ -200,9 +199,13 @@ O foco do MVP é **demonstração funcional**. Caso o backend não esteja ativo,
 ├── frontend/
 ├── backend/
 ├── docs/
-│   ├── report.md
-│   ├── pitch-script.md
-│   └── mvp-demo-script.md
+│   ├── API.md
+│   ├── ARCH.md
+│   ├── CONSTRAINTS.md
+│   ├── CREDENTIALS.md
+│   ├── TESTING.md
+│   ├── tree.md
+│   └── TUTORIAL.md
 │
 ├── README.md
 └── .env.example
@@ -214,21 +217,21 @@ O foco do MVP é **demonstração funcional**. Caso o backend não esteja ativo,
 
 O projeto atende aos requisitos do hackathon **“Auxílio aos professores e professoras no ensino público”**, incluindo:
 
-* Problema claramente definido
-* MVP funcional
-* Demonstração em vídeo
-* Documentação técnica e conceitual
-* Proposta de impacto social
+- Problema claramente definido
+- MVP funcional
+- Demonstração em vídeo
+- Documentação técnica e conceitual
+- Proposta de impacto social
 
 ---
 
 ## Impacto Esperado
 
-* Redução de tempo gasto com controle manual
-* Melhor acompanhamento individual de alunos
-* Comunicação mais clara com famílias
-* Mais dados para decisões pedagógicas
-* Maior engajamento em sala de aula
+- Redução de tempo gasto com controle manual
+- Melhor acompanhamento individual de alunos
+- Comunicação mais clara com famílias
+- Mais dados para decisões pedagógicas
+- Maior engajamento em sala de aula
 
 ---
 

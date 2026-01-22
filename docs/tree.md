@@ -1,16 +1,12 @@
-# Árvore do repositório
+# Árvore do repositório — Safari Escolar
+*Gerado em 2026-01-22 05:28:46Z (UTC)*
 
-*Gerado em 2026-01-22 05:01:33Z (UTC)*
-
-```text
+```
 Safari Escolar/
 ├── .env.example
 ├── .gitignore
-├── API.md
+├── LICENSE.md
 ├── README.md
-├── SECURITY.md
-├── TESTING.md
-├── TREE.md
 ├── apps/
 │   ├── api/
 │   │   ├── accounts/
@@ -73,7 +69,15 @@ Safari Escolar/
 │   └── tsconfig.json
 ├── docker-compose.yml
 ├── docs/
+│   ├── API.md
+│   ├── ARCH.md
+│   ├── CONSTRAINTS.md
+│   ├── CREDENTIALS.md
+│   ├── TESTING.md
+│   ├── TREE.md
+│   ├── TUTORIAL.md
 │   └── security/
+│       └── SECURITY.md
 ├── frontend/
 │   ├── .gitignore
 │   ├── README.md

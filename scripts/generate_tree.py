@@ -56,7 +56,7 @@ def write_tree_md(root: Path, out_path: Path):
 def main():
     script_path = Path(__file__).resolve()
     repo_root = script_path.parents[1]
-    out_path = repo_root / 'tree.md'
+    out_path = repo_root / 'docs' / 'tree.md'
     write_tree_md(repo_root, out_path)
     print(f'Wrote {out_path}')
 
