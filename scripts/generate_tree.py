@@ -13,7 +13,12 @@ def should_ignore(path: Path, ignore_names):
 
 def build_tree(root: Path, ignore_names=None):
     if ignore_names is None:
-        ignore_names = {'.git', 'node_modules', '__pycache__', '.venv', '.env', '.pytest_cache'}
+        ignore_names = {
+            '.git', '.github', 'node_modules', '__pycache__', '.venv', 'venv', 'env', '.env', 
+            '.pytest_cache', '.vscode', '.idea', '.DS_Store',
+            'dist', 'build', 'out', 'coverage', '.next', '.nuxt', 
+            'migrations', 'LC_MESSAGES', 'site-packages'
+        }
 
     lines = []
 
