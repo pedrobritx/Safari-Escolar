@@ -1,0 +1,17 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/admin/(dashboard)/page": "app/admin/(dashboard)/page.js",
+  "/admin/login/page": "app/admin/login/page.js",
+  "/coordinator/(dashboard)/page": "app/coordinator/(dashboard)/page.js",
+  "/coordinator/login/page": "app/coordinator/login/page.js",
+  "/family/(dashboard)/page": "app/family/(dashboard)/page.js",
+  "/page": "app/page.js",
+  "/teacher/(dashboard)/calendar/page": "app/teacher/(dashboard)/calendar/page.js",
+  "/teacher/(dashboard)/classroom/[id]/page": "app/teacher/(dashboard)/classroom/[id]/page.js",
+  "/teacher/(dashboard)/classroom/page": "app/teacher/(dashboard)/classroom/page.js",
+  "/teacher/(dashboard)/gradebook/page": "app/teacher/(dashboard)/gradebook/page.js",
+  "/teacher/(dashboard)/page": "app/teacher/(dashboard)/page.js",
+  "/teacher/(dashboard)/settings/page": "app/teacher/(dashboard)/settings/page.js",
+  "/teacher/(dashboard)/students/page": "app/teacher/(dashboard)/students/page.js",
+  "/teacher/login/page": "app/teacher/login/page.js"
+}

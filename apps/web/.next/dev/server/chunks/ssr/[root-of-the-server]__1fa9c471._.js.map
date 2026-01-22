@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 22, "column": 0}, "map": {"version":3,"sources":["file:///Users/pedr/Developer/Safari%20Escolar/apps/web/src/app/teacher/%28dashboard%29/calendar/page.tsx"],"sourcesContent":["export default function CalendarPage() {\n  return (\n    <div className=\"flex flex-col items-center justify-center min-h-[50vh] text-center gap-4\">\n        <div className=\"text-6xl\">📅</div>\n        <h1 className=\"text-2xl font-bold\">Agenda</h1>\n        <p className=\"text-[var(--text-muted)]\">Funcionalidade em desenvolvimento.</p>\n    </div>\n  );\n}\n"],"names":[],"mappings":";;;;;;AAAe,SAAS;IACtB,qBACE,8OAAC;QAAI,WAAU;;0BACX,8OAAC;gBAAI,WAAU;0BAAW;;;;;;0BAC1B,8OAAC;gBAAG,WAAU;0BAAqB;;;;;;0BACnC,8OAAC;gBAAE,WAAU;0BAA2B;;;;;;;;;;;;AAGhD"}}]
+}
