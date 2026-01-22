@@ -1,26 +1,29 @@
-# Safari Escolar - API Documentation
+# Safari Escolar - Documentação da API
 
-## Base URL
-```
+## URL Base
+
+```text
 http://localhost:3000/api
 ```
 
-## Authentication
+## Autenticação
 
-All endpoints (except login) require a JWT token in the Authorization header:
+Todos os endpoints (exceto login) exigem um token JWT no cabeçalho Authorization:
 
-```
+```text
 Authorization: Bearer <token>
 ```
 
 ## Endpoints
 
-### Authentication
+### Autenticação (Endpoints)
 
 #### POST /auth/login
-Login to the system.
 
-**Request:**
+Login no sistema.
+
+**Requisição:**
+
 ```json
 {
   "email": "joao.professor@escola.com",
@@ -28,7 +31,8 @@ Login to the system.
 }
 ```
 
-**Response:**
+**Resposta:**
+
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIs...",
@@ -43,12 +47,14 @@ Login to the system.
 
 ---
 
-### Classes
+### Turmas (Classes)
 
 #### POST /classes
-Create a new class (Teacher/Coordinator only).
 
-**Request:**
+Criar uma nova turma (Apenas Professor/Coordenador).
+
+**Requisição:**
+
 ```json
 {
   "name": "Turma C - 3º Ano",
@@ -56,7 +62,8 @@ Create a new class (Teacher/Coordinator only).
 }
 ```
 
-**Response:**
+**Resposta:**
+
 ```json
 {
   "id": "uuid",
@@ -69,25 +76,27 @@ Create a new class (Teacher/Coordinator only).
 ```
 
 #### GET /classes
-List all classes (filtered by role).
 
-**Response:**
+Listar todas as turmas (filtrado por função).
+
+**Resposta:**
+
 ```json
-[
-  {
-    "id": "uuid",
-    "name": "Turma A - 1º Ano",
-    "schoolId": "uuid",
-    "teacherId": "uuid",
-    "students": [...]
-  }
-]
+{
+  "id": "uuid",
+  "name": "Turma A - 1º Ano",
+  "schoolId": "uuid",
+  "teacherId": "uuid",
+  "students": [...]
+}
 ```
 
 #### GET /classes/:id
-Get class details with students, attendance, and behavior events.
 
-**Response:**
+Obter detalhes da turma com alunos, presença e eventos de comportamento.
+
+**Resposta:**
+
 ```json
 {
   "id": "uuid",
@@ -106,21 +115,24 @@ Get class details with students, attendance, and behavior events.
 
 ---
 
-### Students
+### Alunos (Students)
 
 #### POST /students
-Add a new student to a class (Teacher/Coordinator only).
 
-**Request:**
+Adicionar um novo aluno a uma turma (Apenas Professor/Coordenador).
+
+**Requisição:**
+
 ```json
 {
   "name": "João da Silva",
   "classId": "uuid",
-  "animalAvatar": "Tigre" // optional, auto-assigned if not provided
+  "animalAvatar": "Tigre" // opcional, atribuído automaticamente se não fornecido
 }
 ```
 
-**Response:**
+**Resposta:**
+
 ```json
 {
   "id": "uuid",
@@ -132,12 +144,15 @@ Add a new student to a class (Teacher/Coordinator only).
 ```
 
 #### GET /students
-List students (optionally filtered by classId).
 
-**Query Parameters:**
-- `classId` (optional): Filter by class
+Listar alunos (opcionalmente filtrado por classId).
 
-**Response:**
+**Parâmetros de Consulta:**
+
+- `classId` (opcional): Filtrar por turma
+
+**Resposta:**
+
 ```json
 [
   {
@@ -152,21 +167,24 @@ List students (optionally filtered by classId).
 
 ---
 
-### Attendance
+### Presença (Attendance)
 
 #### POST /attendance
-Mark attendance for a student (Teacher only).
 
-**Request:**
+Registrar presença de um aluno (Apenas Professor).
+
+**Requisição:**
+
 ```json
 {
   "studentId": "uuid",
   "present": true,
-  "date": "2024-01-15" // optional, defaults to today
+  "date": "2024-01-15" // opcional, padrão é hoje
 }
 ```
 
-**Response:**
+**Resposta:**
+
 ```json
 {
   "id": "uuid",
@@ -177,9 +195,11 @@ Mark attendance for a student (Teacher only).
 ```
 
 #### GET /attendance/today/:classId
-Get today's attendance for a class.
 
-**Response:**
+Obter presença de hoje para uma turma.
+
+**Resposta:**
+
 ```json
 [
   {
@@ -199,21 +219,24 @@ Get today's attendance for a class.
 
 ---
 
-### Behavior Events
+### Comportamento (Behavior Events)
 
 #### POST /behavior
-Create a behavior event (Teacher only).
 
-**Request:**
+Criar um evento de comportamento (Apenas Professor).
+
+**Requisição:**
+
 ```json
 {
   "studentId": "uuid",
-  "type": "positive", // or "negative"
+  "type": "positive", // ou "negative"
   "description": "Ajudou colega com tarefa"
 }
 ```
 
-**Response:**
+**Resposta:**
+
 ```json
 {
   "id": "uuid",
@@ -225,12 +248,15 @@ Create a behavior event (Teacher only).
 ```
 
 #### GET /behavior
-List behavior events (optionally filtered by studentId).
 
-**Query Parameters:**
-- `studentId` (optional): Filter by student
+Listar eventos de comportamento (opcionalmente filtrado por studentId).
 
-**Response:**
+**Parâmetros de Consulta:**
+
+- `studentId` (opcional): Filtrar por aluno
+
+**Resposta:**
+
 ```json
 [
   {
@@ -244,10 +270,12 @@ List behavior events (optionally filtered by studentId).
 ```
 
 #### DELETE /behavior/:id
-Delete a behavior event (Teacher only).
 
-**Response:**
-```
+Excluir um evento de comportamento (Apenas Professor).
+
+**Resposta:**
+
+```text
 204 No Content
 ```
 
@@ -256,9 +284,11 @@ Delete a behavior event (Teacher only).
 ### Dashboard
 
 #### GET /dashboard
-Get teacher dashboard with class statistics (Teacher only).
 
-**Response:**
+Obter dashboard do professor com estatísticas da turma (Apenas Professor).
+
+**Resposta:**
+
 ```json
 [
   {
@@ -275,12 +305,14 @@ Get teacher dashboard with class statistics (Teacher only).
 
 ---
 
-### Family View
+### Visão da Família (Family View)
 
 #### GET /family
-Get read-only view of student data for family members (Family only).
 
-**Response:**
+Obter visualização somente leitura dos dados do aluno para membros da família (Apenas Família).
+
+**Resposta:**
+
 ```json
 {
   "students": [
@@ -302,11 +334,12 @@ Get read-only view of student data for family members (Family only).
 
 ---
 
-## Error Responses
+## Respostas de Erro
 
-All endpoints may return the following error responses:
+Todos os endpoints podem retornar as seguintes respostas de erro:
 
 ### 400 Bad Request
+
 ```json
 {
   "error": "Validation error message"
@@ -314,6 +347,7 @@ All endpoints may return the following error responses:
 ```
 
 ### 401 Unauthorized
+
 ```json
 {
   "error": "Invalid token"
@@ -321,6 +355,7 @@ All endpoints may return the following error responses:
 ```
 
 ### 403 Forbidden
+
 ```json
 {
   "error": "Not authorized"
@@ -328,6 +363,7 @@ All endpoints may return the following error responses:
 ```
 
 ### 404 Not Found
+
 ```json
 {
   "error": "Resource not found"
@@ -335,15 +371,17 @@ All endpoints may return the following error responses:
 ```
 
 ### 500 Internal Server Error
+
 ```json
 {
   "error": "Internal server error"
 }
 ```
 
-## Animal Avatars
+## Avatares de Animais
 
-Available animal avatars for students:
+Avatares de animais disponíveis para estudantes:
+
 - Leão
 - Tigre
 - Elefante
@@ -357,4 +395,4 @@ Available animal avatars for students:
 - Panda
 - Koala
 
-If not specified during student creation, an avatar will be randomly assigned.
+Se não for especificado durante a criação do aluno, um avatar será atribuído aleatoriamente.

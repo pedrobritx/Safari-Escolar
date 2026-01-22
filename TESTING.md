@@ -15,17 +15,21 @@ Safari Escolar é um sistema completo de gestão escolar mobile-first para escol
 ### 1. Iniciar o Sistema
 
 #### Terminal 1 - Backend (API)
+
 ```bash
 # Na raiz do projeto
 npm run dev
 ```
+
 Backend rodará em: `http://localhost:3000`
 
 #### Terminal 2 - Frontend
+
 ```bash
 cd frontend
 npm run dev
 ```
+
 Frontend rodará em: `http://localhost:3001`
 
 ### 2. Acessar a Aplicação
@@ -116,6 +120,7 @@ Você será automaticamente redirecionado para a tela de login.
 ## 📊 Dados de Seed
 
 ### Estrutura
+
 - **1 Escola:** Escola Municipal Safari
 - **1 Coordenador:** Maria Coordenadora
 - **2 Professores:** João Professor, Ana Professora
@@ -124,13 +129,16 @@ Você será automaticamente redirecionado para a tela de login.
 - **4 Famílias:** Vinculadas aos alunos
 
 ### Avatares de Animais
+
 Cada aluno tem um avatar único:
+
 - Leão 🦁, Tigre 🐯, Elefante 🐘, Girafa 🦒, Zebra 🦓, Macaco 🐒
 - Urso 🐻, Lobo 🐺, Raposa 🦊, Coelho 🐰, Panda 🐼, Koala 🐨
 
 ## 🔍 Testando API Diretamente
 
 ### Login
+
 ```bash
 curl -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
@@ -138,6 +146,7 @@ curl -X POST http://localhost:3000/api/auth/login \
 ```
 
 ### Listar Turmas (com token)
+
 ```bash
 TOKEN="seu-token-aqui"
 curl -X GET http://localhost:3000/api/classes \
@@ -145,12 +154,14 @@ curl -X GET http://localhost:3000/api/classes \
 ```
 
 ### Dashboard do Professor
+
 ```bash
 curl -X GET http://localhost:3000/api/dashboard \
   -H "Authorization: Bearer $TOKEN"
 ```
 
 ### Visão Família
+
 ```bash
 # Primeiro, fazer login como família
 FAMILY_TOKEN=$(curl -s -X POST http://localhost:3000/api/auth/login \
@@ -165,7 +176,8 @@ curl -X GET http://localhost:3000/api/family \
 ## 📋 Checklist de Validação
 
 ### Backend
-- [ ] API rodando em http://localhost:3000
+
+- [ ] API rodando em <http://localhost:3000>
 - [ ] Endpoint de health: GET /health retorna {"status": "ok"}
 - [ ] Login funciona e retorna token JWT
 - [ ] RBAC impede acessos não autorizados
@@ -174,7 +186,8 @@ curl -X GET http://localhost:3000/api/family \
 - [ ] Endpoints de comportamento funcionam
 
 ### Frontend
-- [ ] Aplicação abre em http://localhost:3001
+
+- [ ] Aplicação abre em <http://localhost:3001>
 - [ ] Redirecionamento automático para /login
 - [ ] Login funciona com redirecionamento por role
 - [ ] Dashboard do professor carrega
@@ -186,6 +199,7 @@ curl -X GET http://localhost:3000/api/family \
 - [ ] Design responsivo funciona em mobile
 
 ### Mobile-First
+
 - [ ] Layout se adapta para telas pequenas
 - [ ] Botões são grandes o suficiente para toque
 - [ ] Texto legível em dispositivos móveis
@@ -194,6 +208,7 @@ curl -X GET http://localhost:3000/api/family \
 ## 🐛 Troubleshooting
 
 ### Backend não inicia
+
 ```bash
 # Verificar se o PostgreSQL está rodando
 docker compose ps
@@ -206,6 +221,7 @@ docker compose logs
 ```
 
 ### Frontend não carrega
+
 ```bash
 # Limpar cache do Next.js
 cd frontend
@@ -214,7 +230,9 @@ npm run dev
 ```
 
 ### Erro de conexão com API
+
 Verifique se:
+
 - Backend está rodando em localhost:3000
 - Variável NEXT_PUBLIC_API_URL está correta em frontend/.env.local
 - Não há bloqueio de CORS
