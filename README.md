@@ -2,7 +2,7 @@
 
 ## Visão Geral
 
-**Safari Escolar** é um web app de gestão de sala de aula inspirado no ClassDojo, criado para **auxiliar professores e professoras do ensino público** no acompanhamento de frequência, comportamento, atividades e comunicação com famílias. O projeto foi desenvolvido como **MVP de hackathon**, com foco em impacto real, simplicidade operacional e demonstração ponta a ponta.
+**Safari Escolar** é um web app de gestão de sala de aula criado para **auxiliar professores e professoras do ensino público** no acompanhamento de frequência, comportamento, atividades e comunicação com famílias. O projeto foi desenvolvido com foco em impacto real, simplicidade operacional e demonstração ponta a ponta.
 
 O aplicativo parte de um princípio simples: **menos burocracia, mais tempo para ensinar**.
 
