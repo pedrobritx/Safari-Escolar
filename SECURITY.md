@@ -1,4 +1,4 @@
-# Safari Escolar - Resumo de Segurança
+# Resumo de Segurança
 
 ## ✅ Medidas de Segurança Implementadas
 

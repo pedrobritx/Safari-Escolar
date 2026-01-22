@@ -1,4 +1,4 @@
-# Árvore do repositório — Safari Escolar
+# Árvore do repositório
 
 *Gerado em 2026-01-22 05:01:33Z (UTC)*
 

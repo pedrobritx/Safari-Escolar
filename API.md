@@ -1,4 +1,4 @@
-# Safari Escolar - Documentação da API
+# Documentação da API
 
 ## URL Base
 

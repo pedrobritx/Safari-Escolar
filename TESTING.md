@@ -1,4 +1,4 @@
-# Safari Escolar - Guia de Teste do MVP
+# Guia de Teste do MVP
 
 ## 🎯 Visão Geral
 
