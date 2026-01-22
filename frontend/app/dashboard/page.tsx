@@ -3,18 +3,19 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
-import { User, Student } from '@/lib/types';
+import { User, Student, DashboardData } from '@/lib/types';
 import FeedbackModal, { FeedbackItem } from '@/components/FeedbackModal';
 import FeedbackEditorModal from '@/components/FeedbackEditorModal';
 import StudentDetailModal from '@/components/StudentDetailModal';
 import StudentFormModal from '@/components/StudentFormModal';
 import Calendar from '@/components/Calendar';
-import { LayoutGrid, List, Plus, Trash, Download } from 'lucide-react';
+import { LayoutGrid, List, Plus, Trash, Download, GraduationCap } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { toast } from 'sonner';
 import { useDashboard } from '@/hooks/useDashboard';
 import { StudentCard } from '@/components/StudentCard';
+import { ManageClassTeachersModal } from '@/components/ManageClassTeachersModal';
 
 const DEFAULT_POSITIVE_FEEDBACKS: FeedbackItem[] = [
   { id: 'task_ok', label: 'Tarefa em Dia', icon: '📝', points: 1 },
@@ -35,6 +36,8 @@ export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortOption, setSortOption] = useState<'firstNameAsc' | 'firstNameDesc' | 'lastNameAsc' | 'lastNameDesc'>('firstNameAsc');
+  const [currentDashboardData,setCurrentDashboardData] = useState<DashboardData | null>(null)
+  const [isManageTeachersModalOpen, setIsManageTeachersModalOpen] = useState(false);
 
   // Custom Hook
   const { 
@@ -47,7 +50,7 @@ export default function DashboardPage() {
     setSelectedDate,
     refreshData,
     setClasses, 
-    setDashboardData
+    setDashboardData,
   } = useDashboard(user);
 
   
@@ -102,6 +105,14 @@ export default function DashboardPage() {
     setUser(parsedUser);
   }, [router]);
 
+  //Updates class summary when dahboard has any update
+  useEffect(() => {
+    const currentClassDashboard = dashboardData.find(dashboard => dashboard.classId === selectedClass?.id)
+
+    if(currentClassDashboard)
+      setCurrentDashboardData(currentClassDashboard)
+
+  },[dashboardData])
 
   const sortStudents = (students: Student[] | undefined) => {
     if (!students) return [];
@@ -372,6 +383,18 @@ export default function DashboardPage() {
               >
                 <Trash size={20} />
               </Button>
+
+              {user?.role && ['COORDINATOR','ADMIN'].includes(user.role) && (
+                  <Button
+                    variant="ghost"
+                    onClick={() => setIsManageTeachersModalOpen(true)}
+                    className="mb-[2px] px-4 py-3 text-primary hover:bg-primary/10"
+                    title="Vincular professores na turma"
+                  >
+                    <GraduationCap size={20}/>
+                  </Button>
+                )}
+
             </div>
           </div>
         )}
@@ -381,41 +404,41 @@ export default function DashboardPage() {
         <div className="grid-dashboard mb-8">
            {/* Cartão de Resumo */}
           <div className="lg:col-span-1">
-          {dashboardData.map((data) => (
-            <Card key={data.classId} className="h-full">
-              <CardBody>
-                <h3 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">
-                  🏕️ {data.className}
-                </h3>
-                <div className="space-y-3 text-sm font-medium">
-                  <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
-                    <span className="text-[#57534E]">Total de Alunos:</span>
-                    <span className="font-bold text-[var(--safari-green)]">{data.totalStudents}</span>
+          {currentDashboardData && (
+              <Card key={currentDashboardData.classId}>
+                <CardBody>
+                  <h3 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">
+                  🏕️ {currentDashboardData.className}
+                  </h3>
+                  <div className="space-y-3 text-sm font-medium">
+                    <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
+                      <span className="text-[#57534E]">Total de Alunos:</span>
+                      <span className="font-bold text-[var(--safari-green)]">{currentDashboardData.totalStudents}</span>
+                    </div>
+                    <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
+                      <span className="text-[#57534E]">Presentes:</span>
+                      <span className="font-bold text-[var(--safari-green)]">{currentDashboardData.todayAttendance}</span>
+                    </div>
+                    <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
+                      <span className="text-[#57534E]">Atrasados:</span>
+                      <span className="font-bold text-[var(--safari-orange)]">{currentDashboardData.todayLate}</span>
+                    </div>
+                    <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
+                      <span className="text-[#57534E]">Taxa de Presença:</span>
+                      <span className="font-bold text-[var(--safari-green)]">{currentDashboardData.attendanceRate.toFixed(1)}%</span>
+                    </div>
+                    <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
+                      <span className="text-[#57534E]">Feedbacks Positivos:</span>
+                      <span className="font-bold text-[var(--safari-green)]">+{currentDashboardData.todayPositiveEvents}</span>
+                    </div>
+                    <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
+                      <span className="text-[#57534E]">Feedbacks Construtivos:</span>
+                      <span className="font-bold text-[var(--safari-orange)]">-{currentDashboardData.todayNegativeEvents}</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
-                    <span className="text-[#57534E]">Presentes:</span>
-                    <span className="font-bold text-[var(--safari-green)]">{data.todayAttendance}</span>
-                  </div>
-                  <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
-                    <span className="text-[#57534E]">Atrasados:</span>
-                    <span className="font-bold text-[var(--safari-orange)]">{data.todayLate}</span>
-                  </div>
-                  <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
-                    <span className="text-[#57534E]">Taxa de Presença:</span>
-                    <span className="font-bold text-[var(--safari-green)]">{data.attendanceRate.toFixed(1)}%</span>
-                  </div>
-                  <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
-                    <span className="text-[#57534E]">Feedbacks Positivos:</span>
-                    <span className="font-bold text-[var(--safari-green)]">+{data.todayPositiveEvents}</span>
-                  </div>
-                  <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
-                    <span className="text-[#57534E]">Feedbacks Construtivos:</span>
-                    <span className="font-bold text-[var(--safari-orange)]">-{data.todayNegativeEvents}</span>
-                  </div>
-                </div>
-              </CardBody>
-            </Card>
-          ))}
+                </CardBody>
+              </Card>
+            )}
           </div>
 
            {/* Calendário */}
@@ -542,6 +565,14 @@ export default function DashboardPage() {
             onDelete={handleDeleteStudent}
         />
       )}
+
+      <ManageClassTeachersModal
+        classId={selectedClass?.id ? selectedClass.id : ""}
+        isOpen={isManageTeachersModalOpen}
+        onClose={() => setIsManageTeachersModalOpen(false)}
+      />
     </div>
+
+    
   );
 }

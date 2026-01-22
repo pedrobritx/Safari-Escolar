@@ -5,6 +5,7 @@ import EmojiPicker from './EmojiPicker';
 import { Modal } from './ui/Modal';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
+import { getAnimalAvatar } from '@/utils/getAnimalAvatar';
 
 interface StudentFormModalProps {
   isOpen: boolean;
@@ -24,7 +25,7 @@ export default function StudentFormModal({
   mode 
 }: StudentFormModalProps) {
   const [name, setName] = useState('');
-  const [animalAvatar, setAnimalAvatar] = useState('🦁'); // Default
+  const [animalAvatar, setAnimalAvatar] = useState('Leão'); // Default
   const [avatarColor, setAvatarColor] = useState('#FFFFFF');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
@@ -33,12 +34,12 @@ export default function StudentFormModal({
       setTimeout(() => {
         if (mode === 'edit' && initialData) {
           setName(initialData.name);
-          setAnimalAvatar(initialData.animalAvatar || '🦁');
+          setAnimalAvatar(initialData.animalAvatar || 'Leão');
           setAvatarColor(initialData.avatarColor || '#FFFFFF');
         } else {
           // Reset for create
           setName('');
-          setAnimalAvatar('🦁');
+          setAnimalAvatar('Leão');
           setAvatarColor('#FFFFFF');
         }
         setShowEmojiPicker(false);
@@ -71,7 +72,7 @@ export default function StudentFormModal({
               style={{ backgroundColor: avatarColor }}
               aria-label="Choose avatar"
             >
-              {animalAvatar}
+              {getAnimalAvatar(animalAvatar)}
             </button>
             
             <div className="absolute -bottom-2 -right-2 bg-white rounded-full p-1.5 shadow-md border border-gray-200 pointer-events-none">
@@ -83,6 +84,7 @@ export default function StudentFormModal({
             <div className="absolute z-10 mt-28">
                 <EmojiPicker 
                   onSelectEmoji={(emoji) => {
+					console.log(emoji)
                     setAnimalAvatar(emoji);
                     setShowEmojiPicker(false);
                   }}

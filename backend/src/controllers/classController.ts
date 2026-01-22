@@ -159,3 +159,37 @@ export const getClass = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+export const updateClassTeacher = async (req: AuthRequest, res: Response) => {
+  try {
+    const { classId, teacherId } = req.params;
+
+    const classData = await prisma.class.findUnique({
+      where: { id: classId as string },
+    });
+
+    if (!classData) {
+      return res.status(400).json({ error: 'Turma não encontrada' });
+    }
+
+    const teacherData = await prisma.user.findUnique({
+      where: {id: teacherId as string, role: 'TEACHER'}
+    });
+
+    if (!teacherData) {
+      return res.status(400).json({ error: 'Professor não encontrado' });
+    }
+
+    const updatedClass = await prisma.class.update({
+      where: {id: classData.id},
+      data: {
+        teacherId: teacherData.id
+      }
+    })
+
+    res.json(updatedClass);
+  } catch (error) {
+    console.error('Get class error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};

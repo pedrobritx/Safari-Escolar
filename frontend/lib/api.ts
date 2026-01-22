@@ -1,5 +1,5 @@
 import { authEvents } from './authEvents';
-import { User, Student, DashboardData, FamilyStudent } from '@/lib/types';
+import { DashboardData, FamilyStudent, ClassDataWithTeacher } from '@/lib/types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
@@ -57,6 +57,24 @@ export const api = {
         'Authorization': `Bearer ${token}`,
       },
       cache: 'no-store',
+    }));
+  },
+
+  async getClassById(token: string, classId: string): Promise<ClassDataWithTeacher> {
+    return handleResponse(fetch(`${API_URL}/api/classes/${classId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      cache: 'no-store',
+    }));
+  },
+
+  async updateClassTeacher(token: string, classId: string, teacherId: string) {
+    let url = `${API_URL}/api/classes/${classId}/teacher/${teacherId}`;
+
+    return handleResponse(fetch(url, {
+      method: 'PUT',
+      headers: { 'Authorization': `Bearer ${token}` },
     }));
   },
 
@@ -174,4 +192,14 @@ export const api = {
     a.click();
     window.URL.revokeObjectURL(url);
   },
+
+  async getTeachers(token: string) {
+    return handleResponse(fetch(`${API_URL}/api/users/teachers`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      cache: 'no-store',
+    }));
+  },
+
 };

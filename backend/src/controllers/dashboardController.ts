@@ -8,17 +8,16 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
     const userId = req.user!.id;
     const userRole = req.user!.role;
 
-    if (userRole !== 'TEACHER') {
-      return res.status(403).json({ error: 'Only teachers can access dashboard' });
-    }
-
-
-
     const { date } = req.query;
     const { start: targetDateStart, end: targetDateEnd } = getDayRange(date as string | undefined);
 
-    const classes = await prisma.class.findMany({
-      where: { teacherId: userId },
+	const classes = await prisma.class.findMany({
+      where: { OR: [
+		{ teacherId: userId },
+		{
+			school: {coordinatorId: userId}
+		}
+	  ] },
       include: {
         students: {
           include: {
@@ -89,8 +88,14 @@ export const resetDay = async (req: AuthRequest, res: Response) => {
 
     const { start: targetDateStart, end: targetDateEnd } = getDayRange(date as string);
 
-    // Find classes for this teacher (or strict to specific classId if provided)
-    const whereClass: any = { teacherId: userId };
+    // Find classes for this teacher or coordinator (or strict to specific classId if provided)
+    const whereClass: any = { OR: [
+			{ teacherId: userId},
+			{ school: {
+				coordinatorId: userId
+			}}
+		]};
+
     if (classId) {
         whereClass.id = classId as string;
     }

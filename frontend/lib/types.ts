@@ -30,6 +30,12 @@ export interface Student {
   feedbackEvents?: FeedbackEvent[];
 }
 
+export interface School {
+  id: string;
+  name: string;
+  coordinatorId: string;
+}
+
 export interface Attendance {
   id?: string;
   date: string;
@@ -65,4 +71,16 @@ export interface FamilyStudent {
   negativeEvents: number;
   recentAttendances: Attendance[];
   recentFeedbackEvents: FeedbackEvent[];
+}
+
+export type Teacher = Omit<User, 'role'>
+
+export interface ClassDataWithTeacher {
+	id: string;
+	name: string;
+	schoolId: string;
+	teacherId: string;
+	school: School;
+	teacher: Teacher;
+  students: Student[];
 }
