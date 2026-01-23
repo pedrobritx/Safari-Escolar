@@ -9,7 +9,7 @@ import FeedbackEditorModal from '@/components/FeedbackEditorModal';
 import StudentDetailModal from '@/components/StudentDetailModal';
 import StudentFormModal from '@/components/StudentFormModal';
 import Calendar from '@/components/Calendar';
-import { LayoutGrid, List, Plus, Trash, Download, GraduationCap } from 'lucide-react';
+import { LayoutGrid, List, Plus, Trash, Download, GraduationCap, Settings } from 'lucide-react';
 import { Card, CardBody, CardHeader } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { toast } from 'sonner';
@@ -109,10 +109,10 @@ export default function DashboardPage() {
   useEffect(() => {
     const currentClassDashboard = dashboardData.find(dashboard => dashboard.classId === selectedClass?.id)
 
-    if(currentClassDashboard)
+	if(currentClassDashboard)
       setCurrentDashboardData(currentClassDashboard)
 
-  },[dashboardData])
+  },[dashboardData, selectedClass])
 
   const sortStudents = (students: Student[] | undefined) => {
     if (!students) return [];
@@ -392,6 +392,17 @@ export default function DashboardPage() {
                     title="Vincular professores na turma"
                   >
                     <GraduationCap size={20}/>
+                  </Button>
+                )}
+
+              {user?.role && user.role === 'ADMIN' && (
+                  <Button
+                    variant="ghost"
+                    onClick={() => router.push("/settings")}
+                    className="mb-[2px] px-4 py-3 text-primary hover:bg-primary/10"
+                    title="Ir para configurações"
+                  >
+                    <Settings  size={20}/>
                   </Button>
                 )}
 

@@ -73,7 +73,7 @@ export interface FamilyStudent {
   recentFeedbackEvents: FeedbackEvent[];
 }
 
-export type Teacher = Omit<User, 'role'>
+export type UserRole = Omit<User, 'role'>
 
 export interface ClassDataWithTeacher {
 	id: string;
@@ -81,6 +81,10 @@ export interface ClassDataWithTeacher {
 	schoolId: string;
 	teacherId: string;
 	school: School;
-	teacher: Teacher;
+	teacher: UserRole;
   students: Student[];
+}
+
+export interface SchoolWithCoordinator extends School {
+	coordinator: UserRole
 }

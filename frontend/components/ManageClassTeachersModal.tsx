@@ -1,5 +1,5 @@
 import { api } from "@/lib/api";
-import { Teacher } from "@/lib/types";
+import { UserRole } from "@/lib/types";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/utils/getErrorMessage";
@@ -15,8 +15,8 @@ export function ManageClassTeachersModal({
   onClose,
   classId
 }: ManageClassTeachersModalProps) {
-  const [teachers, setTeachers] = useState<Teacher[]>([]);
-  const [currentTeacher, setCurrentTeacher] = useState<Teacher | null>(null);
+  const [teachers, setTeachers] = useState<UserRole[]>([]);
+  const [currentTeacher, setCurrentTeacher] = useState<UserRole | null>(null);
   const [selectedTeacherId, setSelectedTeacherId] = useState<string>("");
 
 	useEffect(() => {
