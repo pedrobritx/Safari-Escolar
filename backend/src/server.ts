@@ -10,7 +10,8 @@ import feedbackRoutes from './routes/feedbackRoutes';
 import dashboardRoutes from './routes/dashboardRoutes';
 import familyRoutes from './routes/familyRoutes';
 import exportRoutes from './routes/exportRoutes';
-import exportUsers from './routes/usersRoutes';
+import usersRoutes from './routes/usersRoutes';
+import schoolRoutes from './routes/schoolRoutes';
 
 dotenv.config();
 
@@ -30,7 +31,8 @@ app.use('/api/feedback', feedbackRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/family', familyRoutes);
 app.use('/api/export', exportRoutes);
-app.use('/api/users', exportUsers);
+app.use('/api/users', usersRoutes);
+app.use('/api/schools', schoolRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

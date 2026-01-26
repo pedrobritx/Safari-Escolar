@@ -151,7 +151,7 @@ export default function FeedbackEditorModal({
             <>
               <div className="space-y-3 mb-6">
                 {currentList.map((item) => (
-                  <div key={item.id} className={`list-item ${deletingId === item.id ? 'list-item-danger' : ''}`}>
+                  <div key={item.id} className={`list-item ${deletingId === item.id ? 'list-item-anger' : ''}`}>
                     <div className="flex items-center gap-4 flex-1">
                       <div className="w-10 h-10 flex items-center justify-center bg-gray-100 rounded-full text-2xl border border-[var(--neu-border-color)]">
                           {item.icon}

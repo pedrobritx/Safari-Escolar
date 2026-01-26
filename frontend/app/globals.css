@@ -215,7 +215,7 @@ body {
            hover:border-gray-400 transition-all;
   }
 
-  .list-item-danger {
+  .list-item-anger {
     @apply border-[var(--safari-orange)] bg-orange-50 !border-b-2 translate-y-0.5;
   }
 }

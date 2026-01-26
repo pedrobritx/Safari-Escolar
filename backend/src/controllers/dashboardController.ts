@@ -11,13 +11,19 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
     const { date } = req.query;
     const { start: targetDateStart, end: targetDateEnd } = getDayRange(date as string | undefined);
 
-	const classes = await prisma.class.findMany({
-      where: { OR: [
-		{ teacherId: userId },
-		{
-			school: {coordinatorId: userId}
-		}
-	  ] },
+    let where = {}
+
+    if(['TEACHER','COORDINATOR'].includes(userRole)) {
+      where = { 
+        OR: [
+          { teacherId: userId },
+          { school: {coordinatorId: userId} },
+        ]
+     }
+    }
+    
+	  const classes = await prisma.class.findMany({
+      where,
       include: {
         students: {
           include: {

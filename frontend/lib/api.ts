@@ -202,4 +202,45 @@ export const api = {
     }));
   },
 
+  async getCoordinators(token: string) {
+    return handleResponse(fetch(`${API_URL}/api/users/coordinators`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      cache: 'no-store',
+    }));
+  },
+
+  async getSchoolsWithCoordinators(token: string) {
+	return handleResponse(fetch(`${API_URL}/api/schools`, {
+		headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      cache: 'no-store',
+	}))
+  },
+
+  async saveSchool(token: string, body: {id?: string, name: string, coordinatorId: string}) {
+    const method = body?.id ? 'PUT' : 'POST'
+
+    return handleResponse(fetch(`${API_URL}/api/schools`, {
+      method,
+      headers: {
+      'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      body: JSON.stringify(body)
+    }))
+  },
+
+  async deleteSchool(token: string, schoolId: string) {
+  let url = `${API_URL}/api/schools/${schoolId}`;
+
+  return handleResponse(fetch(url, {
+    method: 'DELETE',
+    headers: { 'Authorization': `Bearer ${token}` },
+  }));
+},
+
+
 };
