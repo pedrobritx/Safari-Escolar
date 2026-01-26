@@ -1,8 +1,8 @@
 # Árvore do repositório — Safari Escolar
-*Gerado em 2026-01-26 17:19:10Z (UTC)*
+*Gerado em 2026-01-26 17:27:25Z (UTC)*
 
 ```
-Safari Escolar/
+Safari-Escolar/
 ├── .env.example
 ├── .gitignore
 ├── LICENSE.md
@@ -12,7 +12,6 @@ Safari Escolar/
 │   │   ├── accounts/
 │   │   ├── attendance/
 │   │   ├── audit/
-│   │   ├── calendar/
 │   │   ├── classrooms/
 │   │   ├── config/
 │   │   ├── core/
@@ -46,6 +45,7 @@ Safari Escolar/
 │   │   │   ├── exportController.ts
 │   │   │   ├── familyController.ts
 │   │   │   ├── feedbackController.ts
+│   │   │   ├── schoolController.ts
 │   │   │   ├── studentController.ts
 │   │   │   └── usersController.ts
 │   │   ├── middleware/
@@ -58,6 +58,7 @@ Safari Escolar/
 │   │   │   ├── exportRoutes.ts
 │   │   │   ├── familyRoutes.ts
 │   │   │   ├── feedbackRoutes.ts
+│   │   │   ├── schoolRoutes.ts
 │   │   │   ├── studentRoutes.ts
 │   │   │   └── usersRoutes.ts
 │   │   ├── scripts/
@@ -75,10 +76,10 @@ Safari Escolar/
 │   ├── CONSTRAINTS.md
 │   ├── CREDENTIALS.md
 │   ├── TESTING.md
-│   ├── TREE.md
 │   ├── TUTORIAL.md
-│   └── security/
-│       └── SECURITY.md
+│   ├── security/
+│   │   └── SECURITY.md
+│   └── tree.md
 ├── frontend/
 │   ├── .gitignore
 │   ├── README.md
@@ -94,14 +95,19 @@ Safari Escolar/
 │   │   ├── login/
 │   │   │   └── page.tsx
 │   │   ├── page.tsx
-│   │   └── providers.tsx
+│   │   ├── providers.tsx
+│   │   └── settings/
+│   │       └── page.tsx
 │   ├── components/
 │   │   ├── AuthProvider.tsx
 │   │   ├── Calendar.tsx
+│   │   ├── ConfirmDeleteModal.tsx
+│   │   ├── CreateUpdateSchoolModal.tsx
 │   │   ├── EmojiPicker.tsx
 │   │   ├── FeedbackEditorModal.tsx
 │   │   ├── FeedbackModal.tsx
 │   │   ├── ManageClassTeachersModal.tsx
+│   │   ├── SchoolCard.tsx
 │   │   ├── StudentCard.tsx
 │   │   ├── StudentDetailModal.tsx
 │   │   ├── StudentFormModal.tsx
@@ -112,13 +118,13 @@ Safari Escolar/
 │   │       └── Modal.tsx
 │   ├── eslint.config.mjs
 │   ├── hooks/
-│   │   └── useDashboard.ts
+│   │   ├── useDashboard.ts
+│   │   └── useDebounce.ts
 │   ├── lib/
 │   │   ├── api.ts
 │   │   ├── authEvents.ts
 │   │   ├── retry.ts
 │   │   └── types.ts
-│   ├── next-env.d.ts
 │   ├── next.config.ts
 │   ├── package-lock.json
 │   ├── package.json
@@ -134,9 +140,6 @@ Safari Escolar/
 │       ├── animalAvatarMap.ts
 │       ├── getAnimalAvatar.ts
 │       └── getErrorMessage.ts
-├── packages/
-│   ├── shared/
-│   └── ui/
 └── scripts/
     └── generate_tree.py
 ```
