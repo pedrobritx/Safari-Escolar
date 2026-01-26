@@ -4,27 +4,28 @@ import { ConfirmDeleteModal } from "@/components/ConfirmDeleteModal";
 import { CreateUpdateSchoolModal } from "@/components/CreateUpdateSchoolModal";
 import { SchoolCard } from "@/components/SchoolCard";
 import { Button } from "@/components/ui/Button";
+import { useDebounce } from "@/hooks/useDebounce";
 import { api } from "@/lib/api";
 import { SchoolWithCoordinator, User } from "@/lib/types";
-import { Plus, LayoutGrid, List } from "lucide-react";
+import { Plus, LayoutGrid, List, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function SettingsPage() {
-	const router = useRouter();
+  const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [schools, setSchools] = useState<SchoolWithCoordinator[]>([])
   const [schoolToDelete, setSchoolToDelete] = useState<SchoolWithCoordinator | null>(null);
   const [isSchoolModalOpen, setIsSchoolModalOpen] = useState<boolean>(false);
   const [schoolModalMode, setSchoolModalMode] = useState<'create' | 'edit'>('create');
-  const [schoolModal, setSchoolModal] = useState<SchoolWithCoordinator | null>(null)
+  const [schoolModal, setSchoolModal] = useState<SchoolWithCoordinator | null>(null);
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 400);
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    router.push('/login');
-  };
+  const filteredSchools = schools.filter(s =>
+    s.name.toLowerCase().includes(debouncedSearch.toLowerCase())
+  );
 
   useEffect(() => {
     const loadData = async () => {
@@ -55,18 +56,28 @@ export default function SettingsPage() {
   }, [router]);
 
   const handleDeleteSchool = (deletedSchool: SchoolWithCoordinator) => {
-	setSchools(prev => prev.filter( school => school.id !== deletedSchool.id))
+    setSchools(prev => prev.filter( school => school.id !== deletedSchool.id))
   }
 
   const handleCreateOrUpdateSchool = (updatedSchool: SchoolWithCoordinator) => {
-	const schoolExists = schools.find(school => school.id === updatedSchool.id)
+    const schoolExists = schools.find(school => school.id === updatedSchool.id)
 
-	if(schoolExists) {
-		setSchools(prev => prev.map(school => school.id === updatedSchool.id ? updatedSchool : school))
-	} else {
-		setSchools(prev => [...prev, updatedSchool]);
-	}
+    if(schoolExists) {
+      setSchools(prev => prev.map(school => school.id === updatedSchool.id ? updatedSchool : school))
+    } else {
+      setSchools(prev => [...prev, updatedSchool]);
+    }
   }
+
+  const handleGoBack = () => {
+    router.back();
+  };
+
+    const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    router.push('/login');
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -75,14 +86,21 @@ export default function SettingsPage() {
           <div className="flex-between">
             <div>
               <h1 className="text-2xl font-heading font-bold text-primary">🦁 Safari Escolar</h1>
-              {/* <p className="text-sm font-medium text-[#57534E]">{user?.name} - {user?.role}</p> */}
             </div>
-            <Button
-              onClick={handleLogout}
-              variant="accent"
-            >
-              Sair
-          </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={handleGoBack}
+                variant="primary"
+              >
+                Voltar
+              </Button>
+              <Button
+                onClick={handleLogout}
+                variant="accent"
+              >
+                Sair
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -91,7 +109,19 @@ export default function SettingsPage() {
         <div className={`card`}>
           <div className="card-header bg-[var(--color-secondary)]">
             <h2 className="text-xl font-bold text-primary">Listagem de Escolas</h2>
-            <div className="flex gap-2">
+            <div className="relative">
+        <input
+          type="text"
+          placeholder="Buscar escola..."
+          className="h-[42px] w-64 rounded-lg border border-[var(--color-border)] bg-white pl-10 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--safari-green)]"
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <Search
+          size={18}
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+        />
+      </div>
+			<div className="flex gap-2">
               <Button
                 variant="ghost"
                 className="bg-white px-4 py-2 h-[42px] border-2 border-transparent hover:border-[var(--color-border)] mr-2"
@@ -125,7 +155,7 @@ export default function SettingsPage() {
 
           <div className={viewMode === 'list' ? "divide-y-2 divide-[var(--color-border)]" : "p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"}>
             {
-              schools.map(school => {
+              filteredSchools.map(school => {
                 return (
 
                   <SchoolCard
