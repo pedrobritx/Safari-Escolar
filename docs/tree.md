@@ -1,5 +1,5 @@
 # Árvore do repositório — Safari Escolar
-*Gerado em 2026-01-22 05:28:46Z (UTC)*
+*Gerado em 2026-01-26 17:19:10Z (UTC)*
 
 ```
 Safari Escolar/
@@ -27,6 +27,7 @@ Safari Escolar/
 │   │   └── students/
 │   └── web/
 │       ├── next-env.d.ts
+│       ├── package-lock.json
 │       └── tsconfig.tsbuildinfo
 ├── backend/
 │   ├── eslint.config.mjs
@@ -117,6 +118,7 @@ Safari Escolar/
 │   │   ├── authEvents.ts
 │   │   ├── retry.ts
 │   │   └── types.ts
+│   ├── next-env.d.ts
 │   ├── next.config.ts
 │   ├── package-lock.json
 │   ├── package.json
