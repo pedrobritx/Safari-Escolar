@@ -1,5 +1,5 @@
 # Árvore do repositório — Safari Escolar
-*Gerado em 2026-01-27 16:14:31Z (UTC)*
+*Gerado em 2026-01-27 16:27:52Z (UTC)*
 
 ```
 Safari-Escolar/
@@ -34,7 +34,6 @@ Safari-Escolar/
 │   ├── package-lock.json
 │   ├── package.json
 │   ├── prisma/
-│   │   ├── dev.db
 │   │   ├── schema.prisma
 │   │   └── seed.ts
 │   ├── src/
