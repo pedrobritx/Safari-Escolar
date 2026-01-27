@@ -5,23 +5,18 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  ADMIN
-  COORDINATOR
-  TEACHER
-  FAMILY
-}
+
 
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
   password  String
   name      String
-  role      Role
+  role      String // ADMIN, COORDINATOR, TEACHER, FAMILY
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -84,18 +79,14 @@ model Family {
   students  Student[]
 }
 
-enum AttendanceStatus {
-  PRESENT
-  ABSENT
-  LATE
-}
+
 
 model Attendance {
   id        String           @id @default(uuid())
   studentId String
   student   Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
   date      DateTime         @default(now())
-  status    AttendanceStatus
+  status    String // PRESENT, ABSENT, LATE
   createdAt DateTime         @default(now())
 
   @@unique([studentId, date])
