@@ -5,18 +5,34 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  ADMIN
+  COORDINATOR
+  TEACHER
+  FAMILY
+}
 
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+}
+
+enum FeedbackEventType {
+  POSITIVE
+  NEGATIVE
+}
 
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
   password  String
   name      String
-  role      String // ADMIN, COORDINATOR, TEACHER, FAMILY
+  role      Role     @default(TEACHER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -86,7 +102,7 @@ model Attendance {
   studentId String
   student   Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
   date      DateTime         @default(now())
-  status    String // PRESENT, ABSENT, LATE
+  status    AttendanceStatus
   createdAt DateTime         @default(now())
 
   @@unique([studentId, date])
@@ -96,7 +112,7 @@ model FeedbackEvent {
   id          String   @id @default(uuid())
   studentId   String
   student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  type        String   // "positive" or "negative"
+  type        FeedbackEventType
   description String
   date        DateTime @default(now())
   createdAt   DateTime @default(now())
