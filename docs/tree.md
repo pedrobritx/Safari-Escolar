@@ -1,5 +1,5 @@
 # Árvore do repositório — Safari Escolar
-*Gerado em 2026-01-26 17:27:25Z (UTC)*
+*Gerado em 2026-01-27 08:21:56Z (UTC)*
 
 ```
 Safari-Escolar/
@@ -34,6 +34,7 @@ Safari-Escolar/
 │   ├── package-lock.json
 │   ├── package.json
 │   ├── prisma/
+│   │   ├── dev.db
 │   │   ├── schema.prisma
 │   │   └── seed.ts
 │   ├── src/
@@ -115,7 +116,8 @@ Safari-Escolar/
 │   │       ├── Button.tsx
 │   │       ├── Card.tsx
 │   │       ├── Input.tsx
-│   │       └── Modal.tsx
+│   │       ├── Modal.tsx
+│   │       └── Select.tsx
 │   ├── eslint.config.mjs
 │   ├── hooks/
 │   │   ├── useDashboard.ts
