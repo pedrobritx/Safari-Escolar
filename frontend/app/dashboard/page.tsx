@@ -665,7 +665,7 @@ export default function DashboardPage() {
 										setEditingStudentData(null);
 										setStudentFormOpen(true);
 									}}
-									className="bg-[var(--safari-green)] text-white px-4 py-2 h-[42px] border border-transparent hover:brightness-110 mr-2 shadow-[var(--shadow-hardware)]"
+									className="bg-white px-3 py-2 h-[42px] border border-[var(--safari-stone-200)] hover:border-[var(--safari-green)] hover:text-[var(--safari-green)] shadow-[var(--shadow-hardware)] mr-2"
 								>
 									<Plus size={20} />
 									Adicionar Aluno
