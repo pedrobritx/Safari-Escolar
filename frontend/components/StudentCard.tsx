@@ -164,7 +164,7 @@ export const StudentCard: React.FC<StudentCardProps> = ({
 							</button>
 
 							{isOpen && (
-								<div className="absolute top-full left-0 right-0 mt-1 z-50 flex flex-col gap-1 p-1 bg-white/80 backdrop-blur-xl rounded-[var(--radius-inner)] border border-[var(--border-glass)] shadow-[var(--shadow-glass)] animate-in fade-in zoom-in-95 duration-200 origin-top">
+								<div className="absolute top-full left-0 right-0 mt-1 z-50 flex flex-col gap-1 p-1 bg-white/80 backdrop-blur-xl rounded-2xl border border-[var(--border-glass)] shadow-[var(--shadow-glass)] animate-in fade-in zoom-in-95 duration-200 origin-top">
 									<button
 										onClick={(e) => {
 											e.stopPropagation();

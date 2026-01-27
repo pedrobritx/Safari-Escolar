@@ -57,7 +57,7 @@ export function Select({
 			</button>
 
 			{isOpen && (
-				<div className="absolute top-[calc(100%+4px)] left-0 right-0 z-50 flex flex-col p-1 bg-white/80 backdrop-blur-xl rounded-[var(--radius-inner)] border border-[var(--border-glass)] shadow-[var(--shadow-glass)] animate-in fade-in zoom-in-95 duration-200 origin-top min-w-[max-content]">
+				<div className="absolute top-[calc(100%+4px)] left-0 right-0 z-50 flex flex-col p-1 bg-white/80 backdrop-blur-xl rounded-2xl border border-[var(--border-glass)] shadow-[var(--shadow-glass)] animate-in fade-in zoom-in-95 duration-200 origin-top min-w-[max-content]">
 					<div className="max-h-[300px] overflow-y-auto custom-scrollbar">
 						{options.map((option) => (
 							<button
