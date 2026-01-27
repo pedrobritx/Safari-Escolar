@@ -3,133 +3,119 @@ import { UserRole } from "@/lib/types";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { getErrorMessage } from "@/utils/getErrorMessage";
+import { Modal } from "./ui/Modal";
+import { Button } from "./ui/Button";
+import { Select } from "./ui/Select";
 
 interface ManageClassTeachersModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  classId: string;
+	isOpen: boolean;
+	onClose: () => void;
+	classId: string;
 }
 
 export function ManageClassTeachersModal({
-  isOpen,
-  onClose,
-  classId
+	isOpen,
+	onClose,
+	classId,
 }: ManageClassTeachersModalProps) {
-  const [teachers, setTeachers] = useState<UserRole[]>([]);
-  const [currentTeacher, setCurrentTeacher] = useState<UserRole | null>(null);
-  const [selectedTeacherId, setSelectedTeacherId] = useState<string>("");
+	const [teachers, setTeachers] = useState<UserRole[]>([]);
+	const [currentTeacher, setCurrentTeacher] = useState<UserRole | null>(null);
+	const [selectedTeacherId, setSelectedTeacherId] = useState<string>("");
 
 	useEffect(() => {
-    const loadData = async (classId: string) => {
-      const token = localStorage.getItem('token');
+		const loadData = async (classId: string) => {
+			const token = localStorage.getItem("token");
 
-      if (!token) return;
+			if (!token) return;
 
-      const teachers = await api.getTeachers(token)
-      setTeachers(teachers)
+			const teachers = await api.getTeachers(token);
+			setTeachers(teachers);
 
-      const classData = await api.getClassById(token, classId)
+			const classData = await api.getClassById(token, classId);
 
-      if(classData?.teacher)
-        setCurrentTeacher(classData.teacher)
+			if (classData?.teacher) setCurrentTeacher(classData.teacher);
+		};
 
-    }
+		setSelectedTeacherId("");
+		if (isOpen) {
+			loadData(classId);
+		}
+	}, [classId, isOpen]);
 
-    setSelectedTeacherId("")
-    loadData(classId)
+	const handleSave = async () => {
+		if (!selectedTeacherId) {
+			toast.error("Nenhum professor selecionado");
+			return;
+		}
 
-  },[classId,isOpen])
+		try {
+			const token = localStorage.getItem("token");
 
-  if (!isOpen) return;
+			await api.updateClassTeacher(token!, classId, selectedTeacherId);
 
-  const handleSave = async () => {
-    if(!selectedTeacherId) {
-      toast.error('Nenhum professor selecionado');
-      return
-    }
+			toast.success("Professor atualizado com sucesso");
 
-    try {
-      const token = localStorage.getItem('token');
+			onClose();
+		} catch (error: unknown) {
+			toast.error(getErrorMessage(error));
+		}
+	};
 
-      await api.updateClassTeacher(token!,classId,selectedTeacherId)
+	return (
+		<Modal
+			isOpen={isOpen}
+			onClose={onClose}
+			title="Professor da Turma"
+			maxWidth="md"
+		>
+			<div className="p-6">
+				<h3 className="mb-2 text-sm font-bold text-[var(--text-primary)]">
+					Professor Atual
+				</h3>
 
-      toast.success("Professor atualizado com sucesso")
+				<ul className="mb-6 space-y-2 text-sm font-medium">
+					{!currentTeacher && (
+						<li className="list-item min-h-[50px] justify-center text-[var(--text-muted)] italic">
+							Nenhum professor vinculado
+						</li>
+					)}
 
-      onClose();
-    } catch (error: unknown) {
-      toast.error(getErrorMessage(error))
-    }
-  };
+					{currentTeacher && (
+						<li key={currentTeacher.id} className="list-card">
+							<span className="text-[var(--text-primary)] font-bold">
+								{currentTeacher.name}
+							</span>
+						</li>
+					)}
+				</ul>
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+				{/* Adicionar professor */}
+				<div className="mb-8">
+					<h3 className="mb-2 text-sm font-bold text-[var(--safari-green)]">
+						Novo Professor
+					</h3>
 
-        {/* Header */}
-        <h2 className="mb-4 text-xl font-bold text-primary">
-          Professor da Turma
-        </h2>
+					<Select
+						value={selectedTeacherId}
+						onChange={setSelectedTeacherId}
+						options={[
+							{ value: "", label: "Selecione um professor..." },
+							...teachers.map((t) => ({ value: t.id, label: t.name })),
+						]}
+					/>
+				</div>
 
-        <h3 className="mb-2 text-sm font-semibold text-green-800">
-          Professor Atual
-        </h3>
-        
-        <ul className="mb-4 space-y-2 text-sm font-medium">
-          {!currentTeacher && (
-            <li className="rounded-lg border border-[var(--color-border)] bg-white p-3 text-center text-[#78716C]">
-              Nenhum professor vinculado
-            </li>
-          )}
+				{/* Ações */}
+				<div className="flex justify-end gap-3 pt-2 border-t border-[var(--safari-stone-200)]">
+					<Button variant="ghost" onClick={onClose}>
+						Cancelar
+					</Button>
 
-          {currentTeacher && (
-            <li
-              key={currentTeacher.id}
-              className="flex items-center justify-between rounded-lg border border-[var(--color-border)] bg-white p-3"
-            >
-              <span className="text-[#57534E]">{currentTeacher.name}</span>
-
-            </li>
-          )}
-        </ul>
-
-        {/* Adicionar professor */}
-        <div className="mb-6">
-          <h3 className="mb-2 text-sm font-semibold text-emerald-600">
-            Novo Professor
-          </h3>
-
-          <select
-            value={selectedTeacherId}
-            onChange={(e) => setSelectedTeacherId(e.target.value)}
-            className="w-full rounded-lg border border-[var(--color-border)] bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--safari-green)]"
-          >
-            <option value="">Selecione um professor</option>
-            {teachers.map((teacher) => (
-              <option key={teacher.id} value={teacher.id}>
-                {teacher.name}
-              </option>
-            ))}
-          </select>
-
-        </div>
-
-        {/* Ações */}
-        <div className="flex justify-end gap-2">
-          <button
-            onClick={onClose}
-            className="rounded-lg bg-[#E7E5E4] px-4 py-2 text-sm font-medium text-[#44403C] hover:bg-[#D6D3D1] transition"
-          >
-            Cancelar
-          </button>
-
-          <button
-            onClick={handleSave}
-            className="rounded-lg bg-[var(--safari-green)] px-4 py-2 text-sm font-semibold text-white hover:opacity-90 transition"
-          >
-            Salvar
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+					<Button variant="primary" onClick={handleSave}>
+						Salvar
+					</Button>
+				</div>
+			</div>
+		</Modal>
+	);
 }

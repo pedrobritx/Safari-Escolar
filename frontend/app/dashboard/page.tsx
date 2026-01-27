@@ -1,589 +1,690 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { api } from '@/lib/api';
-import { User, Student, DashboardData } from '@/lib/types';
-import FeedbackModal, { FeedbackItem } from '@/components/FeedbackModal';
-import FeedbackEditorModal from '@/components/FeedbackEditorModal';
-import StudentDetailModal from '@/components/StudentDetailModal';
-import StudentFormModal from '@/components/StudentFormModal';
-import Calendar from '@/components/Calendar';
-import { LayoutGrid, List, Plus, Trash, Download, GraduationCap, Settings } from 'lucide-react';
-import { Card, CardBody, CardHeader } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { toast } from 'sonner';
-import { useDashboard } from '@/hooks/useDashboard';
-import { StudentCard } from '@/components/StudentCard';
-import { ManageClassTeachersModal } from '@/components/ManageClassTeachersModal';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { api } from "@/lib/api";
+import { User, Student, DashboardData } from "@/lib/types";
+import FeedbackModal, { FeedbackItem } from "@/components/FeedbackModal";
+import FeedbackEditorModal from "@/components/FeedbackEditorModal";
+import StudentDetailModal from "@/components/StudentDetailModal";
+import StudentFormModal from "@/components/StudentFormModal";
+import Calendar from "@/components/Calendar";
+import {
+	LayoutGrid,
+	List,
+	Plus,
+	Trash,
+	Download,
+	GraduationCap,
+	Settings,
+} from "lucide-react";
+import { Card, CardBody, CardHeader } from "@/components/ui/Card";
+import { Button } from "@/components/ui/Button";
+import { Select } from "@/components/ui/Select";
+import { toast } from "sonner";
+import { useDashboard } from "@/hooks/useDashboard";
+import { StudentCard } from "@/components/StudentCard";
+import { ManageClassTeachersModal } from "@/components/ManageClassTeachersModal";
 
 const DEFAULT_POSITIVE_FEEDBACKS: FeedbackItem[] = [
-  { id: 'task_ok', label: 'Tarefa em Dia', icon: '📝', points: 1 },
-  { id: 'participating', label: 'Participando', icon: '🙋', points: 1 },
-  { id: 'helping', label: 'Ajudando os Outros', icon: '🤝', points: 1 },
-  { id: 'teamwork', label: 'Trabalho em Equipe', icon: '🧩', points: 1 },
-  { id: 'effort', label: 'Se Esforçando', icon: '💪', points: 1 },
+	{ id: "task_ok", label: "Tarefa em Dia", icon: "📝", points: 1 },
+	{ id: "participating", label: "Participando", icon: "🙋", points: 1 },
+	{ id: "helping", label: "Ajudando os Outros", icon: "🤝", points: 1 },
+	{ id: "teamwork", label: "Trabalho em Equipe", icon: "🧩", points: 1 },
+	{ id: "effort", label: "Se Esforçando", icon: "💪", points: 1 },
 ];
 
 const DEFAULT_NEGATIVE_FEEDBACKS: FeedbackItem[] = [
-  { id: 'no_collab', label: 'Não Colabora', icon: '🚫', points: -1 },
-  { id: 'late_task', label: 'Tarefa Atrasada', icon: '⏰', points: -1 },
-  { id: 'disrupting', label: 'Atrapalhando a Aula', icon: '🗣️', points: -1 },
+	{ id: "no_collab", label: "Não Colabora", icon: "🚫", points: -1 },
+	{ id: "late_task", label: "Tarefa Atrasada", icon: "⏰", points: -1 },
+	{ id: "disrupting", label: "Atrapalhando a Aula", icon: "🗣️", points: -1 },
 ];
 
 export default function DashboardPage() {
-  const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [sortOption, setSortOption] = useState<'firstNameAsc' | 'firstNameDesc' | 'lastNameAsc' | 'lastNameDesc'>('firstNameAsc');
-  const [currentDashboardData,setCurrentDashboardData] = useState<DashboardData | null>(null)
-  const [isManageTeachersModalOpen, setIsManageTeachersModalOpen] = useState(false);
+	const router = useRouter();
+	const [user, setUser] = useState<User | null>(null);
+	const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+	const [sortOption, setSortOption] = useState<
+		"firstNameAsc" | "firstNameDesc" | "lastNameAsc" | "lastNameDesc"
+	>("firstNameAsc");
+	const [currentDashboardData, setCurrentDashboardData] =
+		useState<DashboardData | null>(null);
+	const [isManageTeachersModalOpen, setIsManageTeachersModalOpen] =
+		useState(false);
 
-  // Custom Hook
-  const { 
-    dashboardData, 
-    classes, 
-    selectedClass, 
-    setSelectedClass, 
-    loading, 
-    selectedDate, 
-    setSelectedDate,
-    refreshData,
-    setClasses, 
-    setDashboardData,
-  } = useDashboard(user);
+	// Custom Hook
+	const {
+		dashboardData,
+		classes,
+		selectedClass,
+		setSelectedClass,
+		loading,
+		selectedDate,
+		setSelectedDate,
+		refreshData,
+		setClasses,
+		setDashboardData,
+	} = useDashboard(user);
 
-  
-  // Estado do Modal de Comportamento
-  const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
-  const [currentFeedbackStudent, setCurrentFeedbackStudent] = useState<{id: string, name: string} | null>(null);
+	// Estado do Modal de Comportamento
+	const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
+	const [currentFeedbackStudent, setCurrentFeedbackStudent] = useState<{
+		id: string;
+		name: string;
+	} | null>(null);
 
-  // Estado do Editor de Feedback
-  const [feedbackEditorOpen, setFeedbackEditorOpen] = useState(false);
-  const [positiveFeedbacks, setPositiveFeedbacks] = useState<FeedbackItem[]>(DEFAULT_POSITIVE_FEEDBACKS);
-  const [negativeFeedbacks, setNegativeFeedbacks] = useState<FeedbackItem[]>(DEFAULT_NEGATIVE_FEEDBACKS);
+	// Estado do Editor de Feedback
+	const [feedbackEditorOpen, setFeedbackEditorOpen] = useState(false);
+	const [positiveFeedbacks, setPositiveFeedbacks] = useState<FeedbackItem[]>(
+		DEFAULT_POSITIVE_FEEDBACKS,
+	);
+	const [negativeFeedbacks, setNegativeFeedbacks] = useState<FeedbackItem[]>(
+		DEFAULT_NEGATIVE_FEEDBACKS,
+	);
 
-  // Estado do Formulário de Aluno
-  const [studentFormOpen, setStudentFormOpen] = useState(false);
-  const [studentFormMode, setStudentFormMode] = useState<'create' | 'edit'>('create');
-  const [editingStudentData, setEditingStudentData] = useState<Student | null>(null);
+	// Estado do Formulário de Aluno
+	const [studentFormOpen, setStudentFormOpen] = useState(false);
+	const [studentFormMode, setStudentFormMode] = useState<"create" | "edit">(
+		"create",
+	);
+	const [editingStudentData, setEditingStudentData] = useState<Student | null>(
+		null,
+	);
 
-  useEffect(() => {
-    // Carregar comportamentos personalizados do armazenamento local se disponível
-    const savedPositive = localStorage.getItem('safari_positive_feedbacks');
-    const savedNegative = localStorage.getItem('safari_negative_feedbacks');
+	useEffect(() => {
+		// Carregar comportamentos personalizados do armazenamento local se disponível
+		const savedPositive = localStorage.getItem("safari_positive_feedbacks");
+		const savedNegative = localStorage.getItem("safari_negative_feedbacks");
 
-    if (savedPositive) setPositiveFeedbacks(JSON.parse(savedPositive));
-    if (savedNegative) setNegativeFeedbacks(JSON.parse(savedNegative));
-  }, []);
+		if (savedPositive) setPositiveFeedbacks(JSON.parse(savedPositive));
+		if (savedNegative) setNegativeFeedbacks(JSON.parse(savedNegative));
+	}, []);
 
-  const handleUpdateFeedbacks = (type: 'positive' | 'negative', updatedList: FeedbackItem[]) => {
-    if (type === 'positive') {
-      setPositiveFeedbacks(updatedList);
-      localStorage.setItem('safari_positive_feedbacks', JSON.stringify(updatedList));
-    } else {
-      setNegativeFeedbacks(updatedList);
-      localStorage.setItem('safari_negative_feedbacks', JSON.stringify(updatedList));
-    }
-  };
+	const handleUpdateFeedbacks = (
+		type: "positive" | "negative",
+		updatedList: FeedbackItem[],
+	) => {
+		if (type === "positive") {
+			setPositiveFeedbacks(updatedList);
+			localStorage.setItem(
+				"safari_positive_feedbacks",
+				JSON.stringify(updatedList),
+			);
+		} else {
+			setNegativeFeedbacks(updatedList);
+			localStorage.setItem(
+				"safari_negative_feedbacks",
+				JSON.stringify(updatedList),
+			);
+		}
+	};
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
+	useEffect(() => {
+		const token = localStorage.getItem("token");
+		const userData = localStorage.getItem("user");
 
-    if (!token || !userData) {
-      router.push('/login');
-      return;
-    }
+		if (!token || !userData) {
+			router.push("/login");
+			return;
+		}
 
-    const parsedUser = JSON.parse(userData);
-    if (parsedUser.role === 'FAMILY') {
-      router.push('/family');
-      return;
-    }
+		const parsedUser = JSON.parse(userData);
+		if (parsedUser.role === "FAMILY") {
+			router.push("/family");
+			return;
+		}
 
-    setUser(parsedUser);
-  }, [router]);
+		setUser(parsedUser);
+	}, [router]);
 
-  //Updates class summary when dahboard has any update
-  useEffect(() => {
-    const currentClassDashboard = dashboardData.find(dashboard => dashboard.classId === selectedClass?.id)
+	//Updates class summary when dahboard has any update
+	useEffect(() => {
+		const currentClassDashboard = dashboardData.find(
+			(dashboard) => dashboard.classId === selectedClass?.id,
+		);
 
-	if(currentClassDashboard)
-      setCurrentDashboardData(currentClassDashboard)
+		if (currentClassDashboard) setCurrentDashboardData(currentClassDashboard);
+	}, [dashboardData, selectedClass]);
 
-  },[dashboardData, selectedClass])
+	const sortStudents = (students: Student[] | undefined) => {
+		if (!students) return [];
 
-  const sortStudents = (students: Student[] | undefined) => {
-    if (!students) return [];
-    
-    return [...students].sort((a, b) => {
-      const getLastName = (name: string) => {
-        const parts = name.trim().split(' ');
-        return parts.length > 1 ? parts[parts.length - 1] : parts[0];
-      };
+		return [...students].sort((a, b) => {
+			const getLastName = (name: string) => {
+				const parts = name.trim().split(" ");
+				return parts.length > 1 ? parts[parts.length - 1] : parts[0];
+			};
 
-      switch (sortOption) {
-        case 'firstNameAsc':
-          return a.name.localeCompare(b.name);
-        case 'firstNameDesc':
-          return b.name.localeCompare(a.name);
-        case 'lastNameAsc':
-          return getLastName(a.name).localeCompare(getLastName(b.name));
-        case 'lastNameDesc':
-          return getLastName(b.name).localeCompare(getLastName(a.name));
-        default:
-          return 0;
-      }
-    });
-  };
+			switch (sortOption) {
+				case "firstNameAsc":
+					return a.name.localeCompare(b.name);
+				case "firstNameDesc":
+					return b.name.localeCompare(a.name);
+				case "lastNameAsc":
+					return getLastName(a.name).localeCompare(getLastName(b.name));
+				case "lastNameDesc":
+					return getLastName(b.name).localeCompare(getLastName(a.name));
+				default:
+					return 0;
+			}
+		});
+	};
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    router.push('/login');
-  };
+	const handleLogout = () => {
+		localStorage.removeItem("token");
+		localStorage.removeItem("user");
+		router.push("/login");
+	};
 
-  const handleMarkAttendance = async (studentId: string, status: 'PRESENT' | 'ABSENT' | 'LATE' | 'CLEARED') => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
+	const handleMarkAttendance = async (
+		studentId: string,
+		status: "PRESENT" | "ABSENT" | "LATE" | "CLEARED",
+	) => {
+		const token = localStorage.getItem("token");
+		if (!token) return;
 
-    // Save previous state for rollback
-    const previousClass = selectedClass;
-    const previousClasses = classes;
+		// Save previous state for rollback
+		const previousClass = selectedClass;
+		const previousClasses = classes;
 
-    // Direct assignment, no toggling
-    const newStatus = status === 'CLEARED' ? null : status;
-    const apiStatus = status;
+		// Direct assignment, no toggling
+		const newStatus = status === "CLEARED" ? null : status;
+		const apiStatus = status;
 
-    // Optimistic Update: Update UI immediately
-    if (selectedClass) {
-      const updatedStudents = selectedClass.students.map(s => 
-        s.id === studentId ? { ...s, todayStatus: newStatus } : s
-      );
-      
-      const updatedClass = { ...selectedClass, students: updatedStudents };
-      setSelectedClass(updatedClass);
-      
-      // Update classes list as well ensure consistency if switching views
-      setClasses(prev => prev.map(c => c.id === selectedClass.id ? updatedClass : c));
-    }
+		// Optimistic Update: Update UI immediately
+		if (selectedClass) {
+			const updatedStudents = selectedClass.students.map((s) =>
+				s.id === studentId ? { ...s, todayStatus: newStatus } : s,
+			);
 
-    try {
-      const formattedDate = selectedDate.toISOString().split('T')[0];
-      await api.markAttendance(token, studentId, apiStatus, formattedDate);
-      
-      // Show success feedback
-      toast.success('Presença marcada!');
-      
-      // Fetch only dashboard data to update counts without reloading student list (avoiding race conditions)
-      const dashboard = await api.getDashboard(token, formattedDate);
-      setDashboardData(dashboard);
-    } catch (error) {
-      console.error('Error marking attendance:', error);
-      // Rollback to previous state
-      setSelectedClass(previousClass);
-      setClasses(previousClasses);
-      toast.error('Erro ao marcar presença. Tente novamente.');
-    }
-  };
+			const updatedClass = { ...selectedClass, students: updatedStudents };
+			setSelectedClass(updatedClass);
 
-  const handleCreateStudent = async (data: { name: string; animalAvatar?: string; avatarColor?: string }) => {
-    const token = localStorage.getItem('token');
-    if (!token || !selectedClass) return;
+			// Update classes list as well ensure consistency if switching views
+			setClasses((prev) =>
+				prev.map((c) => (c.id === selectedClass.id ? updatedClass : c)),
+			);
+		}
 
-    try {
-      await api.createStudent(token, { ...data, classId: selectedClass.id });
-      toast.success('Aluno adicionado com sucesso!');
-      setStudentFormOpen(false);
-      refreshData();
-    } catch (error) {
-      console.error('Error creating student:', error);
-      toast.error('Erro ao adicionar aluno. Tente novamente.');
-    }
-  };
+		try {
+			const formattedDate = selectedDate.toISOString().split("T")[0];
+			await api.markAttendance(token, studentId, apiStatus, formattedDate);
 
-  const handleDeleteStudent = async () => {
-    const token = localStorage.getItem('token');
-    if (!token || !editingStudentData) return;
+			// Show success feedback
+			toast.success("Presença marcada!");
 
-    try {
-      await api.deleteStudent(token, editingStudentData.id);
-      toast.success('Aluno removido com sucesso!');
-      setStudentFormOpen(false);
-      setEditingStudentData(null);
-      refreshData();
-    } catch (error) {
-      console.error('Error deleting student:', error);
-      toast.error('Erro ao remover aluno. Tente novamente.');
-    }
-  };
+			// Fetch only dashboard data to update counts without reloading student list (avoiding race conditions)
+			const dashboard = await api.getDashboard(token, formattedDate);
+			setDashboardData(dashboard);
+		} catch (error) {
+			console.error("Error marking attendance:", error);
+			// Rollback to previous state
+			setSelectedClass(previousClass);
+			setClasses(previousClasses);
+			toast.error("Erro ao marcar presença. Tente novamente.");
+		}
+	};
 
-  const openFeedbackModal = (studentId: string, studentName: string) => {
-    setCurrentFeedbackStudent({ id: studentId, name: studentName });
-    setFeedbackModalOpen(true);
-  };
+	const handleCreateStudent = async (data: {
+		name: string;
+		animalAvatar?: string;
+		avatarColor?: string;
+	}) => {
+		const token = localStorage.getItem("token");
+		if (!token || !selectedClass) return;
 
-  const handleAddFeedback = async (studentId: string, type: 'positive' | 'negative', description?: string) => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
+		try {
+			await api.createStudent(token, { ...data, classId: selectedClass.id });
+			toast.success("Aluno adicionado com sucesso!");
+			setStudentFormOpen(false);
+			refreshData();
+		} catch (error) {
+			console.error("Error creating student:", error);
+			toast.error("Erro ao adicionar aluno. Tente novamente.");
+		}
+	};
 
-    const finalDescription = description;
+	const handleDeleteStudent = async () => {
+		const token = localStorage.getItem("token");
+		if (!token || !editingStudentData) return;
 
-    if (!finalDescription) {
-       return;
-    }
+		try {
+			await api.deleteStudent(token, editingStudentData.id);
+			toast.success("Aluno removido com sucesso!");
+			setStudentFormOpen(false);
+			setEditingStudentData(null);
+			refreshData();
+		} catch (error) {
+			console.error("Error deleting student:", error);
+			toast.error("Erro ao remover aluno. Tente novamente.");
+		}
+	};
 
-    try {
-      const formattedDate = selectedDate.toISOString().split('T')[0];
-      await api.addFeedbackEvent(token, studentId, type, finalDescription, formattedDate);
-      toast.success('Feedback registrado!');
-      setFeedbackModalOpen(false);
-      refreshData();
-    } catch (error) {
-      console.error('Error adding feedback:', error);
-      toast.error('Erro ao registrar feedback. Tente novamente.');
-    }
-  };
+	const openFeedbackModal = (studentId: string, studentName: string) => {
+		setCurrentFeedbackStudent({ id: studentId, name: studentName });
+		setFeedbackModalOpen(true);
+	};
 
-  const handleResetDay = async () => {
-    if (!confirm('ATENÇÃO: Isso apagará TODOS os registros de presença e feedback desta turma para a data selecionada. Deseja continuar?')) return;
-    
-    const token = localStorage.getItem('token');
-    if (!token || !selectedClass) return;
+	const handleAddFeedback = async (
+		studentId: string,
+		type: "positive" | "negative",
+		description?: string,
+	) => {
+		const token = localStorage.getItem("token");
+		if (!token) return;
 
-    try {
-        const formattedDate = selectedDate.toISOString().split('T')[0];
-        await api.resetDay(token, formattedDate, selectedClass.id);
-        toast.success('Dados do dia reiniciados com sucesso!');
-        refreshData();
-    } catch (error) {
-        console.error('Error resetting day:', error);
-        toast.error('Erro ao reiniciar o dia');
-    }
-  };
+		const finalDescription = description;
 
-  const handleUpdateStudent = async (data: { name?: string; animalAvatar?: string; avatarColor?: string; whatsapp?: string; email?: string; birthday?: string }) => {
-    const token = localStorage.getItem('token');
-    if (!token || !editingStudentData) return;
+		if (!finalDescription) {
+			return;
+		}
 
-    try {
-      await api.updateStudent(token, editingStudentData.id, data);
-      toast.success('Aluno atualizado com sucesso!');
-      setStudentFormOpen(false);
-      setEditingStudentData(null);
-      refreshData();
-    } catch (error) {
-      console.error('Error updating student:', error);
-      toast.error('Erro ao atualizar aluno. Tente novamente.');
-    }
-  };
+		try {
+			const formattedDate = selectedDate.toISOString().split("T")[0];
+			await api.addFeedbackEvent(
+				token,
+				studentId,
+				type,
+				finalDescription,
+				formattedDate,
+			);
+			toast.success("Feedback registrado!");
+			setFeedbackModalOpen(false);
+			refreshData();
+		} catch (error) {
+			console.error("Error adding feedback:", error);
+			toast.error("Erro ao registrar feedback. Tente novamente.");
+		}
+	};
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-xl font-bold text-primary animate-pulse">Carregando Mapa do Safari...</div>
-      </div>
-    );
-  }
+	const handleResetDay = async () => {
+		if (
+			!confirm(
+				"ATENÇÃO: Isso apagará TODOS os registros de presença e feedback desta turma para a data selecionada. Deseja continuar?",
+			)
+		)
+			return;
 
-  return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="bg-white border-b-2 border-[var(--color-border)]">
-        <div className="layout-container py-4">
-          <div className="flex-between">
-            <div>
-              <h1 className="text-2xl font-heading font-bold text-primary">🦁 Safari Escolar</h1>
-              <p className="text-sm font-medium text-[#57534E]">{user?.name} - {user?.role}</p>
-            </div>
-            <Button
-              onClick={handleLogout}
-              variant="accent"
-            >
-              Sair
-            </Button>
-          </div>
-        </div>
-      </header>
+		const token = localStorage.getItem("token");
+		if (!token || !selectedClass) return;
 
-      <main className="layout-container py-8">
-        {/* Seleção de Turma */}
-        {classes.length > 0 && (
-          <div className="mb-6 flex gap-4 items-end">
-            <div className="flex-1 max-w-md">
-              <label htmlFor="class-selector" className="block text-sm font-bold text-primary mb-2 ml-1">MAPA (SELECIONE A TURMA):</label>
-              <select
-                id="class-selector"
-                name="class-selector"
-                value={selectedClass?.id || ''}
-                onChange={(e) => {
-                  const cls = classes.find((c) => c.id === e.target.value);
-                  setSelectedClass(cls || null);
-                }}
-                className="select-field h-[52px] mb-[2px]"
-              >
-                {classes.map((cls) => (
-                  <option key={cls.id} value={cls.id}>
-                    {cls.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+		try {
+			const formattedDate = selectedDate.toISOString().split("T")[0];
+			await api.resetDay(token, formattedDate, selectedClass.id);
+			toast.success("Dados do dia reiniciados com sucesso!");
+			refreshData();
+		} catch (error) {
+			console.error("Error resetting day:", error);
+			toast.error("Erro ao reiniciar o dia");
+		}
+	};
 
-            <div className="flex gap-2">
-              <div className="relative group">
-                <Button
-                  variant="ghost"
-                  className="mb-[2px] px-4 py-3 text-primary hover:bg-primary/10"
-                  title="Exportar CSV"
-                >
-                  <Download size={20} />
-                </Button>
-                <div className="absolute right-0 top-full mt-1 bg-white border-2 border-primary rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 min-w-[180px]">
-                  <button
-                    onClick={async () => {
-                      const token = localStorage.getItem('token');
-                      if (token) {
-                        try {
-                          await api.exportStudents(token);
-                          toast.success('Alunos exportados!');
-                        } catch {
-                          toast.error('Erro ao exportar');
-                        }
-                      }
-                    }}
-                    className="w-full px-4 py-2 text-left hover:bg-gray-100 text-sm"
-                  >
-                    📋 Exportar Alunos
-                  </button>
-                  <button
-                    onClick={async () => {
-                      const token = localStorage.getItem('token');
-                      if (token) {
-                        try {
-                          await api.exportHistory(token);
-                          toast.success('Histórico exportado!');
-                        } catch {
-                          toast.error('Erro ao exportar');
-                        }
-                      }
-                    }}
-                    className="w-full px-4 py-2 text-left hover:bg-gray-100 text-sm border-t"
-                  >
-                    📅 Exportar Histórico
-                  </button>
-                </div>
-              </div>
-              <Button
-                variant="ghost"
-                onClick={handleResetDay}
-                className="mb-[2px] px-4 py-3 text-red-500 hover:bg-red-50 hover:text-red-700"
-                title="Reiniciar Dia"
-              >
-                <Trash size={20} />
-              </Button>
+	const handleUpdateStudent = async (data: {
+		name?: string;
+		animalAvatar?: string;
+		avatarColor?: string;
+		whatsapp?: string;
+		email?: string;
+		birthday?: string;
+	}) => {
+		const token = localStorage.getItem("token");
+		if (!token || !editingStudentData) return;
 
-              {user?.role && ['COORDINATOR','ADMIN'].includes(user.role) && (
-                  <Button
-                    variant="ghost"
-                    onClick={() => setIsManageTeachersModalOpen(true)}
-                    className="mb-[2px] px-4 py-3 text-primary hover:bg-primary/10"
-                    title="Vincular professores na turma"
-                  >
-                    <GraduationCap size={20}/>
-                  </Button>
-                )}
+		try {
+			await api.updateStudent(token, editingStudentData.id, data);
+			toast.success("Aluno atualizado com sucesso!");
+			setStudentFormOpen(false);
+			setEditingStudentData(null);
+			refreshData();
+		} catch (error) {
+			console.error("Error updating student:", error);
+			toast.error("Erro ao atualizar aluno. Tente novamente.");
+		}
+	};
 
-              {user?.role && user.role === 'ADMIN' && (
-                  <Button
-                    variant="ghost"
-                    onClick={() => router.push("/settings")}
-                    className="mb-[2px] px-4 py-3 text-primary hover:bg-primary/10"
-                    title="Ir para configurações"
-                  >
-                    <Settings  size={20}/>
-                  </Button>
-                )}
+	if (loading) {
+		return (
+			<div className="min-h-screen bg-background flex items-center justify-center">
+				<div className="text-xl font-bold text-primary animate-pulse">
+					Carregando Mapa do Safari...
+				</div>
+			</div>
+		);
+	}
 
-            </div>
-          </div>
-        )}
+	return (
+		<div className="min-h-screen bg-background">
+			{/* Header */}
+			<header className="bg-white border-b border-[var(--safari-stone-200)]">
+				<div className="layout-container py-4">
+					<div className="flex items-center justify-between">
+						<h1 className="text-2xl font-heading font-bold text-[var(--safari-green)]">
+							🦁 Safari Escolar
+						</h1>
+						<div className="flex items-center gap-4">
+							<p className="text-sm font-medium text-[var(--text-muted)] text-right hidden sm:block">
+								{user?.name} - {user?.role}
+							</p>
+							<Button onClick={handleLogout} variant="accent">
+								Sair
+							</Button>
+						</div>
+					</div>
+				</div>
+			</header>
 
+			<main className="layout-container py-8">
+				{/* Seleção de Turma */}
+				{classes.length > 0 && (
+					<div className="mb-6 grid grid-cols-1 lg:grid-cols-3 gap-8 items-end">
+						<div className="w-full">
+							<label
+								htmlFor="class-selector"
+								className="block text-sm font-bold text-[var(--text-primary)] mb-2 ml-1"
+							>
+								MAPA (SELECIONE A TURMA):
+							</label>
+							<Select
+								value={selectedClass?.id || ""}
+								onChange={(val) => {
+									const cls = classes.find((c) => c.id === val);
+									setSelectedClass(cls || null);
+								}}
+								options={classes.map((cls) => ({
+									value: cls.id,
+									label: cls.name,
+								}))}
+								placeholder="Selecione uma turma..."
+								className="w-full"
+							/>
+						</div>
 
-        {/* Cartões do Dashboard e Calendário */}
-        <div className="grid-dashboard mb-8">
-           {/* Cartão de Resumo */}
-          <div className="lg:col-span-1">
-          {currentDashboardData && (
-              <Card key={currentDashboardData.classId}>
-                <CardBody>
-                  <h3 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">
-                  🏕️ {currentDashboardData.className}
-                  </h3>
-                  <div className="space-y-3 text-sm font-medium">
-                    <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
-                      <span className="text-[#57534E]">Total de Alunos:</span>
-                      <span className="font-bold text-[var(--safari-green)]">{currentDashboardData.totalStudents}</span>
-                    </div>
-                    <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
-                      <span className="text-[#57534E]">Presentes:</span>
-                      <span className="font-bold text-[var(--safari-green)]">{currentDashboardData.todayAttendance}</span>
-                    </div>
-                    <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
-                      <span className="text-[#57534E]">Atrasados:</span>
-                      <span className="font-bold text-[var(--safari-orange)]">{currentDashboardData.todayLate}</span>
-                    </div>
-                    <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
-                      <span className="text-[#57534E]">Taxa de Presença:</span>
-                      <span className="font-bold text-[var(--safari-green)]">{currentDashboardData.attendanceRate.toFixed(1)}%</span>
-                    </div>
-                    <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
-                      <span className="text-[#57534E]">Feedbacks Positivos:</span>
-                      <span className="font-bold text-[var(--safari-green)]">+{currentDashboardData.todayPositiveEvents}</span>
-                    </div>
-                    <div className="flex justify-between p-2 bg-white rounded-lg border border-[var(--color-border)]">
-                      <span className="text-[#57534E]">Feedbacks Construtivos:</span>
-                      <span className="font-bold text-[var(--safari-orange)]">-{currentDashboardData.todayNegativeEvents}</span>
-                    </div>
-                  </div>
-                </CardBody>
-              </Card>
-            )}
-          </div>
+						<div className="flex gap-2 lg:col-span-2 justifying-start lg:justify-end overflow-x-auto">
+							<div className="relative group">
+								<Button
+									variant="ghost"
+									className="mb-[2px] px-4 py-3 text-[var(--text-muted)] hover:bg-[var(--safari-green-light)]/20 hover:text-[var(--safari-green)]"
+									title="Exportar CSV"
+								>
+									<Download size={20} />
+									<span className="hidden sm:inline">Exportar</span>
+								</Button>
+								<div className="absolute right-0 top-full mt-1 bg-white border border-[var(--safari-stone-200)] rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 min-w-[180px]">
+									<button
+										onClick={async () => {
+											const token = localStorage.getItem("token");
+											if (token) {
+												try {
+													await api.exportStudents(token);
+													toast.success("Alunos exportados!");
+												} catch {
+													toast.error("Erro ao exportar");
+												}
+											}
+										}}
+										className="w-full px-4 py-2 text-left hover:bg-gray-100 text-sm"
+									>
+										📋 Exportar Alunos
+									</button>
+									<button
+										onClick={async () => {
+											const token = localStorage.getItem("token");
+											if (token) {
+												try {
+													await api.exportHistory(token);
+													toast.success("Histórico exportado!");
+												} catch {
+													toast.error("Erro ao exportar");
+												}
+											}
+										}}
+										className="w-full px-4 py-2 text-left hover:bg-gray-100 text-sm border-t"
+									>
+										📅 Exportar Histórico
+									</button>
+								</div>
+							</div>
+							<Button
+								variant="ghost"
+								onClick={handleResetDay}
+								className="mb-[2px] px-4 py-3 text-[var(--safari-orange)] hover:bg-[var(--safari-orange-light)] hover:text-[var(--safari-orange)]"
+								title="Reiniciar Dia"
+							>
+								<Trash size={20} />
+								<span className="hidden sm:inline">Reiniciar</span>
+							</Button>
 
-           {/* Calendário */}
-          <div className="lg:col-span-2">
-             <Calendar selectedDate={selectedDate} onDateChange={setSelectedDate} />
-          </div>
-        </div>
+							{user?.role && ["COORDINATOR", "ADMIN"].includes(user.role) && (
+								<Button
+									variant="ghost"
+									onClick={() => setIsManageTeachersModalOpen(true)}
+									className="mb-[2px] px-4 py-3 text-[var(--text-muted)] hover:bg-[var(--safari-stone-100)]"
+									title="Vincular professores na turma"
+								>
+									<GraduationCap size={20} />
+									<span className="hidden sm:inline">Professores</span>
+								</Button>
+							)}
 
-        {/* Lista de Alunos */}
-        {selectedClass && (
-          <Card>
-            <CardHeader className="bg-[var(--color-secondary)]">
-              <h2 className="text-xl font-bold text-primary">{selectedClass.name} - Exploradores</h2>
-              <div className="flex gap-2">
-                <Button
-                  variant="ghost"
-                  onClick={() => {
-                    setStudentFormMode('create');
-                    setEditingStudentData(null);
-                    setStudentFormOpen(true);
-                  }}
-                  className="bg-white px-4 py-2 h-[42px] border-2 border-transparent hover:border-[var(--color-border)] mr-2"
-                >
-                  <Plus size={20} />
-                  Adicionar Aluno
-                </Button>
-                <select
-                  id="sort-selector"
-                  name="sort-selector"
-                  value={sortOption}
-                  onChange={(e) => setSortOption(e.target.value as 'firstNameAsc' | 'firstNameDesc' | 'lastNameAsc' | 'lastNameDesc')}
-                  className="px-3 py-2 rounded-lg border-2 border-[var(--color-border)] bg-white text-sm font-bold text-primary outline-none focus:border-primary cursor-pointer mr-2"
-                  aria-label="Ordenar alunos"
-                >
-                  <option value="firstNameAsc">Nome (A-Z)</option>
-                  <option value="firstNameDesc">Nome (Z-A)</option>
-                  <option value="lastNameAsc">Sobrenome (A-Z)</option>
-                  <option value="lastNameDesc">Sobrenome (Z-A)</option>
-                </select>
-                <Button 
-                  variant={viewMode === 'grid' ? 'primary' : 'ghost'}
-                  onClick={() => setViewMode('grid')}
-                  className="p-2"
-                  title="Visualização em Grade"
-                >
-                  <LayoutGrid size={20} />
-                </Button>
-                <Button 
-                  variant={viewMode === 'list' ? 'primary' : 'ghost'}
-                  onClick={() => setViewMode('list')}
-                  className="p-2"
-                  title="Visualização em Lista"
-                >
-                  <List size={20} />
-                </Button>
-              </div>
-            </CardHeader>
-            
-            <div className={viewMode === 'list' ? "divide-y-2 divide-[var(--color-border)]" : "p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"}>
-              {sortStudents(selectedClass.students).map((student) => (
-                <StudentCard 
-                    key={student.id}
-                    student={student}
-                    viewMode={viewMode}
-                    onEdit={(s) => {
-                        setEditingStudentData(s);
-                        setStudentFormMode('edit');
-                        setStudentFormOpen(true);
-                    }}
-                    onAttendanceChange={handleMarkAttendance}
-                    onOpenFeedback={openFeedbackModal}
-                />
-              ))}
-            </div>
-          </Card>
-        )}
-      </main>
+							{user?.role && user.role === "ADMIN" && (
+								<Button
+									variant="ghost"
+									onClick={() => router.push("/settings")}
+									className="mb-[2px] px-4 py-3 text-[var(--text-muted)] hover:bg-[var(--safari-stone-100)]"
+									title="Ir para configurações"
+								>
+									<Settings size={20} />
+								</Button>
+							)}
+						</div>
+					</div>
+				)}
 
-      <FeedbackModal 
-        isOpen={feedbackModalOpen}
-        onClose={() => setFeedbackModalOpen(false)}
-        onSelectFeedback={(behavior, type) => {
-          if (currentFeedbackStudent) {
-            handleAddFeedback(currentFeedbackStudent.id, type, behavior);
-          }
-        }}
-        onEditFeedback={() => {
-          setFeedbackModalOpen(false);
-          setFeedbackEditorOpen(true);
-        }}
-        studentName={currentFeedbackStudent?.name || ''}
-        positiveFeedbacks={positiveFeedbacks}
-        negativeFeedbacks={negativeFeedbacks}
-      />
+				{/* Cartões do Dashboard e Calendário */}
+				<div className="grid-dashboard mb-8">
+					{/* Cartão de Resumo */}
+					<div className="lg:col-span-1">
+						{currentDashboardData && (
+							<Card key={currentDashboardData.classId}>
+								<CardBody>
+									<h3 className="text-xl font-bold text-[var(--safari-green)] mb-4 flex items-center gap-2">
+										🏕️ {currentDashboardData.className}
+									</h3>
+									<div className="space-y-3 text-sm font-medium">
+										<div className="flex justify-between p-3 bg-[var(--surface-raised)] rounded-[var(--radius-outer)] border border-[var(--safari-stone-200)]">
+											<span className="text-[var(--text-muted)]">
+												Total de Alunos:
+											</span>
+											<span className="font-bold text-[var(--safari-green)]">
+												{currentDashboardData.totalStudents}
+											</span>
+										</div>
+										<div className="flex justify-between p-3 bg-[var(--surface-raised)] rounded-[var(--radius-outer)] border border-[var(--safari-stone-200)]">
+											<span className="text-[var(--text-muted)]">
+												Presentes:
+											</span>
+											<span className="font-bold text-[var(--safari-green)]">
+												{currentDashboardData.todayAttendance}
+											</span>
+										</div>
+										<div className="flex justify-between p-3 bg-[var(--surface-raised)] rounded-[var(--radius-outer)] border border-[var(--safari-stone-200)]">
+											<span className="text-[var(--text-muted)]">
+												Atrasados:
+											</span>
+											<span className="font-bold text-[var(--safari-orange)]">
+												{currentDashboardData.todayLate}
+											</span>
+										</div>
+										<div className="flex justify-between p-3 bg-[var(--surface-raised)] rounded-[var(--radius-outer)] border border-[var(--safari-stone-200)]">
+											<span className="text-[var(--text-muted)]">
+												Taxa de Presença:
+											</span>
+											<span className="font-bold text-[var(--safari-green)]">
+												{currentDashboardData.attendanceRate.toFixed(1)}%
+											</span>
+										</div>
+										<div className="flex justify-between p-3 bg-[var(--surface-raised)] rounded-[var(--radius-outer)] border border-[var(--safari-stone-200)]">
+											<span className="text-[var(--text-muted)]">
+												Feedbacks Positivos:
+											</span>
+											<span className="font-bold text-[var(--safari-green)]">
+												+{currentDashboardData.todayPositiveEvents}
+											</span>
+										</div>
+										<div className="flex justify-between p-3 bg-[var(--surface-raised)] rounded-[var(--radius-outer)] border border-[var(--safari-stone-200)]">
+											<span className="text-[var(--text-muted)]">
+												Feedbacks Construtivos:
+											</span>
+											<span className="font-bold text-[var(--safari-orange)]">
+												-{currentDashboardData.todayNegativeEvents}
+											</span>
+										</div>
+									</div>
+								</CardBody>
+							</Card>
+						)}
+					</div>
 
-      <FeedbackEditorModal
-        isOpen={feedbackEditorOpen}
-        onClose={() => setFeedbackEditorOpen(false)}
-        onBack={() => {
-          setFeedbackEditorOpen(false);
-          setFeedbackModalOpen(true);
-        }}
-        positiveFeedbacks={positiveFeedbacks}
-        negativeFeedbacks={negativeFeedbacks}
-        onUpdateFeedbacks={handleUpdateFeedbacks}
-      />
+					{/* Calendário */}
+					<div className="lg:col-span-2">
+						<Calendar
+							selectedDate={selectedDate}
+							onDateChange={setSelectedDate}
+						/>
+					</div>
+				</div>
 
-      {studentFormMode === 'create' ? (
-        <StudentFormModal
-            isOpen={studentFormOpen}
-            onClose={() => setStudentFormOpen(false)}
-            onSave={handleCreateStudent}
-            mode="create"
-        />
-      ) : (
-        <StudentDetailModal
-            isOpen={studentFormOpen}
-            onClose={() => {
-                setStudentFormOpen(false);
-                setEditingStudentData(null);
-            }}
-            student={editingStudentData}
-            onUpdate={(data: Partial<Student>) => handleUpdateStudent(data)}
-            onDelete={handleDeleteStudent}
-        />
-      )}
+				{/* Lista de Alunos */}
+				{selectedClass && (
+					<Card>
+						<CardHeader className="bg-[var(--safari-green-light)]/50 border-b border-[var(--safari-stone-200)]">
+							<h2 className="text-xl font-bold text-[var(--safari-green)]">
+								{selectedClass.name} - Exploradores
+							</h2>
+							<div className="flex gap-2">
+								<Button
+									variant="ghost"
+									onClick={() => {
+										setStudentFormMode("create");
+										setEditingStudentData(null);
+										setStudentFormOpen(true);
+									}}
+									className="bg-white px-4 py-2 h-[42px] border border-[var(--safari-stone-200)] hover:border-[var(--safari-green)] mr-2 shadow-[var(--shadow-hardware)]"
+								>
+									<Plus size={20} />
+									Adicionar Aluno
+								</Button>
+								<div className="w-[180px] mr-2">
+									<Select
+										value={sortOption}
+										onChange={(val) => setSortOption(val as any)}
+										options={[
+											{ value: "firstNameAsc", label: "Nome (A-Z)" },
+											{ value: "firstNameDesc", label: "Nome (Z-A)" },
+											{ value: "lastNameAsc", label: "Sobrenome (A-Z)" },
+											{ value: "lastNameDesc", label: "Sobrenome (Z-A)" },
+										]}
+									/>
+								</div>
+								<Button
+									variant={viewMode === "grid" ? "primary" : "ghost"}
+									onClick={() => setViewMode("grid")}
+									className="p-2 h-[42px] w-[42px] flex items-center justify-center"
+									title="Visualização em Grade"
+								>
+									<LayoutGrid size={20} />
+								</Button>
+								<Button
+									variant={viewMode === "list" ? "primary" : "ghost"}
+									onClick={() => setViewMode("list")}
+									className="p-2 h-[42px] w-[42px] flex items-center justify-center"
+									title="Visualização em Lista"
+								>
+									<List size={20} />
+								</Button>
+							</div>
+						</CardHeader>
 
-      <ManageClassTeachersModal
-        classId={selectedClass?.id ? selectedClass.id : ""}
-        isOpen={isManageTeachersModalOpen}
-        onClose={() => setIsManageTeachersModalOpen(false)}
-      />
-    </div>
+						<div
+							className={
+								viewMode === "list"
+									? "divide-y divide-[var(--safari-stone-200)]"
+									: "p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+							}
+						>
+							{sortStudents(selectedClass.students).map((student) => (
+								<StudentCard
+									key={student.id}
+									student={student}
+									viewMode={viewMode}
+									onEdit={(s) => {
+										setEditingStudentData(s);
+										setStudentFormMode("edit");
+										setStudentFormOpen(true);
+									}}
+									onAttendanceChange={handleMarkAttendance}
+									onOpenFeedback={openFeedbackModal}
+								/>
+							))}
+						</div>
+					</Card>
+				)}
+			</main>
 
-    
-  );
+			<FeedbackModal
+				isOpen={feedbackModalOpen}
+				onClose={() => setFeedbackModalOpen(false)}
+				onSelectFeedback={(behavior, type) => {
+					if (currentFeedbackStudent) {
+						handleAddFeedback(currentFeedbackStudent.id, type, behavior);
+					}
+				}}
+				onEditFeedback={() => {
+					setFeedbackModalOpen(false);
+					setFeedbackEditorOpen(true);
+				}}
+				studentName={currentFeedbackStudent?.name || ""}
+				positiveFeedbacks={positiveFeedbacks}
+				negativeFeedbacks={negativeFeedbacks}
+			/>
+
+			<FeedbackEditorModal
+				isOpen={feedbackEditorOpen}
+				onClose={() => setFeedbackEditorOpen(false)}
+				onBack={() => {
+					setFeedbackEditorOpen(false);
+					setFeedbackModalOpen(true);
+				}}
+				positiveFeedbacks={positiveFeedbacks}
+				negativeFeedbacks={negativeFeedbacks}
+				onUpdateFeedbacks={handleUpdateFeedbacks}
+			/>
+
+			{studentFormMode === "create" ? (
+				<StudentFormModal
+					isOpen={studentFormOpen}
+					onClose={() => setStudentFormOpen(false)}
+					onSave={handleCreateStudent}
+					mode="create"
+				/>
+			) : (
+				<StudentDetailModal
+					isOpen={studentFormOpen}
+					onClose={() => {
+						setStudentFormOpen(false);
+						setEditingStudentData(null);
+					}}
+					student={editingStudentData}
+					onUpdate={(data: Partial<Student>) => handleUpdateStudent(data)}
+					onDelete={handleDeleteStudent}
+				/>
+			)}
+
+			<ManageClassTeachersModal
+				classId={selectedClass?.id ? selectedClass.id : ""}
+				isOpen={isManageTeachersModalOpen}
+				onClose={() => setIsManageTeachersModalOpen(false)}
+			/>
+		</div>
+	);
 }

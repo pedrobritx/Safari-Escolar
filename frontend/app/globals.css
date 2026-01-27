@@ -1,222 +1,323 @@
 @import "tailwindcss";
 
 :root {
-  /* Paleta Safari Escolar */
-  /* 60% Caqui - Fundos */
-  --safari-khaki: #F0EAD6;
-  --safari-khaki-dark: #D4CFA3;
-  
-  /* 30% Verde - Natureza/Afirmativo */
-  --safari-green: #4D7C0F;
-  --safari-green-light: #ECFCCB;
-  
-  /* 10% Laranja - Atenção */
-  --safari-orange: #EA580C;
+	/* 🎨 PALETTE (Skeuo-Minimal) */
+	/* Khaki - Dominant Surface */
+	--safari-khaki: #f0ead6;
+	--safari-khaki-light: #f7f5ec;
+	--safari-khaki-dark: #d4cfa3;
 
-  /* Mapeamentos Padrão */
-  --background: var(--safari-khaki);
-  --foreground: #1C1917; /* Pedra 900 */
+	/* Stone - Neutral/Text */
+	--safari-stone-50: #fafaf9;
+	--safari-stone-100: #f5f5f4;
+	--safari-stone-200: #e7e5e4;
+	--safari-stone-300: #d6d3d1;
+	--safari-stone-600: #57534e;
+	--safari-stone-900: #1c1917;
 
-  /* 🎨 NEUBRUTALISM TOKENS */
-  --neu-border-color: var(--safari-khaki-dark);
-  --neu-border: 2px solid var(--neu-border-color);
-  --neu-border-heavy: 3px solid var(--neu-border-color);
-  --neu-shadow: 4px 4px 0px var(--neu-border-color);
-  --neu-shadow-sm: 2px 2px 0px var(--neu-border-color);
-  --neu-shadow-hover: 6px 6px 0px var(--neu-border-color);
-  --neu-radius: 12px;
-  --neu-radius-lg: 16px;
-  --neu-radius-xl: 20px;
+	/* Accents */
+	--safari-green: #4d7c0f; /* Positive / Nav / Main */
+	--safari-green-light: #ecfccb;
+	--safari-aqua: #06b6d4; /* Info / Links / Selection */
+	--safari-aqua-light: #cffafe;
+	--safari-orange: #ea580c; /* Attention / CTA */
+	--safari-orange-light: #ffedd5;
+
+	/* 🏗️ SEMANTIC LAYER SYSTEM */
+
+	/* Layer 1: Base (Flat) */
+	--surface-base: var(--safari-khaki);
+	--surface-raised: var(--safari-khaki-light);
+
+	/* Layer 2: Glass (Overlays/Focus) */
+	--surface-glass: rgba(255, 255, 255, 0.7);
+	--blur-glass: 20px;
+	--border-glass: rgba(255, 255, 255, 0.5);
+
+	/* Layer 3: Hardware (Controls) */
+	--control-surface: #ffffff;
+	--control-surface-off: var(--safari-stone-100);
+
+	/* Text Mapping */
+	--text-primary: var(--safari-stone-900);
+	--text-muted: var(--safari-stone-600);
+	--text-on-color: #ffffff;
+
+	/* Shadows & Depth */
+	--shadow-hardware:
+		0 1px 0 rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.08),
+		inset 0 1px 0.5px rgba(255, 255, 255, 0.7);
+
+	--shadow-hardware-press:
+		inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 255, 255, 0.5);
+
+	--shadow-glass:
+		0 8px 32px rgba(77, 124, 15, 0.1), 0 2px 8px rgba(0, 0, 0, 0.05),
+		inset 0 0 0 1px var(--border-glass);
+
+	--shadow-float:
+		0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+
+	/* Corner System */
+	--radius-outer: 8px; /* Containers */
+	--radius-inner: 20px; /* Controls */
+
+	/* Mappings for Tailwind compatibility */
+	--background: var(--surface-base);
+	--foreground: var(--text-primary);
 }
 
 @theme inline {
-  --color-background: var(--safari-khaki);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--safari-green);
-  --color-primary-foreground: #ffffff;
-  --color-secondary: var(--safari-green-light);
-  --color-accent: var(--safari-orange);
-  --color-border: var(--safari-khaki-dark);
-  
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+	--color-background: var(--surface-base);
+	--color-foreground: var(--foreground);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #1C1917;
-    --foreground: #F0EAD6;
-    /* No modo escuro, talvez inverter ou ajustar? Por enquanto mantendo simples mas mapeado */
-  }
+	--color-primary: var(--safari-green);
+	--color-primary-foreground: #ffffff;
+
+	--color-secondary: var(--safari-green-light);
+	--color-secondary-foreground: var(--safari-green);
+
+	--color-accent: var(--safari-orange);
+	--color-accent-foreground: #ffffff;
+
+	--color-info: var(--safari-aqua);
+	--color-muted: var(--safari-stone-200);
+
+	--color-stone-600: var(--safari-stone-600);
+	--color-stone-900: var(--safari-stone-900);
+
+	/* Semantic Surfaces */
+	--color-surface-glass: var(--surface-glass);
+	--color-surface-raised: var(--surface-raised);
+
+	/* Radii */
+	--radius-outer: var(--radius-outer);
+	--radius-inner: var(--radius-inner);
+
+	--font-sans: var(--font-geist-sans);
+	--font-mono: var(--font-geist-mono);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+	background: var(--background);
+	color: var(--foreground);
+	font-family: Arial, Helvetica, sans-serif;
+	-webkit-font-smoothing: antialiased;
 }
 
 /* =========================================
-   🦁 SAFARI ESCOLAR - SISTEMA DE DESIGN
+   🦁 SAFARI ESCOLAR - DESIGN SYSTEM (Skeuo-Glass)
    =========================================
 */
 
 @layer components {
-  /* --- WRAPPERS DE LAYOUT --- */
-  
-  /* Container Principal */
-  .layout-container {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
-  }
+	/* --- LAYOUT WRAPPERS --- */
+	.layout-container {
+		@apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+	}
 
-  /* Espaçamento de Seção */
-  .section-container {
-    @apply mb-8;
-  }
+	.section-container {
+		@apply mb-10; /* Chunky spacing */
+	}
 
-  /* Atalhos Flexbox */
-  .flex-between {
-    @apply flex justify-between items-center;
-  }
-  
-  .flex-center {
-    @apply flex items-center justify-center;
-  }
+	.grid-dashboard {
+		@apply grid grid-cols-1 lg:grid-cols-3 gap-8; /* 24-32px gap */
+	}
 
-  .flex-gap {
-    @apply flex items-center gap-2;
-  }
+	/* --- LAYER 1: BASE SURFACES (Flat, Calm) --- */
+	.card {
+		@apply bg-white/60 border border-[var(--safari-stone-300)]/30 rounded-[var(--radius-outer)] 
+		       shadow-[var(--shadow-float)] backdrop-blur-[2px];
+	}
 
-  /* Grades (Grids) */
-  .grid-dashboard {
-    @apply grid grid-cols-1 lg:grid-cols-3 gap-6;
-  }
+	.card-header {
+		@apply px-6 py-4 border-b border-[var(--safari-stone-200)] flex justify-between items-center
+		       font-bold text-[var(--safari-green)];
+	}
 
-  /* --- ESTILOS DE COMPONENTES --- */
+	.card-body {
+		@apply p-6; /* 24px inner spacing */
+	}
 
-  /* Cards - As caixas brancas/claras */
-  .card {
-     @apply bg-white border-2 border-[var(--neu-border-color)] rounded-[var(--neu-radius-lg)] shadow-[var(--neu-shadow)];
-  }
+	/* --- LAYER 2: GLASS SURFACES --- */
+	/* Modals, Floating Panels, Topbars */
+	.card-glass {
+		@apply bg-[var(--surface-glass)] backdrop-blur-[var(--blur-glass)] 
+		       rounded-[var(--radius-inner)] border border-[var(--border-glass)]
+		       shadow-[var(--shadow-glass)];
+	}
 
-  .card-header {
-    @apply px-6 py-4 border-b-2 border-[var(--neu-border-color)] rounded-t-[var(--neu-radius-lg)] font-bold text-primary flex justify-between items-center;
-  }
-  
-  .card-body {
-    @apply p-6;
-  }
+	/* --- LAYER 3: HARDWARE CONTROLS (Skeuo) --- */
+	/* 
+       Micro-texture noise is simulated via a subtle gradient 
+       and hardware shadow stack. 
+    */
 
-  /* Cards Interativas (StudentCard, FeedbackItem) */
-  .card-interactive {
-    @apply bg-white border-2 border-[var(--neu-border-color)] rounded-[var(--neu-radius)] shadow-[var(--neu-shadow-sm)] 
-           hover:shadow-[var(--neu-shadow)] hover:-translate-y-0.5 transition-all duration-200;
-  }
-  
-  /* Botões - Os elementos interativos */
-  .btn {
-    @apply font-bold rounded-[var(--neu-radius)] border-b-4 active:border-b-0 active:translate-y-1 transition-all py-2 px-4 cursor-pointer flex items-center gap-2 justify-center;
-  }
+	/* Interactive Card (Hardware-like behavior) */
+	.card-interactive {
+		@apply bg-white rounded-[var(--radius-inner)] border border-[var(--safari-stone-200)]
+		       shadow-[var(--shadow-hardware)]
+		       transition-all duration-200 ease-out
+		       cursor-pointer select-none;
+	}
 
-  /* Verde (Sucesso/Primário) - Safari Green */
-  .btn-primary {
-    @apply bg-[var(--safari-green)] text-white border-[#365314] hover:brightness-110;
-  }
+	.card-interactive:hover {
+		@apply scale-[1.01] shadow-lg brightness-[1.01]; /* Lens warp illusion */
+	}
 
-  /* Laranja (Atenção/Negativo/Ação) */
-  .btn-accent {
-    @apply bg-[var(--safari-orange)] text-white border-[#9A3412] hover:brightness-110;
-  }
+	.card-interactive:active {
+		@apply scale-[0.99] shadow-[var(--shadow-hardware-press)] brightness-95;
+	}
 
-  /* Vermelho agora é Laranja (Consistência) */
-  .btn-anger {
-    @apply bg-[var(--safari-orange)] text-white border-[#9A3412] hover:brightness-110;
-  }
-  
-  /* Amarelo (Atrasado) */
-  .btn-warning {
-    @apply bg-yellow-500 text-white border-yellow-700 hover:brightness-110;
-  }
+	/* BUTTONS */
+	.btn {
+		@apply font-bold rounded-[var(--radius-inner)] px-5 py-2.5 
+		       shadow-[var(--shadow-hardware)] border border-transparent
+		       transition-all duration-150 flex items-center justify-center gap-2
+		       active:shadow-[var(--shadow-hardware-press)] active:scale-[0.98];
+	}
 
-  /* Teal (Positivo/Feedback) */
-  .btn-info {
-    @apply bg-[#0D9488] text-white border-[#0F766E] hover:brightness-110;
-  }
+	.btn-primary {
+		@apply bg-[var(--safari-green)] text-white 
+		       border-t border-white/20 border-b border-black/10;
+	}
 
-  /* Fantasma/Secundário (Cinza/Branco) */
-  .btn-ghost {
-    @apply bg-[#F3F4F6] text-gray-600 border-gray-300 hover:bg-white hover:border-[var(--safari-green)] hover:text-[var(--safari-green)];
-  }
+	.btn-primary:hover {
+		@apply brightness-110 saturate-110;
+	}
 
-  /* Tabs - Botões de navegação entre seções */
-  .tab {
-    @apply flex-1 py-3 px-4 rounded-[var(--neu-radius)] font-bold text-sm uppercase tracking-wide 
-           border-2 border-b-4 transition-all cursor-pointer;
-  }
+	.btn-accent {
+		@apply bg-[var(--safari-orange)] text-white
+		       border-t border-white/20 border-b border-black/10;
+	}
 
-  .tab-inactive {
-    @apply bg-[#F3F4F6] text-gray-400 border-gray-200 
-           hover:bg-white hover:text-gray-600 hover:border-gray-300;
-  }
+	.btn-accent:hover {
+		@apply brightness-110 saturate-110;
+	}
 
-  .tab-positive {
-    @apply bg-[var(--safari-green)] text-white border-[#365314] shadow-sm;
-  }
+	/* Backward Compatibility / Semantic Aliases */
+	.btn-anger {
+		@apply bg-[var(--safari-orange)] text-white
+		       border-t border-white/20 border-b border-black/10;
+	}
 
-  .tab-negative {
-    @apply bg-[var(--safari-orange)] text-white border-[#9A3412] shadow-sm;
-  }
+	.btn-anger:hover {
+		@apply brightness-110 saturate-110;
+	}
 
-  .tab-neutral {
-    @apply bg-[#EAB308] text-white border-[#CA8A04] shadow-sm;
-  }
+	.btn-warning {
+		@apply bg-yellow-400 text-yellow-900
+		       border-t border-white/20 border-b border-black/10;
+	}
 
-  /* Inputs e Seletores */
-  .input-field, .select-field {
-    @apply w-full px-4 py-3 border-2 border-[var(--neu-border-color)] rounded-[var(--neu-radius)] text-gray-700 font-bold 
-           bg-white focus:ring-4 focus:ring-[var(--safari-green-light)] focus:border-[var(--safari-green)] outline-none transition-all;
-  }
+	.btn-warning:hover {
+		@apply brightness-110;
+	}
 
-  .select-field {
-    @apply cursor-pointer hover:border-[var(--safari-green)] hover:text-[var(--safari-green)];
-  }
-  
-  /* Tipografia */
-  .text-h1 {
-    @apply text-2xl font-bold text-[var(--safari-green)];
-  }
-  
-  .text-h2 {
-    @apply text-xl font-bold text-[var(--safari-green)];
-  }
-  
-  .text-h3 {
-    @apply text-lg font-bold text-[var(--safari-green)];
-  }
+	.btn-info {
+		@apply bg-[var(--safari-aqua)] text-white
+		       border-t border-white/20 border-b border-black/10;
+	}
 
-  /* Badge de Pontuação */
-  .score-badge {
-    @apply absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm
-           border-2 border-white shadow-md z-10;
-  }
+	.btn-ghost {
+		@apply bg-transparent text-[var(--text-muted)] shadow-none border border-transparent
+		       hover:bg-[var(--safari-stone-100)] hover:text-[var(--text-primary)];
+	}
 
-  .score-badge-positive {
-    @apply bg-[var(--safari-green)];
-  }
+	.btn-ghost:active {
+		@apply shadow-[var(--shadow-hardware-press)] bg-[var(--safari-stone-200)];
+	}
 
-  .score-badge-negative {
-    @apply bg-[var(--safari-orange)];
-  }
+	/* INPUTS (Hardware Wells) */
+	.input-field,
+	.select-field {
+		@apply w-full px-4 py-3 rounded-[var(--radius-inner)]
+		       bg-[var(--control-surface-off)]
+		       border border-[var(--safari-stone-300)]
+		       text-[var(--text-primary)] font-medium
+		       shadow-inner
+		       focus:bg-white focus:ring-2 focus:ring-[var(--safari-green)]/30 focus:border-[var(--safari-green)]
+		       outline-none transition-all;
+	}
 
-  /* Lista de itens (FeedbackEditor, etc.) */
-  .list-item {
-    @apply flex items-center justify-between bg-white p-3 px-4 rounded-[var(--neu-radius)] 
-           border-2 border-[var(--neu-border-color)] border-b-4 
-           hover:border-gray-400 transition-all;
-  }
+	.select-field {
+		@apply cursor-pointer bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2357534e%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')]
+		       bg-no-repeat bg-[length:0.7em] bg-[right_1rem_center] appearance-none;
+	}
 
-  .list-item-anger {
-    @apply border-[var(--safari-orange)] bg-orange-50 !border-b-2 translate-y-0.5;
-  }
+	/* TABS (Segmented Controls) */
+	.tab {
+		@apply flex-1 py-2 px-4 rounded-[var(--radius-inner)] font-bold text-sm tracking-wide
+		       transition-all cursor-pointer text-center select-none
+		       border border-transparent;
+	}
+
+	.tab-inactive {
+		@apply text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--safari-stone-100)];
+	}
+
+	/* Active tabs look like pressed/engaged hardware or lit glass */
+	.tab-positive {
+		@apply bg-[var(--safari-green)] text-white shadow-[var(--shadow-hardware)]
+		       border-t border-white/20;
+	}
+
+	.tab-negative {
+		@apply bg-[var(--safari-orange)] text-white shadow-[var(--shadow-hardware)]
+		       border-t border-white/20;
+	}
+
+	.tab-neutral {
+		@apply bg-[var(--safari-stone-600)] text-white shadow-[var(--shadow-hardware)];
+	}
+
+	/* Control Bars (Toolbars) */
+	.control-bar {
+		@apply flex items-center gap-3 p-1.5 rounded-[calc(var(--radius-inner)+4px)]
+		       bg-[var(--safari-stone-200)]/50 border border-[var(--safari-stone-200)];
+	}
+
+	/* Score Badges */
+	.score-badge {
+		@apply absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center 
+		       text-white font-bold text-sm
+		       border-2 border-white shadow-md z-10;
+	}
+
+	.score-badge-positive {
+		@apply bg-[var(--safari-green)];
+	}
+
+	.score-badge-negative {
+		@apply bg-[var(--safari-orange)];
+	}
+
+	/* LIST ITEMS */
+	.list-card {
+		@apply flex items-center justify-between p-3 px-4 rounded-[var(--radius-outer)]
+		       bg-white border border-[var(--safari-stone-200)]
+		       shadow-[var(--shadow-float)]
+		       hover:shadow-md transition-all;
+	}
+
+	.list-card-anger {
+		@apply border-[var(--safari-orange)] bg-orange-50;
+	}
 }
 
+@layer utilities {
+	.custom-scrollbar::-webkit-scrollbar {
+		width: 6px;
+		height: 6px;
+	}
+	.custom-scrollbar::-webkit-scrollbar-track {
+		background: transparent;
+	}
+	.custom-scrollbar::-webkit-scrollbar-thumb {
+		background: var(--safari-stone-300);
+		border-radius: 99px;
+	}
+	.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+		background: var(--safari-stone-600);
+	}
+}
