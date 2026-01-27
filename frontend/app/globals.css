@@ -167,7 +167,7 @@ body {
 
 	/* Interactive Card (Hardware-like behavior) */
 	.card-interactive {
-		@apply bg-white rounded-[var(--radius-inner)] border border-[var(--safari-stone-200)]
+		@apply bg-white rounded-[var(--radius-outer)] border border-[var(--safari-stone-200)]
 		       shadow-[var(--shadow-hardware)]
 		       transition-all duration-200 ease-out
 		       cursor-pointer select-none;
