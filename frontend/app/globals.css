@@ -1,13 +1,14 @@
 @import "tailwindcss";
 
 :root {
-	/* 🎨 PALETTE (Skeuo-Minimal) */
-	/* Khaki - Dominant Surface */
+	/* 🎨 PALETTE (Skeuo-Minimal) - Strict Discipline */
+
+	/* Surfaces (Khaki & White) */
 	--safari-khaki: #f0ead6;
 	--safari-khaki-light: #f7f5ec;
 	--safari-khaki-dark: #d4cfa3;
 
-	/* Stone - Neutral/Text */
+	/* Text & Neutrals (Stone) */
 	--safari-stone-50: #fafaf9;
 	--safari-stone-100: #f5f5f4;
 	--safari-stone-200: #e7e5e4;
@@ -15,13 +16,20 @@
 	--safari-stone-600: #57534e;
 	--safari-stone-900: #1c1917;
 
-	/* Accents */
-	--safari-green: #4d7c0f; /* Positive / Nav / Main */
+	/* Primary Actions & Success (Leaf Green only) */
+	--safari-green: #4d7c0f;
 	--safari-green-light: #ecfccb;
-	--safari-aqua: #06b6d4; /* Info / Links / Selection */
+	--safari-green-dark: #3f6212;
+
+	/* Information, Links, Secondary (Aqua) */
+	--safari-aqua: #06b6d4;
 	--safari-aqua-light: #cffafe;
-	--safari-orange: #ea580c; /* Attention / CTA */
+	--safari-aqua-dark: #0891b2;
+
+	/* Destructive, Attention (Sunset Orange) */
+	--safari-orange: #ea580c;
 	--safari-orange-light: #ffedd5;
+	--safari-orange-dark: #c2410c;
 
 	/* 🏗️ SEMANTIC LAYER SYSTEM */
 
@@ -30,6 +38,7 @@
 	--surface-raised: var(--safari-khaki-light);
 
 	/* Layer 2: Glass (Overlays/Focus) */
+	/* Pure glass aesthetic for modals and sticky headers */
 	--surface-glass: rgba(255, 255, 255, 0.7);
 	--blur-glass: 20px;
 	--border-glass: rgba(255, 255, 255, 0.5);
@@ -44,23 +53,26 @@
 	--text-on-color: #ffffff;
 
 	/* Shadows & Depth */
+	/* Tactile controls with bevel/press feel */
 	--shadow-hardware:
 		0 1px 0 rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.08),
 		inset 0 1px 0.5px rgba(255, 255, 255, 0.7);
 
-	--shadow-hardware-press:
+	--shadow-hardware-active:
 		inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 255, 255, 0.5);
 
+	/* Glass glow + blur only for modals */
 	--shadow-glass:
-		0 8px 32px rgba(77, 124, 15, 0.1), 0 2px 8px rgba(0, 0, 0, 0.05),
+		0 8px 32px rgba(77, 124, 15, 0.15), 0 2px 8px rgba(0, 0, 0, 0.05),
 		inset 0 0 0 1px var(--border-glass);
 
-	--shadow-float:
-		0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+	/* Flat content tiles with quiet border */
+	--shadow-float: 0 2px 4px -2px rgba(0, 0, 0, 0.05);
 
 	/* Corner System */
-	--radius-outer: 8px; /* Containers */
-	--radius-inner: 20px; /* Controls */
+	--radius-outer: 12px; /* Containers, Sections (Sharper) */
+	--radius-inner: 9999px; /* Controls, Buttons (Rounder/Pill) */
+	--radius-input: 16px; /* Inputs (Slightly rounded) */
 
 	/* Mappings for Tailwind compatibility */
 	--background: var(--surface-base);

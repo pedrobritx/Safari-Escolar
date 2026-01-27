@@ -17,6 +17,7 @@ import {
 	Download,
 	GraduationCap,
 	Settings,
+	CheckSquare,
 } from "lucide-react";
 import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -342,6 +343,32 @@ export default function DashboardPage() {
 		}
 	};
 
+	const handleMarkAllPresent = async () => {
+		if (!selectedClass) return;
+
+		const confirm = window.confirm(
+			`Marcar todos os ${selectedClass.students.length} alunos como PRESENTES?`,
+		);
+		if (!confirm) return;
+
+		const token = localStorage.getItem("token");
+		if (!token) return;
+
+		try {
+			const formattedDate = selectedDate.toISOString().split("T")[0];
+			const promises = selectedClass.students.map((student) =>
+				api.markAttendance(token, student.id, "PRESENT", formattedDate),
+			);
+
+			await Promise.all(promises);
+			toast.success("Todos marcados como presentes!");
+			refreshData();
+		} catch (error) {
+			console.error("Error marking all present:", error);
+			toast.error("Erro ao marcar presenças. Tente novamente.");
+		}
+	};
+
 	if (loading) {
 		return (
 			<div className="min-h-screen bg-background flex items-center justify-center">
@@ -355,62 +382,68 @@ export default function DashboardPage() {
 	return (
 		<div className="min-h-screen bg-background">
 			{/* Header */}
-			<header className="bg-white border-b border-[var(--safari-stone-200)]">
-				<div className="layout-container py-4">
-					<div className="flex items-center justify-between">
-						<h1 className="text-2xl font-heading font-bold text-[var(--safari-green)]">
-							🦁 Safari Escolar
-						</h1>
-						<div className="flex items-center gap-4">
-							<p className="text-sm font-medium text-[var(--text-muted)] text-right hidden sm:block">
-								{user?.name} - {user?.role}
-							</p>
-							<Button onClick={handleLogout} variant="accent">
-								Sair
-							</Button>
-						</div>
-					</div>
-				</div>
-			</header>
+			{/* 🦁 NEW STICKY HEADER (Skeuo-Glass) */}
+			<header className="sticky top-0 z-50 bg-[var(--surface-glass)] backdrop-blur-[var(--blur-glass)] border-b border-[var(--border-glass)] shadow-[var(--shadow-glass)] transition-all mb-8">
+				<div className="layout-container py-3 space-y-3">
+					{/* Top Row: Brand + Controls */}
+					<div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+						{/* Left: Brand & Class Selector */}
+						<div className="flex items-center gap-4 w-full sm:w-auto">
+							<div className="hidden md:flex items-center gap-2 text-[var(--safari-green)] opacity-80 hover:opacity-100 transition-opacity">
+								<span className="text-xl">🦁</span>
+							</div>
 
-			<main className="layout-container py-8">
-				{/* Seleção de Turma */}
-				{classes.length > 0 && (
-					<div className="mb-6 grid grid-cols-1 lg:grid-cols-3 gap-8 items-end">
-						<div className="w-full">
-							<label
-								htmlFor="class-selector"
-								className="block text-sm font-bold text-[var(--text-primary)] mb-2 ml-1"
-							>
-								MAPA (SELECIONE A TURMA):
-							</label>
-							<Select
-								value={selectedClass?.id || ""}
-								onChange={(val) => {
-									const cls = classes.find((c) => c.id === val);
-									setSelectedClass(cls || null);
-								}}
-								options={classes.map((cls) => ({
-									value: cls.id,
-									label: cls.name,
-								}))}
-								placeholder="Selecione uma turma..."
-								className="w-full"
-							/>
+							<div className="flex-1 sm:w-[280px]">
+								<Select
+									value={selectedClass?.id || ""}
+									onChange={(val) => {
+										const cls = classes.find((c) => c.id === val);
+										setSelectedClass(cls || null);
+									}}
+									options={classes.map((cls) => ({
+										value: cls.id,
+										label: cls.name,
+									}))}
+									placeholder="Selecione a turma..."
+								/>
+							</div>
 						</div>
 
-						<div className="flex gap-2 lg:col-span-2 justifying-start lg:justify-end overflow-x-auto">
-							<div className="relative group">
-								<Button
-									variant="ghost"
-									className="mb-[2px] px-4 py-3 text-[var(--text-muted)] hover:bg-[var(--safari-green-light)]/20 hover:text-[var(--safari-green)]"
-									title="Exportar CSV"
-								>
-									<Download size={20} />
-									<span className="hidden sm:inline">Exportar</span>
-								</Button>
-								<div className="absolute right-0 top-full mt-1 bg-white border border-[var(--safari-stone-200)] rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 min-w-[180px]">
-									<button
+						<div className="flex w-full items-center justify-between gap-2 sm:contents">
+							{/* Center: Date Display (Loud) */}
+							<div className="flex flex-col sm:flex-row items-center gap-1 bg-[var(--surface-raised)] rounded-[var(--radius-inner)] px-4 py-1.5 shadow-[var(--shadow-hardware)] border border-[var(--safari-stone-200)] flex-1 sm:flex-none justify-center sm:justify-start min-h-[42px]">
+								<span className="font-bold text-[var(--safari-green)] text-lg whitespace-nowrap leading-none">
+									{selectedDate.toLocaleDateString("pt-BR", {
+										day: "2-digit",
+										month: "short",
+									})}
+								</span>
+								{/* Mobile Stats (Compact) */}
+								{currentDashboardData && (
+									<div className="flex sm:hidden gap-2 text-[10px] font-medium opacity-80 mt-1 sm:mt-0">
+										<span className="text-[var(--safari-green)]">
+											{currentDashboardData.todayAttendance} P
+										</span>
+										<span className="text-[var(--safari-orange)]">
+											{currentDashboardData.todayLate} A
+										</span>
+										<span className="text-[var(--safari-stone-400)]">
+											{currentDashboardData.totalStudents -
+												currentDashboardData.todayAttendance}{" "}
+											F
+										</span>
+									</div>
+								)}
+							</div>
+
+							{/* Right: Hardware Controls & User */}
+							<div className="flex items-center gap-3">
+								{/* Hardware Control Cluster */}
+								<div className="flex items-center bg-[var(--safari-stone-100)] rounded-[var(--radius-inner)] p-1 shadow-[var(--shadow-hardware)] border border-[var(--safari-stone-200)]">
+									<Button
+										variant="ghost"
+										className="h-8 w-8 p-0 rounded-full hover:bg-white hover:text-[var(--safari-green)] hover:shadow-sm"
+										title="Exportar CSV"
 										onClick={async () => {
 											const token = localStorage.getItem("token");
 											if (token) {
@@ -422,70 +455,123 @@ export default function DashboardPage() {
 												}
 											}
 										}}
-										className="w-full px-4 py-2 text-left hover:bg-gray-100 text-sm"
 									>
-										📋 Exportar Alunos
-									</button>
-									<button
-										onClick={async () => {
-											const token = localStorage.getItem("token");
-											if (token) {
-												try {
-													await api.exportHistory(token);
-													toast.success("Histórico exportado!");
-												} catch {
-													toast.error("Erro ao exportar");
-												}
-											}
-										}}
-										className="w-full px-4 py-2 text-left hover:bg-gray-100 text-sm border-t"
+										<Download size={16} />
+									</Button>
+
+									<div className="w-[1px] h-4 bg-[var(--safari-stone-300)] mx-1"></div>
+
+									{user?.role &&
+										["COORDINATOR", "ADMIN"].includes(user.role) && (
+											<>
+												<Button
+													variant="ghost"
+													onClick={() => setIsManageTeachersModalOpen(true)}
+													className="h-8 w-8 p-0 rounded-full hover:bg-white hover:text-[var(--text-primary)] hover:shadow-sm"
+													title="Professores"
+												>
+													<GraduationCap size={16} />
+												</Button>
+												<div className="w-[1px] h-4 bg-[var(--safari-stone-300)] mx-1"></div>
+											</>
+										)}
+
+									<Button
+										variant="ghost"
+										onClick={handleResetDay}
+										className="h-8 w-8 p-0 rounded-full hover:bg-[var(--safari-orange-light)] hover:text-[var(--safari-orange)]"
+										title="Reiniciar Dia"
 									>
-										📅 Exportar Histórico
-									</button>
+										<Trash size={16} />
+									</Button>
+								</div>
+
+								{/* User Profile */}
+								<div className="flex items-center gap-3 pl-3 border-l border-[var(--safari-stone-300)]/50">
+									<div className="text-right hidden sm:block">
+										<p className="text-xs font-bold text-[var(--text-primary)] leading-tight">
+											{user?.name}
+										</p>
+										<p className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider">
+											{user?.role}
+										</p>
+									</div>
+									<Button
+										onClick={handleLogout}
+										variant="ghost"
+										className="h-8 w-8 p-0"
+									>
+										<div className="w-8 h-8 rounded-full bg-[var(--safari-stone-200)] flex items-center justify-center border border-[var(--safari-stone-300)] hover:border-[var(--safari-orange)] transition-colors">
+											<span className="text-xs">🚪</span>
+										</div>
+									</Button>
 								</div>
 							</div>
-							<Button
-								variant="ghost"
-								onClick={handleResetDay}
-								className="mb-[2px] px-4 py-3 text-[var(--safari-orange)] hover:bg-[var(--safari-orange-light)] hover:text-[var(--safari-orange)]"
-								title="Reiniciar Dia"
-							>
-								<Trash size={20} />
-								<span className="hidden sm:inline">Reiniciar</span>
-							</Button>
-
-							{user?.role && ["COORDINATOR", "ADMIN"].includes(user.role) && (
-								<Button
-									variant="ghost"
-									onClick={() => setIsManageTeachersModalOpen(true)}
-									className="mb-[2px] px-4 py-3 text-[var(--text-muted)] hover:bg-[var(--safari-stone-100)]"
-									title="Vincular professores na turma"
-								>
-									<GraduationCap size={20} />
-									<span className="hidden sm:inline">Professores</span>
-								</Button>
-							)}
-
-							{user?.role && user.role === "ADMIN" && (
-								<Button
-									variant="ghost"
-									onClick={() => router.push("/settings")}
-									className="mb-[2px] px-4 py-3 text-[var(--text-muted)] hover:bg-[var(--safari-stone-100)]"
-									title="Ir para configurações"
-								>
-									<Settings size={20} />
-								</Button>
-							)}
 						</div>
 					</div>
-				)}
+
+					{/* Bottom Row: Attendance Status Strip */}
+					{currentDashboardData && (
+						<div className="hidden sm:flex flex-col sm:flex-row items-center gap-4 bg-[var(--surface-raised)]/50 rounded-[var(--radius-outer)] p-2 px-4 border border-[var(--safari-stone-200)]/50">
+							<span className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide min-w-fit hidden sm:inline">
+								Status do Dia:
+							</span>
+
+							{/* Progress Bar */}
+							<div className="flex-1 w-full bg-[var(--safari-stone-200)] h-2.5 rounded-full overflow-hidden shadow-inner relative group">
+								<div
+									className="bg-[var(--safari-green)] h-full transition-all duration-500 rounded-full"
+									style={{ width: `${currentDashboardData.attendanceRate}%` }}
+								></div>
+								{/* Tooltip on hover */}
+								<div className="absolute top-[-24px] left-1/2 -translate-x-1/2 bg-black/80 text-white text-[10px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+									{currentDashboardData.attendanceRate.toFixed(1)}% Presentes
+								</div>
+							</div>
+
+							{/* Counters */}
+							{/* Counters (Desktop Only) */}
+							<div className="hidden sm:flex items-center gap-4 text-xs font-medium">
+								<div className="flex items-center gap-1.5" title="Presentes">
+									<div className="w-2 h-2 rounded-full bg-[var(--safari-green)]"></div>
+									<span className="text-[var(--text-primary)]">
+										{currentDashboardData.todayAttendance}{" "}
+										<span className="text-[var(--text-muted)]">Pres.</span>
+									</span>
+								</div>
+								<div className="flex items-center gap-1.5" title="Atrasados">
+									<div className="w-2 h-2 rounded-full bg-[var(--safari-orange)]"></div>
+									<span className="text-[var(--text-primary)]">
+										{currentDashboardData.todayLate}{" "}
+										<span className="text-[var(--text-muted)]">Atras.</span>
+									</span>
+								</div>
+								<div className="flex items-center gap-1.5" title="Faltantes">
+									<div className="w-2 h-2 rounded-full bg-[var(--safari-stone-400)]"></div>
+									<span className="text-[var(--text-primary)]">
+										{currentDashboardData.totalStudents -
+											currentDashboardData.todayAttendance}{" "}
+										<span className="text-[var(--text-muted)]">Falt.</span>
+									</span>
+								</div>
+							</div>
+						</div>
+					)}
+				</div>
+			</header>
+
+			<main className="layout-container py-8">
+				{/* Seleção de Turma */}
 
 				{/* Cartões do Dashboard e Calendário */}
 				<div className="grid-dashboard mb-8">
 					{/* Cartão de Resumo */}
 					<div className="lg:col-span-1">
 						{currentDashboardData && (
-							<Card key={currentDashboardData.classId}>
+							<Card
+								key={currentDashboardData.classId}
+								className="h-full bg-[var(--surface-raised)]"
+							>
 								<CardBody>
 									<h3 className="text-xl font-bold text-[var(--safari-green)] mb-4 flex items-center gap-2">
 										🏕️ {currentDashboardData.className}
@@ -564,12 +650,22 @@ export default function DashboardPage() {
 							<div className="flex gap-2">
 								<Button
 									variant="ghost"
+									onClick={handleMarkAllPresent}
+									className="bg-white px-3 py-2 h-[42px] border border-[var(--safari-stone-200)] hover:border-[var(--safari-green)] hover:text-[var(--safari-green)] shadow-[var(--shadow-hardware)] mr-2"
+									title="Marcar Todos Presentes"
+								>
+									<CheckSquare size={18} />
+									<span className="hidden sm:inline">Marcar Todos</span>
+								</Button>
+
+								<Button
+									variant="ghost"
 									onClick={() => {
 										setStudentFormMode("create");
 										setEditingStudentData(null);
 										setStudentFormOpen(true);
 									}}
-									className="bg-white px-4 py-2 h-[42px] border border-[var(--safari-stone-200)] hover:border-[var(--safari-green)] mr-2 shadow-[var(--shadow-hardware)]"
+									className="bg-[var(--safari-green)] text-white px-4 py-2 h-[42px] border border-transparent hover:brightness-110 mr-2 shadow-[var(--shadow-hardware)]"
 								>
 									<Plus size={20} />
 									Adicionar Aluno
