@@ -88,6 +88,12 @@ export default function StudentDetailModal({
 	};
 
 	const handleDeleteFeedback = async (feedbackId: string) => {
+		console.log("[Delete Feedback] Attempting to delete:", {
+			feedbackId,
+			feedbackIdType: typeof feedbackId,
+			studentId: student?.id,
+		});
+
 		if (!confirm("Tem certeza que deseja apagar este feedback?")) {
 			return;
 		}
@@ -99,13 +105,20 @@ export default function StudentDetailModal({
 			return;
 		}
 
+		console.log("[Delete Feedback] Token found, making API call...");
+
 		try {
 			await api.deleteFeedbackEvent(token, feedbackId);
 
+			console.log("[Delete Feedback] Success! Removing from local state");
 			setFeedbacks((prev) => prev.filter((f) => f.id !== feedbackId));
 			toast.success("Feedback removido!");
 		} catch (error) {
-			console.error("[Delete Feedback] Error:", error);
+			console.error("[Delete Feedback] Error details:", {
+				error,
+				message: error instanceof Error ? error.message : "Unknown",
+				feedbackId,
+			});
 			const errorMessage =
 				error instanceof Error ? error.message : "Erro desconhecido";
 			toast.error(`Erro ao remover feedback: ${errorMessage}`, {

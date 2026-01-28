@@ -92,19 +92,58 @@ export const getFeedbackEvents = async (req: AuthRequest, res: Response) => {
 export const deleteFeedbackEvent = async (req: AuthRequest, res: Response) => {
 	try {
 		const id = req.params.id as string;
+		const user = req.user;
 
+		console.log("[Delete Feedback] Request received:", {
+			feedbackId: id,
+			userId: user?.id,
+			userRole: user?.role,
+			userEmail: user?.email,
+		});
+
+		// Validate ID format
+		if (!id || id === "undefined" || id === "null") {
+			console.error("[Delete Feedback] Invalid ID received:", id);
+			return res.status(400).json({ error: `Invalid feedback ID: ${id}` });
+		}
+
+		// Check if feedback exists before deleting
+		const existingFeedback = await prisma.feedbackEvent.findUnique({
+			where: { id },
+			include: { student: true },
+		});
+
+		console.log("[Delete Feedback] Existing feedback:", existingFeedback);
+
+		if (!existingFeedback) {
+			console.error("[Delete Feedback] Feedback not found with ID:", id);
+			return res
+				.status(404)
+				.json({ error: `Feedback not found with ID: ${id}` });
+		}
+
+		// Perform deletion
 		await prisma.feedbackEvent.delete({
 			where: { id },
 		});
 
+		console.log("[Delete Feedback] Successfully deleted feedback:", id);
 		res.status(204).send();
 	} catch (error: any) {
-		console.error("Delete feedback event error:", error);
+		console.error("[Delete Feedback] Error:", {
+			message: error.message,
+			code: error.code,
+			meta: error.meta,
+			stack: error.stack,
+		});
+
 		if (error.code === "P2025") {
-			return res.status(404).json({ error: "Feedback not found" });
+			return res.status(404).json({ error: "Feedback not found (P2025)" });
 		}
-		res
-			.status(500)
-			.json({ error: `Failed to delete feedback: ${error.message}` });
+
+		res.status(500).json({
+			error: `Failed to delete feedback: ${error.message}`,
+			code: error.code,
+		});
 	}
 };
