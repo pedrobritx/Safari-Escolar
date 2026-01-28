@@ -23,6 +23,7 @@ interface StudentDetailModalProps {
 	student: Student | null;
 	onUpdate: (data: Partial<Student>) => void;
 	onDelete?: () => void;
+	onFeedbackChange?: () => void; // New callback for sync
 }
 
 export default function StudentDetailModal({
@@ -31,6 +32,7 @@ export default function StudentDetailModal({
 	student,
 	onUpdate,
 	onDelete,
+	onFeedbackChange,
 }: StudentDetailModalProps) {
 	const [activeTab, setActiveTab] = useState<"feedback" | "contact">(
 		"feedback",
@@ -95,6 +97,7 @@ export default function StudentDetailModal({
 			},
 			cancel: {
 				label: "Cancelar",
+				onClick: () => {},
 			},
 			duration: 5000,
 		});
@@ -116,6 +119,11 @@ export default function StudentDetailModal({
 			console.log("[Delete Feedback] Success! Removing from local state");
 			setFeedbacks((prev) => prev.filter((f) => f.id !== feedbackId));
 			toast.success("Feedback removido!");
+
+			// Notify parent to refresh data (sync card badge)
+			if (onFeedbackChange) {
+				onFeedbackChange();
+			}
 		} catch (error) {
 			console.error("[Delete Feedback] Error details:", {
 				error,

@@ -775,6 +775,7 @@ export default function DashboardPage() {
 					student={editingStudentData}
 					onUpdate={(data: Partial<Student>) => handleUpdateStudent(data)}
 					onDelete={handleDeleteStudent}
+					onFeedbackChange={refreshData}
 				/>
 			)}
 
