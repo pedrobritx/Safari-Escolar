@@ -123,6 +123,7 @@ export default function StudentDetailModal({
 			onClose={onClose}
 			headerColorClass="hidden" // Hiding default header to use Custom Green Header
 			maxWidth="md"
+			hideCloseButton={true}
 		>
 			{/* Content Container with Standard Padding */}
 			<div className="p-6">

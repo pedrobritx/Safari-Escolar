@@ -8,6 +8,7 @@ interface ModalProps {
 	title?: string;
 	children: React.ReactNode;
 	maxWidth?: "sm" | "md" | "lg" | "xl" | "2xl";
+	hideCloseButton?: boolean;
 	/** @deprecated Use standard modal styling instead */
 	headerColorClass?: string;
 	/** @deprecated Modal borders no longer change by mode */
@@ -20,6 +21,7 @@ export function Modal({
 	title,
 	children,
 	maxWidth = "md",
+	hideCloseButton = false,
 	// Deprecated props kept for backward compatibility but ignored
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	headerColorClass,
@@ -63,13 +65,15 @@ export function Modal({
 				{/* Header */}
 				<div className="modal-header">
 					{title && <h2 className="modal-header-title">{title}</h2>}
-					<button
-						onClick={onClose}
-						className="modal-close liquid-control icon-btn"
-						aria-label="Close modal"
-					>
-						<X size={24} strokeWidth={2.5} />
-					</button>
+					{!hideCloseButton && (
+						<button
+							onClick={onClose}
+							className="modal-close liquid-control icon-btn"
+							aria-label="Close modal"
+						>
+							<X size={24} strokeWidth={2.5} />
+						</button>
+					)}
 				</div>
 
 				{/* Content */}
