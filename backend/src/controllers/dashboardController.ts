@@ -57,6 +57,15 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
 				),
 			).length;
 
+			const todayMarked = cls.students.filter((student) =>
+				student.attendances.some(
+					(att) =>
+						att.status === "PRESENT" ||
+						att.status === "LATE" ||
+						att.status === "ABSENT",
+				),
+			).length;
+
 			const todayLate = cls.students.filter((student) =>
 				student.attendances.some((att) => att.status === "LATE"),
 			).length;
@@ -72,7 +81,7 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
 				todayAttendance,
 				todayLate,
 				attendanceRate:
-					totalStudents > 0 ? (todayAttendance / totalStudents) * 100 : 0,
+					totalStudents > 0 ? (todayMarked / totalStudents) * 100 : 0,
 				todayPositiveEvents: todayFeedbackEvents.filter(
 					(e) => e.type === "POSITIVE",
 				).length,

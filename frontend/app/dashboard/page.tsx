@@ -528,7 +528,7 @@ export default function DashboardPage() {
 								></div>
 								{/* Tooltip on hover */}
 								<div className="absolute top-[-24px] left-1/2 -translate-x-1/2 bg-black/80 text-white text-[10px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-									{currentDashboardData.attendanceRate.toFixed(1)}% Presentes
+									{currentDashboardData.attendanceRate.toFixed(1)}% Marcados
 								</div>
 							</div>
 
