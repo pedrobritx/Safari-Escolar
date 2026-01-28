@@ -1,5 +1,5 @@
 # Árvore do repositório — Safari Escolar
-*Gerado em 2026-01-28 04:54:57Z (UTC)*
+*Gerado em 2026-01-28 05:52:33Z (UTC)*
 
 ```
 Safari-Escolar/
@@ -142,6 +142,7 @@ Safari-Escolar/
 │   ├── tsconfig.json
 │   └── utils/
 │       ├── animalAvatarMap.ts
+│       ├── dateUtils.ts
 │       ├── getAnimalAvatar.ts
 │       └── getErrorMessage.ts
 └── scripts/
