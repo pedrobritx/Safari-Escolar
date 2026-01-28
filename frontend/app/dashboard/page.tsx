@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { formatDateForAPI } from "@/utils/dateUtils";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import { User, Student, DashboardData } from "@/lib/types";
@@ -208,7 +209,7 @@ export default function DashboardPage() {
 		}
 
 		try {
-			const formattedDate = selectedDate.toISOString().split("T")[0];
+			const formattedDate = formatDateForAPI(selectedDate);
 			await api.markAttendance(token, studentId, apiStatus, formattedDate);
 
 			// Show success feedback
@@ -281,7 +282,7 @@ export default function DashboardPage() {
 		}
 
 		try {
-			const formattedDate = selectedDate.toISOString().split("T")[0];
+			const formattedDate = formatDateForAPI(selectedDate);
 			await api.addFeedbackEvent(
 				token,
 				studentId,
@@ -310,7 +311,7 @@ export default function DashboardPage() {
 		if (!token || !selectedClass) return;
 
 		try {
-			const formattedDate = selectedDate.toISOString().split("T")[0];
+			const formattedDate = formatDateForAPI(selectedDate);
 			await api.resetDay(token, formattedDate, selectedClass.id);
 			toast.success("Dados do dia reiniciados com sucesso!");
 			refreshData();
@@ -355,7 +356,7 @@ export default function DashboardPage() {
 		if (!token) return;
 
 		try {
-			const formattedDate = selectedDate.toISOString().split("T")[0];
+			const formattedDate = formatDateForAPI(selectedDate);
 			const promises = selectedClass.students.map((student) =>
 				api.markAttendance(token, student.id, "PRESENT", formattedDate),
 			);
