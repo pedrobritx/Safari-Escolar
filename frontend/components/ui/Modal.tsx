@@ -57,7 +57,7 @@ export function Modal({
 			onClick={onClose}
 		>
 			<div
-				className={`bg-[var(--surface-base)] rounded-[var(--radius-inner)] w-full ${maxWidthClass} shadow-[var(--shadow-glass)] overflow-hidden animate-in zoom-in-95 duration-200 border ${borderColorClass ? borderColorClass : "border-[var(--border-glass)]"}`}
+				className={`bg-[var(--surface-base)] rounded-[var(--radius-outer)] w-full ${maxWidthClass} shadow-[var(--shadow-glass)] overflow-hidden animate-in zoom-in-95 duration-200 border ${borderColorClass ? borderColorClass : "border-[var(--border-glass)]"}`}
 				onClick={(e) => e.stopPropagation()}
 			>
 				{/* Header */}
@@ -71,7 +71,7 @@ export function Modal({
 					)}
 					<button
 						onClick={onClose}
-						className="btn btn-ghost p-2 rounded-[var(--radius-inner)] ml-auto hover:bg-black/5"
+						className="liquid-control icon-btn ml-auto"
 						aria-label="Close modal"
 					>
 						<X size={24} strokeWidth={2.5} />

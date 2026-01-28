@@ -74,6 +74,30 @@
 	--radius-inner: 9999px; /* Controls, Buttons (Rounder/Pill) */
 	--radius-input: 16px; /* Inputs (Slightly rounded) */
 
+	/* 🌊 LIQUID-GLASS INTERACTION SYSTEM */
+
+	/* Glow Colors (semantic variants) */
+	--liquid-glow-leaf: rgba(77, 124, 15, 0.3);
+	--liquid-glow-aqua: rgba(6, 182, 212, 0.3);
+	--liquid-glow-orange: rgba(234, 88, 12, 0.3);
+
+	/* Liquid Control Shadows */
+	--shadow-liquid-bloom:
+		0 0 0 3px var(--liquid-glow, var(--liquid-glow-leaf)),
+		0 4px 16px var(--liquid-glow, var(--liquid-glow-leaf));
+	--shadow-liquid-press:
+		inset 0 2px 6px rgba(0, 0, 0, 0.12), 0 1px 0 rgba(255, 255, 255, 0.4);
+
+	/* Timing (synchronized feel) */
+	--timing-hover: 180ms ease-out;
+	--timing-press: 80ms ease-in;
+	--timing-release: 140ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+	/* Yellow tokens (for LATE status - avoiding Tailwind defaults) */
+	--safari-yellow: #eab308;
+	--safari-yellow-light: #fef9c3;
+	--safari-yellow-dark: #a16207;
+
 	/* Mappings for Tailwind compatibility */
 	--background: var(--surface-base);
 	--foreground: var(--text-primary);
@@ -181,15 +205,173 @@ body {
 		@apply scale-[0.99] shadow-[var(--shadow-hardware-press)] brightness-95;
 	}
 
-	/* BUTTONS */
+	/* ============================================
+	   🌊 LIQUID-CONTROL BASE CLASS
+	   The shared interaction physics for all clickable controls.
+	   ============================================ */
+	.liquid-control {
+		--liquid-glow: var(--liquid-glow-leaf); /* Default glow color */
+		position: relative;
+		transition:
+			transform var(--timing-hover),
+			box-shadow var(--timing-hover),
+			filter var(--timing-hover);
+	}
+
+	/* Hover: Ambient bloom glow */
+	.liquid-control::before {
+		content: "";
+		position: absolute;
+		inset: -2px;
+		border-radius: inherit;
+		opacity: 0;
+		background: transparent;
+		box-shadow: var(--shadow-liquid-bloom);
+		transition: opacity var(--timing-hover);
+		pointer-events: none;
+		z-index: -1;
+	}
+
+	.liquid-control:hover::before {
+		opacity: 1;
+	}
+
+	/* Hover: Lens highlight sheen */
+	.liquid-control::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		background: linear-gradient(
+			135deg,
+			rgba(255, 255, 255, 0.3) 0%,
+			rgba(255, 255, 255, 0) 50%
+		);
+		opacity: 0;
+		transition: opacity var(--timing-hover);
+		pointer-events: none;
+	}
+
+	.liquid-control:hover::after {
+		opacity: 1;
+	}
+
+	.liquid-control:hover {
+		filter: brightness(1.05) saturate(1.08);
+	}
+
+	/* Press: Compress + shadow inversion */
+	.liquid-control:active {
+		transform: translateY(1px) scale(0.98);
+		box-shadow: var(--shadow-liquid-press);
+		transition:
+			transform var(--timing-press),
+			box-shadow var(--timing-press);
+	}
+
+	/* Focus: Visible ring for accessibility */
+	.liquid-control:focus-visible {
+		outline: none;
+		box-shadow:
+			0 0 0 3px var(--liquid-glow),
+			var(--shadow-hardware);
+	}
+
+	/* Reduced motion: Disable transforms, keep visual affordance */
+	@media (prefers-reduced-motion: reduce) {
+		.liquid-control,
+		.liquid-control:active {
+			transform: none !important;
+			transition:
+				box-shadow var(--timing-hover),
+				filter var(--timing-hover);
+		}
+	}
+
+	/* Glow color variants */
+	.liquid-control--aqua {
+		--liquid-glow: var(--liquid-glow-aqua);
+	}
+	.liquid-control--orange {
+		--liquid-glow: var(--liquid-glow-orange);
+	}
+	.liquid-control--leaf {
+		--liquid-glow: var(--liquid-glow-leaf);
+	}
+
+	/* ============================================
+	   BUTTONS (inherits liquid-control)
+	   ============================================ */
 	.btn {
 		@apply font-bold rounded-[var(--radius-inner)] px-5 py-2.5 
 		       shadow-[var(--shadow-hardware)] border border-transparent
-		       transition-all duration-150 flex items-center justify-center gap-2
-		       active:shadow-[var(--shadow-hardware-press)] active:scale-[0.98];
+		       flex items-center justify-center gap-2 cursor-pointer select-none;
+	}
+
+	/* Icon Button: Square/round variant */
+	.icon-btn {
+		@apply flex items-center justify-center rounded-full
+		       bg-[var(--control-surface)] border border-[var(--safari-stone-200)]
+		       shadow-[var(--shadow-hardware)] cursor-pointer select-none;
+		width: 36px;
+		height: 36px;
+	}
+
+	.icon-btn:hover {
+		@apply bg-white border-[var(--safari-green)] text-[var(--safari-green)];
+	}
+
+	/* Chip / Status Pill */
+	.chip {
+		@apply inline-flex items-center justify-center gap-1.5 px-3 py-1.5
+		       rounded-[var(--radius-inner)] font-bold text-sm
+		       border shadow-[var(--shadow-hardware)] cursor-pointer select-none;
+	}
+
+	.chip--positive {
+		--liquid-glow: var(--liquid-glow-leaf);
+		@apply bg-[var(--safari-green-light)] text-[var(--safari-green)] border-[var(--safari-green)];
+	}
+
+	.chip--negative {
+		--liquid-glow: var(--liquid-glow-orange);
+		@apply bg-[var(--safari-orange-light)] text-[var(--safari-orange)] border-[var(--safari-orange)];
+	}
+
+	.chip--warning {
+		--liquid-glow: var(--liquid-glow-orange);
+		@apply bg-[var(--safari-yellow-light)] text-[var(--safari-yellow-dark)] border-[var(--safari-yellow)];
+	}
+
+	.chip--neutral {
+		@apply bg-[var(--control-surface-off)] text-[var(--text-muted)] border-[var(--safari-stone-200)];
+	}
+
+	/* Calendar Day Pill */
+	.calendar-day {
+		@apply flex flex-col items-center justify-center rounded-[var(--radius-inner)]
+		       bg-[var(--control-surface)] border border-[var(--safari-stone-200)]
+		       shadow-[var(--shadow-hardware)] cursor-pointer select-none
+		       font-bold text-sm text-[var(--text-muted)];
+		width: 40px;
+		height: 40px;
+	}
+
+	.calendar-day:hover {
+		@apply bg-[var(--safari-green-light)]/20 text-[var(--safari-green)] border-[var(--safari-green)];
+	}
+
+	.calendar-day--selected {
+		@apply bg-[var(--safari-green)] text-white border-transparent scale-105;
+		box-shadow: var(--shadow-hardware-active);
+	}
+
+	.calendar-day--today:not(.calendar-day--selected) {
+		@apply ring-2 ring-[var(--safari-green)] ring-offset-1;
 	}
 
 	.btn-primary {
+		--liquid-glow: var(--liquid-glow-leaf);
 		@apply bg-[var(--safari-green)] text-white 
 		       border-t border-white/20 border-b border-black/10;
 	}
@@ -199,6 +381,7 @@ body {
 	}
 
 	.btn-accent {
+		--liquid-glow: var(--liquid-glow-orange);
 		@apply bg-[var(--safari-orange)] text-white
 		       border-t border-white/20 border-b border-black/10;
 	}
@@ -209,6 +392,7 @@ body {
 
 	/* Backward Compatibility / Semantic Aliases */
 	.btn-anger {
+		--liquid-glow: var(--liquid-glow-orange);
 		@apply bg-[var(--safari-orange)] text-white
 		       border-t border-white/20 border-b border-black/10;
 	}
@@ -218,7 +402,8 @@ body {
 	}
 
 	.btn-warning {
-		@apply bg-yellow-400 text-yellow-900
+		--liquid-glow: var(--liquid-glow-orange);
+		@apply bg-[var(--safari-yellow)] text-[var(--safari-yellow-dark)]
 		       border-t border-white/20 border-b border-black/10;
 	}
 
@@ -227,6 +412,7 @@ body {
 	}
 
 	.btn-info {
+		--liquid-glow: var(--liquid-glow-aqua);
 		@apply bg-[var(--safari-aqua)] text-white
 		       border-t border-white/20 border-b border-black/10;
 	}

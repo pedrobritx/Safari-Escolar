@@ -50,9 +50,9 @@ export const StudentCard: React.FC<StudentCardProps> = ({
 			case "LATE":
 				return {
 					label: "⏰ Atrasado",
-					bg: "bg-yellow-100",
-					text: "text-yellow-700",
-					border: "border-yellow-500",
+					bg: "bg-[var(--safari-yellow-light)]",
+					text: "text-[var(--safari-yellow-dark)]",
+					border: "border-[var(--safari-yellow)]",
 				};
 			case "ABSENT":
 				return {
@@ -153,7 +153,7 @@ export const StudentCard: React.FC<StudentCardProps> = ({
 									e.stopPropagation();
 									setIsOpen(!isOpen);
 								}}
-								className={`w-full font-bold rounded-[var(--radius-inner)] border transition-all text-sm text-center shadow-inner py-2 flex items-center justify-between px-3 whitespace-nowrap
+								className={`liquid-control w-full font-bold rounded-[var(--radius-inner)] border text-sm text-center shadow-[var(--shadow-hardware)] py-2 flex items-center justify-between px-3 whitespace-nowrap
                   ${currentConfig.bg} ${currentConfig.border} ${currentConfig.text}
                 `}
 							>
@@ -171,7 +171,7 @@ export const StudentCard: React.FC<StudentCardProps> = ({
 											onAttendanceChange(student.id, "PRESENT");
 											setIsOpen(false);
 										}}
-										className="w-full text-left px-3 py-2 rounded-[calc(var(--radius-inner)-4px)] font-bold text-sm hover:bg-[var(--safari-green-light)] hover:text-[var(--safari-green)] transition-all flex items-center gap-2"
+										className="liquid-control liquid-control--leaf w-full text-left px-3 py-2 rounded-[calc(var(--radius-inner)-4px)] font-bold text-sm hover:bg-[var(--safari-green-light)] hover:text-[var(--safari-green)] flex items-center gap-2"
 									>
 										✅ Presente
 									</button>
@@ -181,7 +181,7 @@ export const StudentCard: React.FC<StudentCardProps> = ({
 											onAttendanceChange(student.id, "LATE");
 											setIsOpen(false);
 										}}
-										className="w-full text-left px-3 py-2 rounded-[calc(var(--radius-inner)-4px)] font-bold text-sm hover:bg-yellow-100 hover:text-yellow-700 transition-all flex items-center gap-2"
+										className="liquid-control w-full text-left px-3 py-2 rounded-[calc(var(--radius-inner)-4px)] font-bold text-sm hover:bg-[var(--safari-yellow-light)] hover:text-[var(--safari-yellow-dark)] flex items-center gap-2"
 									>
 										⏰ Atrasado
 									</button>
@@ -191,7 +191,7 @@ export const StudentCard: React.FC<StudentCardProps> = ({
 											onAttendanceChange(student.id, "ABSENT");
 											setIsOpen(false);
 										}}
-										className="w-full text-left px-3 py-2 rounded-[calc(var(--radius-inner)-4px)] font-bold text-sm hover:bg-[var(--safari-orange-light)] hover:text-[var(--safari-orange)] transition-all flex items-center gap-2"
+										className="liquid-control liquid-control--orange w-full text-left px-3 py-2 rounded-[calc(var(--radius-inner)-4px)] font-bold text-sm hover:bg-[var(--safari-orange-light)] hover:text-[var(--safari-orange)] flex items-center gap-2"
 									>
 										🚫 Ausente
 									</button>
@@ -202,7 +202,7 @@ export const StudentCard: React.FC<StudentCardProps> = ({
 											onAttendanceChange(student.id, "CLEARED");
 											setIsOpen(false);
 										}}
-										className="w-full text-left px-3 py-2 rounded-[calc(var(--radius-inner)-4px)] font-medium text-sm text-[var(--text-muted)] hover:bg-[var(--safari-stone-100)] hover:text-[var(--text-primary)] transition-all flex items-center gap-2"
+										className="liquid-control w-full text-left px-3 py-2 rounded-[calc(var(--radius-inner)-4px)] font-medium text-sm text-[var(--text-muted)] hover:bg-[var(--safari-stone-100)] hover:text-[var(--text-primary)] flex items-center gap-2"
 									>
 										🗑️ Limpar
 									</button>

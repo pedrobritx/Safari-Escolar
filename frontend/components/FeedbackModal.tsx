@@ -58,7 +58,7 @@ export default function FeedbackModal({
 			<div className="flex p-2 gap-2 bg-[var(--surface-raised)]">
 				<button
 					onClick={() => setActiveTab("positive")}
-					className={`tab ${
+					className={`liquid-control liquid-control--leaf tab ${
 						activeTab === "positive" ? "tab-positive" : "tab-inactive"
 					}`}
 				>
@@ -66,7 +66,7 @@ export default function FeedbackModal({
 				</button>
 				<button
 					onClick={() => setActiveTab("negative")}
-					className={`tab ${
+					className={`liquid-control liquid-control--orange tab ${
 						activeTab === "negative" ? "tab-negative" : "tab-inactive"
 					}`}
 				>
@@ -89,7 +89,7 @@ export default function FeedbackModal({
 						<button
 							key={item.id}
 							onClick={() => onSelectFeedback(item.label, activeTab)}
-							className={`card-interactive flex flex-col items-center justify-center p-4 group active:translate-y-1 active:shadow-[var(--shadow-hardware-press)] ${activeTab === "positive" ? "hover:border-[var(--safari-green)] hover:bg-[var(--safari-green-light)]" : "hover:border-[var(--safari-orange)] hover:bg-[var(--safari-orange-light)]"}`}
+							className={`liquid-control ${activeTab === "positive" ? "liquid-control--leaf" : "liquid-control--orange"} card-interactive flex flex-col items-center justify-center p-4 group rounded-[var(--radius-outer)] ${activeTab === "positive" ? "hover:border-[var(--safari-green)] hover:bg-[var(--safari-green-light)]" : "hover:border-[var(--safari-orange)] hover:bg-[var(--safari-orange-light)]"}`}
 						>
 							<div
 								className={`${activeTab === "positive" ? "bg-[var(--safari-green-light)]" : "bg-[var(--safari-orange-light)]"} w-16 h-16 rounded-full flex items-center justify-center text-3xl mb-3 group-hover:scale-110 transition-transform`}
