@@ -87,16 +87,21 @@ export default function StudentDetailModal({
 		toast.success("Informações atualizadas!");
 	};
 
-	const handleDeleteFeedback = async (feedbackId: string) => {
-		console.log("[Delete Feedback] Attempting to delete:", {
-			feedbackId,
-			feedbackIdType: typeof feedbackId,
-			studentId: student?.id,
+	const handleDeleteFeedback = (feedbackId: string) => {
+		toast("Tem certeza que deseja apagar este feedback?", {
+			action: {
+				label: "Apagar",
+				onClick: () => executeDeleteFeedback(feedbackId),
+			},
+			cancel: {
+				label: "Cancelar",
+			},
+			duration: 5000,
 		});
+	};
 
-		if (!confirm("Tem certeza que deseja apagar este feedback?")) {
-			return;
-		}
+	const executeDeleteFeedback = async (feedbackId: string) => {
+		console.log("[Delete Feedback] Executing delete for:", feedbackId);
 
 		const token = localStorage.getItem("token");
 		if (!token) {
@@ -104,8 +109,6 @@ export default function StudentDetailModal({
 			toast.error("Sessão expirada. Faça login novamente.");
 			return;
 		}
-
-		console.log("[Delete Feedback] Token found, making API call...");
 
 		try {
 			await api.deleteFeedbackEvent(token, feedbackId);
@@ -121,10 +124,7 @@ export default function StudentDetailModal({
 			});
 			const errorMessage =
 				error instanceof Error ? error.message : "Erro desconhecido";
-			toast.error(`Erro ao remover feedback: ${errorMessage}`, {
-				duration: 30000,
-				closeButton: true,
-			});
+			toast.error(`Erro ao remover feedback: ${errorMessage}`);
 		}
 	};
 

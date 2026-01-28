@@ -23,8 +23,8 @@ enum AttendanceStatus {
 }
 
 enum FeedbackEventType {
-  POSITIVE
-  NEGATIVE
+  POSITIVE @map("positive")
+  NEGATIVE @map("negative")
 }
 
 model User {
