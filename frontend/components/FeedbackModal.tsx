@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Settings } from "lucide-react";
 import { Modal } from "./ui/Modal";
 import { Button } from "./ui/Button";
 
@@ -34,73 +35,79 @@ export default function FeedbackModal({
 
 	useEffect(() => {
 		if (isOpen) {
-			setTimeout(() => setActiveTab("positive"), 0); // Reset to positive when opening, async to avoid lint error
+			setTimeout(() => setActiveTab("positive"), 0); // Reset to positive when opening
 		}
 	}, [isOpen]);
 
 	const currentFeedbacks =
 		activeTab === "positive" ? positiveFeedbacks : negativeFeedbacks;
-	const currentBorderColor =
-		activeTab === "positive"
-			? "border-[var(--safari-green)]"
-			: "border-[var(--safari-orange)]";
 
 	return (
 		<Modal
 			isOpen={isOpen}
 			onClose={onClose}
-			title={`Feedback: ${studentName}`} // Improved title context
+			title={`Feedback • ${studentName}`}
 			maxWidth="lg"
-			borderColorClass={currentBorderColor}
-			// Using standard header for consistency, but keeping the border color to indicate state.
 		>
-			{/* Tabs */}
-			<div className="flex p-2 gap-2 bg-[var(--surface-raised)]">
-				<button
-					onClick={() => setActiveTab("positive")}
-					className={`liquid-control liquid-control--leaf tab ${
-						activeTab === "positive" ? "tab-positive" : "tab-inactive"
-					}`}
-				>
-					Positivo
-				</button>
-				<button
-					onClick={() => setActiveTab("negative")}
-					className={`liquid-control liquid-control--orange tab ${
-						activeTab === "negative" ? "tab-negative" : "tab-inactive"
-					}`}
-				>
-					Construtivo
-				</button>
-				<Button
-					variant="ghost"
-					onClick={onEditFeedback}
-					className="w-12 px-0 flex items-center justify-center bg-white"
-					title="Configurar Feedback"
-				>
-					⚙️
-				</Button>
+			{/* Segmented Tabs */}
+			<div className="p-2 bg-[var(--surface-raised)]">
+				<div className="segmented-control">
+					<button
+						onClick={() => setActiveTab("positive")}
+						className={`segmented-tab segmented-tab--positive liquid-control ${
+							activeTab === "positive" ? "segmented-tab--active" : ""
+						}`}
+					>
+						Positivo
+					</button>
+					<button
+						onClick={() => setActiveTab("negative")}
+						className={`segmented-tab segmented-tab--negative liquid-control ${
+							activeTab === "negative" ? "segmented-tab--active" : ""
+						}`}
+					>
+						Construtivo
+					</button>
+					<Button
+						variant="ghost"
+						onClick={onEditFeedback}
+						className="w-12 px-0 flex items-center justify-center bg-white flex-none"
+						title="Configurar Feedback"
+					>
+						<Settings size={18} />
+					</Button>
+				</div>
 			</div>
 
-			{/* Content */}
-			<div className="p-6 bg-[var(--safari-khaki)] h-[60vh] overflow-y-auto custom-scrollbar">
+			{/* Content - Feedback Tiles Grid */}
+			<div className="modal-body">
 				<div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
 					{currentFeedbacks.map((item) => (
 						<button
 							key={item.id}
 							onClick={() => onSelectFeedback(item.label, activeTab)}
-							className={`liquid-control ${activeTab === "positive" ? "liquid-control--leaf" : "liquid-control--orange"} card-interactive flex flex-col items-center justify-center p-4 group rounded-[var(--radius-outer)] ${activeTab === "positive" ? "hover:border-[var(--safari-green)] hover:bg-[var(--safari-green-light)]" : "hover:border-[var(--safari-orange)] hover:bg-[var(--safari-orange-light)]"}`}
+							className={`feedback-tile liquid-control group ${
+								activeTab === "positive"
+									? "feedback-tile--positive"
+									: "feedback-tile--negative"
+							}`}
 						>
 							<div
-								className={`${activeTab === "positive" ? "bg-[var(--safari-green-light)]" : "bg-[var(--safari-orange-light)]"} w-16 h-16 rounded-full flex items-center justify-center text-3xl mb-3 group-hover:scale-110 transition-transform`}
+								className={`feedback-tile-icon ${
+									activeTab === "positive"
+										? "feedback-tile-icon--positive"
+										: "feedback-tile-icon--negative"
+								}`}
 							>
 								{item.icon}
 							</div>
-							<span className="font-bold text-[var(--safari-green)] text-sm text-center line-clamp-2">
-								{item.label}
-							</span>
+							<span className="feedback-tile-label">{item.label}</span>
 							<span
-								className={`text-xs font-bold mt-1 ${activeTab === "positive" ? "text-[var(--safari-green)]" : "text-[var(--safari-orange)]"}`}
+								className={`feedback-tile-points ${
+									activeTab === "positive"
+										? "feedback-tile-points--positive"
+										: "feedback-tile-points--negative"
+								}`}
 							>
 								{activeTab === "positive" ? "+" : ""}
 								{item.points}
@@ -108,14 +115,6 @@ export default function FeedbackModal({
 						</button>
 					))}
 				</div>
-			</div>
-
-			{/* Footer with Student Name */}
-			<div className="p-3 bg-[var(--surface-raised)] border-t border-[var(--safari-stone-200)] text-center">
-				<span className="text-gray-500 font-bold text-sm">Aluno: </span>
-				<span className="text-[var(--safari-green)] font-black text-lg">
-					{studentName}
-				</span>
 			</div>
 		</Modal>
 	);

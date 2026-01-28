@@ -8,8 +8,10 @@ interface ModalProps {
 	title?: string;
 	children: React.ReactNode;
 	maxWidth?: "sm" | "md" | "lg" | "xl" | "2xl";
-	headerColorClass?: string; // Optional override for header color
-	borderColorClass?: string; // Optional override for border color
+	/** @deprecated Use standard modal styling instead */
+	headerColorClass?: string;
+	/** @deprecated Modal borders no longer change by mode */
+	borderColorClass?: string;
 }
 
 export function Modal({
@@ -18,7 +20,10 @@ export function Modal({
 	title,
 	children,
 	maxWidth = "md",
+	// Deprecated props kept for backward compatibility but ignored
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	headerColorClass,
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	borderColorClass,
 }: ModalProps) {
 	const [mounted, setMounted] = useState(false);
@@ -46,32 +51,21 @@ export function Modal({
 		"2xl": "max-w-2xl",
 	}[maxWidth];
 
-	const headerClass =
-		headerColorClass ||
-		"bg-[var(--safari-green-light)]/50 border-[var(--safari-stone-200)]";
-	// unused borderClass removed
-
 	const content = (
 		<div
-			className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-[4px] animate-in fade-in duration-200"
+			className="modal-overlay animate-in fade-in duration-200"
 			onClick={onClose}
 		>
 			<div
-				className={`bg-[var(--surface-base)] rounded-[var(--radius-outer)] w-full ${maxWidthClass} shadow-[var(--shadow-glass)] overflow-hidden animate-in zoom-in-95 duration-200 border ${borderColorClass ? borderColorClass : "border-[var(--border-glass)]"}`}
+				className={`modal-glass ${maxWidthClass} animate-in zoom-in-95 duration-200`}
 				onClick={(e) => e.stopPropagation()}
 			>
 				{/* Header */}
-				<div
-					className={`px-6 py-4 border-b border-[var(--safari-stone-200)] flex justify-between items-center ${headerClass}`}
-				>
-					{title && (
-						<h2 className="text-xl font-bold text-[var(--safari-green)]">
-							{title}
-						</h2>
-					)}
+				<div className="modal-header">
+					{title && <h2 className="modal-header-title">{title}</h2>}
 					<button
 						onClick={onClose}
-						className="liquid-control icon-btn ml-auto"
+						className="modal-close liquid-control icon-btn"
 						aria-label="Close modal"
 					>
 						<X size={24} strokeWidth={2.5} />

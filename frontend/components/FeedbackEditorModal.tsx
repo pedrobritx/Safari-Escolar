@@ -137,47 +137,41 @@ export default function FeedbackEditorModal({
 		setDeletingId(null);
 	};
 
-	const headerColorClass =
-		"bg-[var(--safari-orange-light)] border-[var(--safari-orange)] text-[var(--text-primary)]";
-
 	return (
 		<Modal
 			isOpen={isOpen}
 			onClose={onClose}
-			headerColorClass={headerColorClass}
-			title="EDITAR FEEDBACK"
+			title="Editar Feedback"
 			maxWidth="lg"
-			borderColorClass="border-[var(--safari-orange)]"
 		>
 			{/* Navigation & Tabs */}
-			<div className="bg-[var(--surface-raised)] p-2 flex gap-2">
-				{/* Back Button */}
-				<Button
-					variant="ghost"
-					onClick={() => {
-						if (editingId) {
-							setEditingId(null);
-							setIsCreating(false);
-						} else {
-							onBack();
-						}
-					}}
-					className="w-12 bg-white flex items-center justify-center p-0"
-					title="Voltar"
-				>
-					<ArrowLeft size={24} strokeWidth={2.5} />
-				</Button>
+			<div className="p-2 bg-[var(--surface-raised)]">
+				<div className="segmented-control">
+					{/* Back Button */}
+					<button
+						onClick={() => {
+							if (editingId) {
+								setEditingId(null);
+								setIsCreating(false);
+							} else {
+								onBack();
+							}
+						}}
+						className="feedback-action-btn liquid-control flex-none"
+						title="Voltar"
+					>
+						<ArrowLeft size={20} strokeWidth={2.5} />
+					</button>
 
-				{/* Tabs */}
-				<div className="flex-1 flex gap-2">
+					{/* Tabs */}
 					<button
 						onClick={() => {
 							setActiveTab("positive");
 							setEditingId(null);
 							setDeletingId(null);
 						}}
-						className={`tab ${
-							activeTab === "positive" ? "tab-positive" : "tab-inactive"
+						className={`segmented-tab segmented-tab--positive liquid-control ${
+							activeTab === "positive" ? "segmented-tab--active" : ""
 						}`}
 					>
 						Positivo
@@ -188,8 +182,8 @@ export default function FeedbackEditorModal({
 							setEditingId(null);
 							setDeletingId(null);
 						}}
-						className={`tab ${
-							activeTab === "negative" ? "tab-negative" : "tab-inactive"
+						className={`segmented-tab segmented-tab--negative liquid-control ${
+							activeTab === "negative" ? "segmented-tab--active" : ""
 						}`}
 					>
 						Construtivo
@@ -198,7 +192,7 @@ export default function FeedbackEditorModal({
 			</div>
 
 			{/* Content */}
-			<div className="p-6 bg-[var(--safari-khaki)] overflow-y-auto h-[calc(60vh+3.5rem)] custom-scrollbar">
+			<div className="modal-body">
 				{!editingId ? (
 					/* LIST MODE */
 					<>
@@ -206,57 +200,49 @@ export default function FeedbackEditorModal({
 							{currentList.map((item) => (
 								<div
 									key={item.id}
-									className={`list-item ${deletingId === item.id ? "list-item-anger" : ""}`}
+									className={`feedback-row ${deletingId === item.id ? "feedback-row--deleting" : ""}`}
 								>
-									<div className="flex items-center gap-4 flex-1">
-										<div className="w-10 h-10 flex items-center justify-center bg-[var(--surface-raised)] rounded-full text-2xl border border-[var(--safari-stone-200)]">
-											{item.icon}
-										</div>
-										<span className="font-bold text-[var(--text-primary)] text-lg flex-1 truncate">
-											{item.label}
-										</span>
-										<div className="bg-[var(--safari-stone-200)] text-[var(--text-muted)] font-bold px-3 py-1 rounded-[var(--radius-outer)] text-sm">
-											{item.points > 0 ? "+" : ""}
-											{item.points}
-										</div>
+									<div className="feedback-row-icon">{item.icon}</div>
+									<span className="feedback-row-label">{item.label}</span>
+									<div className="feedback-row-points">
+										{item.points > 0 ? "+" : ""}
+										{item.points}
 									</div>
 
-									<div className="flex gap-2 ml-4">
+									<div className="feedback-row-actions">
 										{deletingId === item.id ? (
 											<>
-												<Button
-													variant="accent"
+												<button
 													onClick={() => handleConfirmDelete(item.id)}
-													className="p-2"
+													className="feedback-action-btn feedback-action-btn--confirm liquid-control"
 													title="Confirmar"
 												>
 													<Check size={18} />
-												</Button>
-												<Button
-													variant="ghost"
+												</button>
+												<button
 													onClick={() => setDeletingId(null)}
-													className="p-2 bg-gray-400 text-white hover:bg-gray-500 border-gray-500"
+													className="feedback-action-btn feedback-action-btn--cancel liquid-control"
 													title="Cancelar"
 												>
 													<X size={18} />
-												</Button>
+												</button>
 											</>
 										) : (
 											<>
-												<Button
+												<button
 													onClick={() => handleStartEdit(item)}
-													className="bg-amber-400 border-amber-600 hover:bg-amber-500 p-2"
+													className="feedback-action-btn liquid-control"
 													title="Editar"
 												>
 													<Pencil size={18} />
-												</Button>
-												<Button
+												</button>
+												<button
 													onClick={() => handleInitiateDelete(item.id)}
-													className="bg-amber-400 border-amber-600 hover:bg-amber-500 p-2"
+													className="feedback-action-btn feedback-action-btn--delete liquid-control"
 													title="Excluir"
 												>
 													<Trash2 size={18} />
-												</Button>
+												</button>
 											</>
 										)}
 									</div>
@@ -267,16 +253,16 @@ export default function FeedbackEditorModal({
 						{!deletingId && (
 							<button
 								onClick={handleStartCreate}
-								className="w-full py-4 border-2 border-dashed border-[var(--safari-stone-300)] rounded-[var(--radius-inner)] text-[var(--text-muted)] font-bold hover:bg-white hover:border-[var(--safari-green)] hover:text-[var(--safari-green)] transition-all flex items-center justify-center gap-2 uppercase tracking-wide"
+								className="feedback-add-btn liquid-control"
 							>
-								<Plus size={24} /> Adicionar Novo
+								<Plus size={20} /> Adicionar Novo
 							</button>
 						)}
 					</>
 				) : (
 					/* FORM MODE (In-Place) */
 					<div className="animate-in fade-in slide-in-from-right-4 duration-200">
-						<div className="bg-white p-6 rounded-[var(--radius-inner)] shadow-sm border border-[var(--safari-stone-200)]">
+						<div className="bg-white p-6 rounded-[var(--radius-outer)] shadow-sm border border-[var(--safari-stone-200)]">
 							<h4 className="font-black text-[var(--text-primary)] mb-6 uppercase tracking-wide text-center border-b border-[var(--safari-stone-200)] pb-2">
 								{isCreating ? "Criar Novo Item" : "Editando Item"}
 							</h4>
@@ -292,7 +278,7 @@ export default function FeedbackEditorModal({
 											<button
 												key={emoji}
 												onClick={() => setEditIcon(emoji)}
-												className={`text-3xl w-12 h-12 flex-none rounded-xl hover:bg-yellow-50 transition-all flex items-center justify-center ${editIcon === emoji ? "bg-yellow-100 ring-2 ring-yellow-500 scale-110 shadow-sm" : "bg-white border border-gray-100"}`}
+												className={`liquid-control text-3xl w-12 h-12 flex-none rounded-xl hover:bg-[var(--safari-green-light)]/30 transition-all flex items-center justify-center ${editIcon === emoji ? "bg-[var(--safari-green-light)] ring-2 ring-[var(--safari-green)] scale-110 shadow-sm" : "bg-white border border-gray-100"}`}
 											>
 												{emoji}
 											</button>

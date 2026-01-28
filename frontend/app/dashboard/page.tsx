@@ -365,7 +365,9 @@ export default function DashboardPage() {
 			refreshData();
 		} catch (error) {
 			console.error("Error marking all present:", error);
-			toast.error("Erro ao marcar presenças. Tente novamente.");
+			const errorMessage =
+				error instanceof Error ? error.message : "Erro desconhecido";
+			toast.error(`Erro ao marcar presenças: ${errorMessage}`);
 		}
 	};
 

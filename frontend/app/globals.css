@@ -501,6 +501,269 @@ body {
 	.list-card-anger {
 		@apply border-[var(--safari-orange)] bg-orange-50;
 	}
+
+	/* ============================================
+	   🪟 MODAL GLASS SYSTEM
+	   Unified modal styling for Skeuo-Glass design
+	   ============================================ */
+
+	/* Overlay: Darkened backdrop with blur + vignette */
+	.modal-overlay {
+		position: fixed;
+		inset: 0;
+		z-index: 50;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 1rem;
+		background: radial-gradient(
+			ellipse at center,
+			rgba(0, 0, 0, 0.35) 0%,
+			rgba(0, 0, 0, 0.55) 100%
+		);
+		backdrop-filter: blur(6px);
+		-webkit-backdrop-filter: blur(6px);
+	}
+
+	/* Glass Surface: Translucent khaki with ambient glow */
+	.modal-glass {
+		@apply bg-[var(--surface-base)] rounded-[var(--radius-outer)] w-full
+			   overflow-hidden border border-[var(--border-glass)];
+		box-shadow:
+			0 8px 32px rgba(77, 124, 15, 0.12),
+			0 2px 8px rgba(0, 0, 0, 0.08),
+			inset 0 1px 0 rgba(255, 255, 255, 0.5);
+	}
+
+	/* Header: Fixed height, title left, actions right */
+	.modal-header {
+		@apply px-6 py-4 flex justify-between items-center gap-4
+			   bg-[var(--safari-green-light)]/40 border-b border-[var(--safari-stone-200)];
+	}
+
+	.modal-header-title {
+		@apply text-xl font-bold text-[var(--safari-green)] truncate;
+	}
+
+	.modal-header-subtitle {
+		@apply text-sm text-[var(--text-muted)] font-medium;
+	}
+
+	/* Body: Scrollable content area */
+	.modal-body {
+		@apply p-6 overflow-y-auto bg-[var(--safari-khaki)];
+		max-height: 70vh;
+	}
+
+	.modal-body::-webkit-scrollbar {
+		width: 6px;
+		height: 6px;
+	}
+	.modal-body::-webkit-scrollbar-track {
+		background: transparent;
+	}
+	.modal-body::-webkit-scrollbar-thumb {
+		background: var(--safari-stone-300);
+		border-radius: 99px;
+	}
+	.modal-body::-webkit-scrollbar-thumb:hover {
+		background: var(--safari-stone-600);
+	}
+
+	.modal-body--compact {
+		@apply p-4;
+	}
+
+	.modal-body--flush {
+		@apply p-0;
+	}
+
+	/* Footer: Sticky actions area */
+	.modal-footer {
+		@apply px-6 py-4 flex justify-end gap-3
+			   bg-[var(--surface-raised)] border-t border-[var(--safari-stone-200)];
+	}
+
+	/* Close button: Add 'liquid-control icon-btn' classes in component */
+	.modal-close {
+		@apply flex-shrink-0;
+		--liquid-glow: var(--liquid-glow-aqua);
+	}
+
+	/* ============================================
+	   📑 SEGMENTED CONTROL (Tabs)
+	   Unified tab styling with semantic glow colors
+	   ============================================ */
+
+	.segmented-control {
+		@apply flex gap-2 p-1.5 rounded-[calc(var(--radius-inner)+4px)]
+			   bg-[var(--safari-stone-200)]/50 border border-[var(--safari-stone-200)];
+	}
+
+	/* Add 'liquid-control' class in component for interaction physics */
+	.segmented-tab {
+		@apply flex-1 py-2 px-4 rounded-[var(--radius-inner)]
+			   font-bold text-sm tracking-wide text-center select-none
+			   cursor-pointer border border-transparent
+			   text-[var(--text-muted)] bg-transparent;
+	}
+
+	.segmented-tab:hover:not(.segmented-tab--active) {
+		@apply text-[var(--text-primary)] bg-white/50;
+	}
+
+	.segmented-tab--active {
+		@apply text-white border-t border-white/20;
+		box-shadow: var(--shadow-hardware);
+	}
+
+	.segmented-tab--positive.segmented-tab--active {
+		--liquid-glow: var(--liquid-glow-leaf);
+		@apply bg-[var(--safari-green)];
+	}
+
+	.segmented-tab--negative.segmented-tab--active {
+		--liquid-glow: var(--liquid-glow-orange);
+		@apply bg-[var(--safari-orange)];
+	}
+
+	/* ============================================
+	   🎯 FEEDBACK TILES
+	   Interactive feedback selection tiles
+	   ============================================ */
+
+	/* Add 'liquid-control' class in component for interaction physics */
+	.feedback-tile {
+		@apply flex flex-col items-center justify-center p-4 gap-2 
+			   rounded-[var(--radius-outer)] bg-white 
+			   border border-[var(--safari-stone-200)]
+			   shadow-[var(--shadow-hardware)] cursor-pointer select-none
+			   transition-all duration-200 ease-out;
+	}
+
+	.feedback-tile:hover {
+		@apply scale-[1.02];
+	}
+
+	.feedback-tile--positive {
+		--liquid-glow: var(--liquid-glow-leaf);
+	}
+
+	.feedback-tile--positive:hover {
+		@apply border-[var(--safari-green)] bg-[var(--safari-green-light)]/30;
+	}
+
+	.feedback-tile--negative {
+		--liquid-glow: var(--liquid-glow-orange);
+	}
+
+	.feedback-tile--negative:hover {
+		@apply border-[var(--safari-orange)] bg-[var(--safari-orange-light)]/30;
+	}
+
+	.feedback-tile-icon {
+		@apply w-14 h-14 rounded-full flex items-center justify-center
+			   text-3xl transition-transform group-hover:scale-110;
+	}
+
+	.feedback-tile-icon--positive {
+		@apply bg-[var(--safari-green-light)]/60;
+	}
+
+	.feedback-tile-icon--negative {
+		@apply bg-[var(--safari-orange-light)]/60;
+	}
+
+	.feedback-tile-label {
+		@apply font-bold text-[var(--text-primary)] text-sm text-center line-clamp-2;
+	}
+
+	.feedback-tile-points {
+		@apply text-xs font-bold;
+	}
+
+	.feedback-tile-points--positive {
+		@apply text-[var(--safari-green)];
+	}
+
+	.feedback-tile-points--negative {
+		@apply text-[var(--safari-orange)];
+	}
+
+	/* ============================================
+	   📋 FEEDBACK ROW (Edit Modal)
+	   Consistent list item pattern
+	   ============================================ */
+
+	.feedback-row {
+		@apply flex items-center gap-4 p-3 px-4 rounded-[var(--radius-outer)]
+			   bg-white border border-[var(--safari-stone-200)]
+			   shadow-[var(--shadow-float)] transition-all;
+	}
+
+	.feedback-row--deleting {
+		@apply border-[var(--safari-orange)] bg-[var(--safari-orange-light)]/20;
+	}
+
+	.feedback-row-icon {
+		@apply w-10 h-10 flex items-center justify-center
+			   bg-[var(--surface-raised)] rounded-full text-2xl
+			   border border-[var(--safari-stone-200)] flex-shrink-0;
+	}
+
+	.feedback-row-label {
+		@apply font-bold text-[var(--text-primary)] text-lg flex-1 truncate;
+	}
+
+	.feedback-row-points {
+		@apply bg-[var(--safari-stone-200)] text-[var(--text-muted)]
+			   font-bold px-3 py-1 rounded-[var(--radius-inner)] text-sm;
+	}
+
+	.feedback-row-actions {
+		@apply flex gap-2 ml-2;
+	}
+
+	/* Quiet icon action buttons - add 'liquid-control' class in component */
+	.feedback-action-btn {
+		@apply flex items-center justify-center rounded-full
+			   w-9 h-9 cursor-pointer select-none
+			   bg-[var(--control-surface)] text-[var(--text-muted)]
+			   border border-[var(--safari-stone-200)]
+			   shadow-[var(--shadow-hardware)]
+			   transition-all duration-200 ease-out;
+	}
+
+	.feedback-action-btn:hover {
+		@apply bg-white text-[var(--safari-aqua)] border-[var(--safari-aqua)];
+		--liquid-glow: var(--liquid-glow-aqua);
+	}
+
+	.feedback-action-btn--delete:hover {
+		@apply text-[var(--safari-orange)] border-[var(--safari-orange)];
+		--liquid-glow: var(--liquid-glow-orange);
+	}
+
+	.feedback-action-btn--confirm {
+		@apply bg-[var(--safari-orange)] text-white border-[var(--safari-orange)];
+		--liquid-glow: var(--liquid-glow-orange);
+	}
+
+	.feedback-action-btn--cancel {
+		@apply bg-[var(--safari-stone-300)] text-white border-[var(--safari-stone-300)];
+	}
+
+	/* Add new feedback button - add 'liquid-control' class in component */
+	.feedback-add-btn {
+		@apply w-full py-3 px-4 rounded-[var(--radius-inner)]
+			   border-2 border-dashed border-[var(--safari-stone-300)]
+			   text-[var(--text-muted)] uppercase tracking-wide
+			   bg-transparent cursor-pointer select-none
+			   transition-all duration-200 ease-out
+			   hover:border-[var(--safari-green)] hover:text-[var(--safari-green)]
+			   hover:bg-white;
+		--liquid-glow: var(--liquid-glow-leaf);
+	}
 }
 
 @layer utilities {

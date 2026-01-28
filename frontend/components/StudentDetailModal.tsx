@@ -106,7 +106,12 @@ export default function StudentDetailModal({
 			toast.success("Feedback removido!");
 		} catch (error) {
 			console.error("[Delete Feedback] Error:", error);
-			toast.error("Erro ao remover feedback");
+			const errorMessage =
+				error instanceof Error ? error.message : "Erro desconhecido";
+			toast.error(`Erro ao remover feedback: ${errorMessage}`, {
+				duration: 30000,
+				closeButton: true,
+			});
 		}
 	};
 
