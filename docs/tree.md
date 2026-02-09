@@ -1,5 +1,5 @@
 # Árvore do repositório — Safari Escolar
-*Gerado em 2026-01-28 06:12:09Z (UTC)*
+*Gerado em 2026-02-09 23:30:59Z (UTC)*
 
 ```
 Safari-Escolar/
@@ -68,6 +68,7 @@ Safari-Escolar/
 │   │   │   └── test-attendance-endpoint.ts
 │   │   ├── server.ts
 │   │   └── utils/
+│   │       ├── dateUtils.backup.ts
 │   │       ├── dateUtils.ts
 │   │       └── prisma.ts
 │   ├── tsconfig.build.json
