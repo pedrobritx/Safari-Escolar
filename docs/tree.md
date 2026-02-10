@@ -1,5 +1,5 @@
 # Árvore do repositório — Safari Escolar
-*Gerado em 2026-02-09 23:30:59Z (UTC)*
+*Gerado em 2026-02-10 02:46:32Z (UTC)*
 
 ```
 Safari-Escolar/
@@ -29,6 +29,7 @@ Safari-Escolar/
 │       ├── package-lock.json
 │       └── tsconfig.tsbuildinfo
 ├── backend/
+│   ├── .env.example
 │   ├── eslint.config.mjs
 │   ├── nodemon.json
 │   ├── package-lock.json
@@ -51,7 +52,9 @@ Safari-Escolar/
 │   │   │   ├── studentController.ts
 │   │   │   └── usersController.ts
 │   │   ├── middleware/
-│   │   │   └── auth.ts
+│   │   │   ├── auth.ts
+│   │   │   ├── errorHandlers.ts
+│   │   │   └── validate.ts
 │   │   ├── routes/
 │   │   │   ├── attendanceRoutes.ts
 │   │   │   ├── authRoutes.ts
@@ -68,9 +71,14 @@ Safari-Escolar/
 │   │   │   └── test-attendance-endpoint.ts
 │   │   ├── server.ts
 │   │   └── utils/
+│   │       ├── authz.ts
 │   │       ├── dateUtils.backup.ts
+│   │       ├── dateUtils.test.ts
 │   │       ├── dateUtils.ts
-│   │       └── prisma.ts
+│   │       ├── errors.ts
+│   │       ├── prisma.ts
+│   │       ├── response.test.ts
+│   │       └── response.ts
 │   ├── tsconfig.build.json
 │   └── tsconfig.json
 ├── docker-compose.yml
@@ -103,6 +111,7 @@ Safari-Escolar/
 │   │   └── settings/
 │   │       └── page.tsx
 │   ├── components/
+│   │   ├── AuthGate.tsx
 │   │   ├── AuthProvider.tsx
 │   │   ├── Calendar.tsx
 │   │   ├── ConfirmDeleteModal.tsx
