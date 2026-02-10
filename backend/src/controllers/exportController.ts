@@ -23,7 +23,7 @@ export const exportStudents = async (req: AuthRequest, res: Response) => {
 		const userRole = req.user!.role;
 
 		if (userRole !== "TEACHER") {
-			return res.status(403).json({ error: "Only teachers can export data" });
+			return res.status(403).json({ success: false, error: "Only teachers can export data" });
 		}
 
 		const classes = await prisma.class.findMany({
@@ -100,7 +100,7 @@ export const exportStudents = async (req: AuthRequest, res: Response) => {
 		res.send("\uFEFF" + csv); // BOM for Excel UTF-8 compatibility
 	} catch (error) {
 		console.error("Export students error:", error);
-		res.status(500).json({ error: "Failed to export students" });
+		res.status(500).json({ success: false, error: "Failed to export students" });
 	}
 };
 
@@ -113,7 +113,7 @@ export const exportHistory = async (req: AuthRequest, res: Response) => {
 		const userRole = req.user!.role;
 
 		if (userRole !== "TEACHER") {
-			return res.status(403).json({ error: "Only teachers can export data" });
+			return res.status(403).json({ success: false, error: "Only teachers can export data" });
 		}
 
 		const classes = await prisma.class.findMany({
@@ -183,6 +183,6 @@ export const exportHistory = async (req: AuthRequest, res: Response) => {
 		res.send("\uFEFF" + csv); // BOM for Excel UTF-8 compatibility
 	} catch (error) {
 		console.error("Export history error:", error);
-		res.status(500).json({ error: "Failed to export history" });
+		res.status(500).json({ success: false, error: "Failed to export history" });
 	}
 };

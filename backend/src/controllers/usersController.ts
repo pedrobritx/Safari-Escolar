@@ -1,6 +1,7 @@
-import { Response } from 'express';
+import { Response } from "express";
 import { AuthRequest } from "../middleware/auth";
 import prisma from "../utils/prisma";
+import { ok, fail } from "../utils/response";
 
 export const getTeachers = async (req: AuthRequest, res: Response) => {
   try {
@@ -13,10 +14,10 @@ export const getTeachers = async (req: AuthRequest, res: Response) => {
       }
     });
 
-    res.json(usersData);
+    ok(res, usersData);
   } catch (error) {
     console.error('Get class error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    fail(res, 'Internal server error', 500);
   }
 };
 
@@ -31,9 +32,9 @@ export const getCoordinators = async (req: AuthRequest, res: Response) => {
       }
 		});
 
-		res.json(usersData);
+		ok(res, usersData);
 	} catch (error) {
 		console.error('Get class error:', error);
-		res.status(500).json({ error: 'Internal server error' });
+		fail(res, 'Internal server error', 500);
 	}
 }

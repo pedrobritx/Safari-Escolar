@@ -1,6 +1,9 @@
 import express from "express";
-import cors from "cors";
+import cors, { CorsOptions } from "cors";
 import dotenv from "dotenv";
+import helmet from "helmet";
+import morgan from "morgan";
+import rateLimit from "express-rate-limit";
 
 import authRoutes from "./routes/authRoutes";
 import classRoutes from "./routes/classRoutes";
@@ -12,15 +15,56 @@ import familyRoutes from "./routes/familyRoutes";
 import exportRoutes from "./routes/exportRoutes";
 import usersRoutes from "./routes/usersRoutes";
 import schoolRoutes from "./routes/schoolRoutes";
+import { notFoundHandler, errorHandler } from "./middleware/errorHandlers";
+import prisma from "./utils/prisma";
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+const validateEnv = () => {
+	const required = ["DATABASE_URL", "JWT_SECRET", "JWT_EXPIRES_IN"];
+	const missing = required.filter((key) => !process.env[key]);
+
+	if (missing.length > 0) {
+		console.error(
+			`❌ Missing required environment variables: ${missing.join(", ")}`,
+		);
+		process.exit(1);
+	}
+};
+
+validateEnv();
+
+const allowedOrigins =
+	process.env.CORS_ORIGINS?.split(",").map((o) => o.trim()) || ["*"];
+
+const corsOptions: CorsOptions = {
+	origin: allowedOrigins.includes("*") ? true : allowedOrigins,
+};
+
+const apiLimiter = rateLimit({
+	windowMs: 15 * 60 * 1000,
+	max: 500,
+	standardHeaders: true,
+	legacyHeaders: false,
+});
+
+const authLimiter = rateLimit({
+	windowMs: 15 * 60 * 1000,
+	max: 50,
+	standardHeaders: true,
+	legacyHeaders: false,
+});
+
 // Middleware
-app.use(cors());
+app.use(helmet());
+app.use(cors(corsOptions));
 app.use(express.json());
+app.use(morgan("combined"));
+app.use("/api/auth", authLimiter);
+app.use("/api", apiLimiter);
 
 // Routes
 app.use("/api/auth", authRoutes);
@@ -44,19 +88,9 @@ app.get("/", (req, res) => {
 	res.json({ message: "Safari Escolar API is running 🚀" });
 });
 
-const validateEnv = () => {
-	const required = ["DATABASE_URL", "JWT_SECRET", "PORT"];
-	const missing = required.filter((key) => !process.env[key]);
-
-	if (missing.length > 0) {
-		console.error(
-			`❌ Missing required environment variables: ${missing.join(", ")}`,
-		);
-		process.exit(1);
-	}
-};
-
-validateEnv();
+// 404 + error handlers
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 const server = app.listen(PORT, () => {
 	console.log(`✅ Server running on port ${PORT}`);
@@ -67,7 +101,10 @@ const shutdown = () => {
 	console.log("🛑 Received kill signal, shutting down gracefully");
 	server.close(() => {
 		console.log("🔒 Closed out remaining connections");
-		process.exit(0);
+		prisma
+			.$disconnect()
+			.catch((e) => console.error("Error disconnecting prisma", e))
+			.finally(() => process.exit(0));
 	});
 };
 

@@ -141,8 +141,8 @@ npx prisma generate
 npm run dev
 ```
 
-- **Health check:** `GET http://localhost:4000/health`
-- **Base da API:** `http://localhost:4000/api`
+- **Health check:** `GET http://localhost:3000/api/health`
+- **Base da API:** `http://localhost:3000/api`
 - As rotas de demonstração utilizam dados em memória (ideal para o MVP).
 
 #### Banco de dados (opcional para MVP)
@@ -198,6 +198,8 @@ O foco do MVP é **demonstração funcional**. Caso o backend não esteja ativo,
 │
 ├── frontend/
 ├── backend/
+├── apps/               # protótipos legados (não usados no fluxo atual)
+├── packages/           # placeholders para libs compartilhadas futuras
 ├── docs/
 │   ├── API.md
 │   ├── ARCH.md

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { fail } from '../utils/response';
 
 export interface AuthRequest extends Request {
   user?: {
@@ -15,7 +16,7 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
     const token = authHeader?.replace('Bearer ', '');
 
     if (!token) {
-      return res.status(401).json({ error: 'No token provided' });
+      return fail(res, 'No token provided', 401);
     }
 
     const jwtSecret = process.env.JWT_SECRET;
@@ -34,18 +35,18 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
     next();
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-    return res.status(401).json({ error: 'Invalid token', details: errorMsg });
+    return fail(res, 'Invalid token', 401, errorMsg);
   }
 };
 
 export const authorize = (...roles: string[]) => {
   return (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.user) {
-      return res.status(401).json({ error: 'Not authenticated' });
+      return fail(res, 'Not authenticated', 401);
     }
 
     if (!roles.includes(req.user.role) && req.user.role !== 'ADMIN') {
-      return res.status(403).json({ error: 'Not authorized' });
+      return fail(res, 'Not authorized', 403);
     }
 
     next();

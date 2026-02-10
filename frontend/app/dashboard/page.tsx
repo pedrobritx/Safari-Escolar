@@ -27,6 +27,7 @@ import { toast } from "sonner";
 import { useDashboard } from "@/hooks/useDashboard";
 import { StudentCard } from "@/components/StudentCard";
 import { ManageClassTeachersModal } from "@/components/ManageClassTeachersModal";
+import { AuthGate } from "@/components/AuthGate";
 
 const DEFAULT_POSITIVE_FEEDBACKS: FeedbackItem[] = [
 	{ id: "task_ok", label: "Tarefa em Dia", icon: "📝", points: 1 },
@@ -122,22 +123,11 @@ export default function DashboardPage() {
 	};
 
 	useEffect(() => {
-		const token = localStorage.getItem("token");
 		const userData = localStorage.getItem("user");
-
-		if (!token || !userData) {
-			router.push("/login");
-			return;
+		if (userData) {
+			setUser(JSON.parse(userData));
 		}
-
-		const parsedUser = JSON.parse(userData);
-		if (parsedUser.role === "FAMILY") {
-			router.push("/family");
-			return;
-		}
-
-		setUser(parsedUser);
-	}, [router]);
+	}, []);
 
 	//Updates class summary when dahboard has any update
 	useEffect(() => {
@@ -374,15 +364,18 @@ export default function DashboardPage() {
 
 	if (loading) {
 		return (
-			<div className="min-h-screen bg-background flex items-center justify-center">
-				<div className="text-xl font-bold text-primary animate-pulse">
-					Carregando Mapa do Safari...
+			<AuthGate allowRoles={["ADMIN", "COORDINATOR", "TEACHER"]}>
+				<div className="min-h-screen bg-background flex items-center justify-center">
+					<div className="text-xl font-bold text-primary animate-pulse">
+						Carregando Mapa do Safari...
+					</div>
 				</div>
-			</div>
+			</AuthGate>
 		);
 	}
 
 	return (
+		<AuthGate allowRoles={["ADMIN", "COORDINATOR", "TEACHER"]}>
 		<div className="min-h-screen bg-background">
 			{/* Header */}
 			{/* 🦁 NEW STICKY HEADER (Skeuo-Glass) */}
@@ -786,5 +779,6 @@ export default function DashboardPage() {
 				onClose={() => setIsManageTeachersModalOpen(false)}
 			/>
 		</div>
+		</AuthGate>
 	);
 }

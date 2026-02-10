@@ -4,6 +4,7 @@ import {
 	FamilyStudent,
 	ClassDataWithTeacher,
 } from "@/lib/types";
+import { withRetry } from "./retry";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
@@ -27,9 +28,12 @@ async function handleResponse<T = any>(
 
 	if (!response.ok) {
 		const errorData = await response.json().catch(() => ({}));
-		throw new Error(
+		const err: any = new Error(
 			errorData.error || `Request failed with status ${response.status}`,
 		);
+		err.status = response.status;
+		err.details = errorData.details;
+		throw err;
 	}
 
 	// Handle 204 No Content
@@ -37,7 +41,11 @@ async function handleResponse<T = any>(
 		return true as unknown as T;
 	}
 
-	return response.json();
+	const json = await response.json();
+	if (json && json.success === true && "data" in json) {
+		return json.data as T;
+	}
+	return json as T;
 }
 
 export const api = {
@@ -66,12 +74,14 @@ export const api = {
 	async getClasses(token: string, date?: string) {
 		const query = date ? `?date=${encodeURIComponent(date)}` : "";
 		return handleResponse(
-			fetch(`${API_URL}/api/classes${query}`, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-				cache: "no-store",
-			}),
+			withRetry(() =>
+				fetch(`${API_URL}/api/classes${query}`, {
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+					cache: "no-store",
+				}),
+			),
 		);
 	},
 
@@ -103,10 +113,12 @@ export const api = {
 	async getDashboard(token: string, date?: string) {
 		const query = date ? `?date=${encodeURIComponent(date)}` : "";
 		return handleResponse<DashboardData[]>(
-			fetch(`${API_URL}/api/dashboard${query}`, {
-				headers: { Authorization: `Bearer ${token}` },
-				cache: "no-store",
-			}),
+			withRetry(() =>
+				fetch(`${API_URL}/api/dashboard${query}`, {
+					headers: { Authorization: `Bearer ${token}` },
+					cache: "no-store",
+				}),
+			),
 		);
 	},
 
@@ -124,9 +136,11 @@ export const api = {
 
 	async getFamilyView(token: string) {
 		return handleResponse<{ students: FamilyStudent[] }>(
-			fetch(`${API_URL}/api/family`, {
-				headers: { Authorization: `Bearer ${token}` },
-			}),
+			withRetry(() =>
+				fetch(`${API_URL}/api/family`, {
+					headers: { Authorization: `Bearer ${token}` },
+				}),
+			),
 		);
 	},
 

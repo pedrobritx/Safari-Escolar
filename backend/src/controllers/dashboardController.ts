@@ -2,6 +2,7 @@ import { Response } from "express";
 import { AuthRequest } from "../middleware/auth";
 import prisma from "../utils/prisma";
 import { getDayRange } from "../utils/dateUtils";
+import { ok, fail } from "../utils/response";
 
 export const getDashboard = async (req: AuthRequest, res: Response) => {
 	try {
@@ -91,10 +92,10 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
 			};
 		});
 
-		res.json(dashboardData);
+		ok(res, dashboardData);
 	} catch (error) {
 		console.error("Get dashboard error:", error);
-		res.status(500).json({ error: "Internal server error" });
+		fail(res, "Internal server error", 500);
 	}
 };
 
@@ -104,7 +105,7 @@ export const resetDay = async (req: AuthRequest, res: Response) => {
 		const { date, classId } = req.query;
 
 		if (!date) {
-			return res.status(400).json({ error: "Date requirement" });
+			return fail(res, "Date requirement", 400);
 		}
 
 		const { start: targetDateStart, end: targetDateEnd } = getDayRange(
@@ -171,6 +172,6 @@ export const resetDay = async (req: AuthRequest, res: Response) => {
 		});
 	} catch (error) {
 		console.error("Reset day error:", error);
-		res.status(500).json({ error: "Internal server error" });
+		fail(res, "Internal server error", 500);
 	}
 };

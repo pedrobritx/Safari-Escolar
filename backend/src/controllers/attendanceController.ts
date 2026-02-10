@@ -1,46 +1,26 @@
 import { Response } from "express";
 import { AuthRequest } from "../middleware/auth";
 import prisma from "../utils/prisma";
-import { parseDateString } from "../utils/dateUtils";
+import { normalizeDateToUTC } from "../utils/dateUtils";
+import { assertClassAccess, assertStudentAccess } from "../utils/authz";
+import { ok, fail } from "../utils/response";
+import { HttpError } from "../utils/errors";
 
 export const markAttendance = async (req: AuthRequest, res: Response) => {
 	try {
 		const { studentId, status, date } = req.body;
-
-		// Enhanced validation
-		if (!studentId || typeof studentId !== "string") {
-			return res.status(400).json({
-				success: false,
-				error: "studentId is required and must be a string",
-			});
-		}
-
-		if (!status) {
-			return res
-				.status(400)
-				.json({ success: false, error: "status is required" });
-		}
-
-		const validStatuses = ["PRESENT", "ABSENT", "LATE", "CLEARED"];
-		if (!validStatuses.includes(status)) {
-			return res.status(400).json({
-				success: false,
-				error: "Invalid status. Must be PRESENT, ABSENT, LATE, or CLEARED",
-			});
-		}
 
 		// Verify student exists before marking attendance
 		const student = await prisma.student.findUnique({
 			where: { id: studentId },
 		});
 		if (!student) {
-			return res
-				.status(404)
-				.json({ success: false, error: "Student not found" });
+			return fail(res, "Student not found", 404);
 		}
 
-		let attendanceDate = date ? parseDateString(date) : new Date();
-		if (!date) attendanceDate.setHours(0, 0, 0, 0);
+		await assertStudentAccess(req.user!, student.id);
+
+		const attendanceDate = normalizeDateToUTC(date);
 
 		if (status === "CLEARED") {
 			await prisma.attendance
@@ -56,7 +36,7 @@ export const markAttendance = async (req: AuthRequest, res: Response) => {
 					// Ignore specific error if record not found, otherwise rethrow
 					if (e.code !== "P2025") throw e;
 				});
-			return res.json({ success: true, message: "Attendance cleared" });
+			return ok(res, { message: "Attendance cleared" });
 		}
 
 		const attendance = await prisma.attendance.upsert({
@@ -76,16 +56,15 @@ export const markAttendance = async (req: AuthRequest, res: Response) => {
 			},
 		});
 
-		res.json({ success: true, data: attendance });
+		ok(res, attendance);
 	} catch (error) {
 		console.error("Mark attendance error:", error);
+		if (error instanceof HttpError) {
+			return fail(res, error.message, error.status, error.details);
+		}
 		const errorMessage =
 			error instanceof Error ? error.message : "Unknown error";
-		res.status(500).json({
-			success: false,
-			error: "Internal server error",
-			details: errorMessage,
-		});
+		fail(res, "Internal server error", 500, errorMessage);
 	}
 };
 
@@ -93,8 +72,9 @@ export const getTodayAttendance = async (req: AuthRequest, res: Response) => {
 	try {
 		const { classId } = req.params;
 
-		const today = new Date();
-		today.setHours(0, 0, 0, 0);
+		await assertClassAccess(req.user!, classId as string);
+
+		const today = normalizeDateToUTC();
 
 		const students = await prisma.student.findMany({
 			where: { classId: classId as string },
@@ -113,9 +93,12 @@ export const getTodayAttendance = async (req: AuthRequest, res: Response) => {
 			animalAvatar: s.animalAvatar,
 		}));
 
-		res.json(studentsWithAttendance);
+		ok(res, studentsWithAttendance);
 	} catch (error) {
 		console.error("Get today attendance error:", error);
-		res.status(500).json({ error: "Internal server error" });
+		if (error instanceof HttpError) {
+			return fail(res, error.message, error.status, error.details);
+		}
+		fail(res, "Internal server error", 500);
 	}
 };

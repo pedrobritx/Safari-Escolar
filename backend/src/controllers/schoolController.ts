@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { AuthRequest } from "../middleware/auth";
 import prisma from "../utils/prisma";
+import { ok, fail } from "../utils/response";
 
 export const getSchools = async (req: AuthRequest, res: Response) => {
 	try {
@@ -18,10 +19,10 @@ export const getSchools = async (req: AuthRequest, res: Response) => {
       }
     });
 
-  	res.json(schoolsData);
+  	ok(res, schoolsData);
   } catch (error) {
   	console.error('Get class error:', error);
-  	res.status(500).json({ error: 'Internal server error' });
+  	fail(res, 'Internal server error', 500);
   }
 
 }
@@ -32,7 +33,7 @@ export const setSchoolCoordinator = async (req: AuthRequest, res: Response) => {
     const { schoolId } = req.params;
 
     if(!schoolId || !coordinatorId) {
-      return res.status(400).json({ error: 'Escola e/ou Id do Coordenador não informado' });
+      return fail(res, 'Escola e/ou Id do Coordenador não informado', 400);
     }
 
     const school = await prisma.school.findUnique({
@@ -40,7 +41,7 @@ export const setSchoolCoordinator = async (req: AuthRequest, res: Response) => {
     });
 
     if(!school) {
-      return res.status(400).json({ error: 'Escola não Encontrada' });
+      return fail(res, 'Escola não Encontrada', 400);
     }
 
     const coordinator = await prisma.user.findUnique({
@@ -51,9 +52,9 @@ export const setSchoolCoordinator = async (req: AuthRequest, res: Response) => {
     })
 
     if(!coordinator) {
-      return res.status(400).json({ error: 'Coordenador não encontrado' });
+      return fail(res, 'Coordenador não encontrado', 400);
     } else if (coordinator.coordinatorSchool){
-      return res.status(400).json({ error: 'Coordenador já vinculado a uma escola' });
+      return fail(res, 'Coordenador já vinculado a uma escola', 400);
     }
 
     const newSchoolCoordinator = await prisma.school.update({
@@ -66,10 +67,10 @@ export const setSchoolCoordinator = async (req: AuthRequest, res: Response) => {
       }
     })
 
-    res.json(newSchoolCoordinator);
+    ok(res, newSchoolCoordinator);
   } catch (error) {
 	console.error('Get class error:', error);
-	res.status(500).json({ error: 'Internal server error' });
+	fail(res, 'Internal server error', 500);
   }
 }
 
@@ -78,7 +79,7 @@ export const createSchool = async (req: AuthRequest, res: Response) => {
     const { name, coordinatorId } = req.body;
 
    if (!name || !coordinatorId) {
-      return res.status(400).json({ error: 'Nome e/ou Id do Coordenador não informados' });
+      return fail(res, 'Nome e/ou Id do Coordenador não informados', 400);
     }
 
     const school = await prisma.school.findFirst({
@@ -86,7 +87,7 @@ export const createSchool = async (req: AuthRequest, res: Response) => {
       });
 
     if(school) {
-      return res.status(400).json({ error: `Escola ${name} já cadastrada` });
+      return fail(res, `Escola ${name} já cadastrada`, 400);
     }
 
     if(coordinatorId) {
@@ -98,11 +99,11 @@ export const createSchool = async (req: AuthRequest, res: Response) => {
       })
 
       if(!coordinator) {
-        return res.status(400).json({ error: 'Coordenador não encontrado' });
+        return fail(res, 'Coordenador não encontrado', 400);
       }
 
       if(coordinator.coordinatorSchool) {
-        return res.status(400).json({ error: 'Coordenador já vinculado em uma escola' });
+        return fail(res, 'Coordenador já vinculado em uma escola', 400);
       }
     }
 
@@ -124,10 +125,10 @@ export const createSchool = async (req: AuthRequest, res: Response) => {
       }
     })
 
-    res.status(201).json(newSchool);
+    ok(res, newSchool, 201);
   } catch (error) {
     console.error('Create class error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    fail(res, 'Internal server error', 500);
   }
 
 }
@@ -137,14 +138,14 @@ export const updateSchool = async (req: AuthRequest, res: Response) => {
     const { name, coordinatorId, id } = req.body;
 
     if(!id)
-      return res.status(400).json({ error: 'Id não informado' });
+      return fail(res, 'Id não informado', 400);
 
     const school = await prisma.school.findUnique({
       where: { id: id as string },
     });
 
     if(!school) {
-      return res.status(400).json({ error: 'Escola não Encontrada' });
+      return fail(res, 'Escola não Encontrada', 400);
     }
 
     if(coordinatorId && coordinatorId !== school.coordinatorId) {
@@ -156,9 +157,9 @@ export const updateSchool = async (req: AuthRequest, res: Response) => {
       })
 
       if(!coordinator) {
-        return res.status(400).json({ error: 'Coordenador não encontrado' });
+        return fail(res, 'Coordenador não encontrado', 400);
       } else if (coordinator.coordinatorSchool){
-        return res.status(400).json({ error: 'Coordenador já vinculado a uma escola' });
+        return fail(res, 'Coordenador já vinculado a uma escola', 400);
       }
     }
 
@@ -170,7 +171,7 @@ export const updateSchool = async (req: AuthRequest, res: Response) => {
       }
     })
 
-    res.status(200).json(updatedSchool)
+    ok(res, updatedSchool)
 
   } catch (error) {
     console.error('Get class error:', error);
@@ -187,20 +188,17 @@ export const deleteSchool = async (req: AuthRequest, res: Response) => {
     });
 
     if(!school) {
-      return res.status(400).json({ error: 'Escola não Encontrada' });
+      return fail(res, 'Escola não Encontrada', 400);
     }
 
     await prisma.school.delete({
       where: {id: school.id}
     })
 
-    res.status(200).json({
-      success: true,
-      message: 'Registro excluído com sucesso'
-    })
+    ok(res, { message: 'Registro excluído com sucesso' })
 
   } catch (error) {
     console.error('Get class error:', error);
-	  res.status(500).json({ error: 'Internal server error' });
+	  fail(res, 'Internal server error', 500);
   }
 }

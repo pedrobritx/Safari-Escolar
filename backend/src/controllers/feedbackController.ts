@@ -1,7 +1,10 @@
 import { Response } from "express";
 import { AuthRequest } from "../middleware/auth";
 import prisma from "../utils/prisma";
-import { parseDateString } from "../utils/dateUtils";
+import { normalizeDateToUTC } from "../utils/dateUtils";
+import { assertStudentAccess } from "../utils/authz";
+import { ok, fail } from "../utils/response";
+import { HttpError } from "../utils/errors";
 
 export const createFeedbackEvent = async (req: AuthRequest, res: Response) => {
 	try {
@@ -15,35 +18,9 @@ export const createFeedbackEvent = async (req: AuthRequest, res: Response) => {
 			});
 		}
 
-		if (!type || (type !== "positive" && type !== "negative")) {
-			return res.status(400).json({
-				success: false,
-				error: 'Type must be "positive" or "negative"',
-			});
-		}
+		await assertStudentAccess(req.user!, studentId);
 
-		if (
-			!description ||
-			typeof description !== "string" ||
-			description.trim().length === 0
-		) {
-			return res.status(400).json({
-				success: false,
-				error: "Description is required and must be non-empty",
-			});
-		}
-
-		// Verify student exists before creating event
-		const student = await prisma.student.findUnique({
-			where: { id: studentId },
-		});
-		if (!student) {
-			return res
-				.status(404)
-				.json({ success: false, error: "Student not found" });
-		}
-
-		const eventDate = date ? parseDateString(date) : undefined;
+		const eventDate = date ? normalizeDateToUTC(date) : normalizeDateToUTC();
 
 		const feedbackEvent = await prisma.feedbackEvent.create({
 			data: {
@@ -57,22 +34,24 @@ export const createFeedbackEvent = async (req: AuthRequest, res: Response) => {
 			},
 		});
 
-		res.status(201).json({
-			success: true,
-			data: feedbackEvent,
-			message: "Feedback event created successfully",
+		ok(res, {
+			...feedbackEvent,
+			type: feedbackEvent.type.toLowerCase(),
 		});
 	} catch (error) {
 		console.error("Create feedback event error:", error);
-		res
-			.status(500)
-			.json({ success: false, error: "Failed to create feedback event" });
+		if (error instanceof HttpError) {
+			return fail(res, error.message, error.status, error.details);
+		}
+		fail(res, "Failed to create feedback event", 500);
 	}
 };
 
 export const getFeedbackEvents = async (req: AuthRequest, res: Response) => {
 	try {
 		const studentId = req.params.studentId as string;
+
+		await assertStudentAccess(req.user!, studentId);
 
 		const feedbackEvents = await prisma.feedbackEvent.findMany({
 			where: { studentId },
@@ -82,10 +61,16 @@ export const getFeedbackEvents = async (req: AuthRequest, res: Response) => {
 			orderBy: { date: "desc" },
 		});
 
-		res.json(feedbackEvents);
+		ok(
+			res,
+			feedbackEvents.map((e) => ({ ...e, type: e.type.toLowerCase() })),
+		);
 	} catch (error) {
 		console.error("Get feedback events error:", error);
-		res.status(500).json({ error: "Failed to fetch feedback events" });
+		if (error instanceof HttpError) {
+			return fail(res, error.message, error.status, error.details);
+		}
+		fail(res, "Failed to fetch feedback events", 500);
 	}
 };
 
@@ -101,12 +86,6 @@ export const deleteFeedbackEvent = async (req: AuthRequest, res: Response) => {
 			userEmail: user?.email,
 		});
 
-		// Validate ID format
-		if (!id || id === "undefined" || id === "null") {
-			console.error("[Delete Feedback] Invalid ID received:", id);
-			return res.status(400).json({ error: `Invalid feedback ID: ${id}` });
-		}
-
 		// Check if feedback exists before deleting
 		const existingFeedback = await prisma.feedbackEvent.findUnique({
 			where: { id },
@@ -121,6 +100,8 @@ export const deleteFeedbackEvent = async (req: AuthRequest, res: Response) => {
 				.status(404)
 				.json({ error: `Feedback not found with ID: ${id}` });
 		}
+
+		await assertStudentAccess(req.user!, existingFeedback.studentId);
 
 		// Perform deletion
 		await prisma.feedbackEvent.delete({
@@ -141,9 +122,10 @@ export const deleteFeedbackEvent = async (req: AuthRequest, res: Response) => {
 			return res.status(404).json({ error: "Feedback not found (P2025)" });
 		}
 
-		res.status(500).json({
-			error: `Failed to delete feedback: ${error.message}`,
-			code: error.code,
-		});
+		if (error instanceof HttpError) {
+			return fail(res, error.message, error.status, error.details);
+		}
+
+		fail(res, `Failed to delete feedback: ${error.message}`, 500, error.code);
 	}
 };

@@ -4,72 +4,50 @@
  */
 
 /**
- * Parse a YYYY-MM-DD date string to a local Date object at midnight.
- * This prevents UTC timezone shifts that can cause incorrect date matching.
+ * Parse a YYYY-MM-DD date string to a UTC Date at midnight.
+ * Falls back to today's date if invalid.
  */
 export function parseDateString(dateStr: string): Date {
 	const parts = dateStr.split("-");
 	if (parts.length !== 3) {
-		const now = new Date();
-		return new Date(
-			now.getFullYear(),
-			now.getMonth(),
-			now.getDate(),
-			0,
-			0,
-			0,
-			0,
-		);
+		return normalizeDateToUTC();
 	}
 
-	const year = parseInt(parts[0]);
-	const month = parseInt(parts[1]) - 1;
-	const day = parseInt(parts[2]);
+	const year = parseInt(parts[0], 10);
+	const month = parseInt(parts[1], 10) - 1;
+	const day = parseInt(parts[2], 10);
 
-	const date = new Date(year, month, day, 0, 0, 0, 0);
+	const date = new Date(Date.UTC(year, month, day, 0, 0, 0, 0));
 
-	// Validate if date is valid
 	if (isNaN(date.getTime())) {
-		const now = new Date();
-		return new Date(
-			now.getFullYear(),
-			now.getMonth(),
-			now.getDate(),
-			0,
-			0,
-			0,
-			0,
-		);
+		return normalizeDateToUTC();
 	}
-
 	return date;
 }
 
 /**
- * Get the start and end of a day for database queries.
- * If no date string is provided, uses current date.
+ * Normalize a given date string or Date to UTC midnight.
  */
-export function getDayRange(dateStr?: string): { start: Date; end: Date } {
-	let targetDate: Date;
-
-	if (dateStr) {
-		targetDate = parseDateString(dateStr);
-	} else {
-		const now = new Date();
-		targetDate = new Date(
-			now.getFullYear(),
-			now.getMonth(),
-			now.getDate(),
-			0,
-			0,
-			0,
-			0,
-		);
+export function normalizeDateToUTC(dateInput?: string | Date): Date {
+	if (dateInput instanceof Date) {
+		return new Date(Date.UTC(dateInput.getUTCFullYear(), dateInput.getUTCMonth(), dateInput.getUTCDate(), 0, 0, 0, 0));
 	}
 
-	const start = new Date(targetDate);
-	const end = new Date(targetDate);
-	end.setHours(23, 59, 59, 999);
+	if (typeof dateInput === "string") {
+		return parseDateString(dateInput);
+	}
 
+	const now = new Date();
+	return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0));
+}
+
+/**
+ * Get the UTC start and end of a day for database queries.
+ * If no date string is provided, uses current date (UTC day).
+ */
+export function getDayRange(dateStr?: string): { start: Date; end: Date } {
+	const start = normalizeDateToUTC(dateStr);
+	const end = new Date(start);
+	end.setUTCHours(23, 59, 59, 999);
 	return { start, end };
 }

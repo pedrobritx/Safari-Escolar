@@ -10,6 +10,7 @@ import { SchoolWithCoordinator, User } from "@/lib/types";
 import { Plus, LayoutGrid, List, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { AuthGate } from "@/components/AuthGate";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -32,24 +33,13 @@ export default function SettingsPage() {
       const token = localStorage.getItem('token');
       const userData = localStorage.getItem('user');
 
-      if (!token || !userData) {
-        router.push('/login');
-        return;
-      }
+      if (token && userData) {
+        const parsedUser = JSON.parse(userData);
+        setUser(parsedUser);
 
-      const parsedUser = JSON.parse(userData);
-      switch (parsedUser.role) {
-        case 'FAMILY':
-          router.push('/family');
-          return
-        case 'COORDINATOR':
-          router.push('/dashboard');
-          return
-      }
-      setUser(parsedUser);
-
-      const schoolList = await api.getSchoolsWithCoordinators(token)
+        const schoolList = await api.getSchoolsWithCoordinators(token)
 	  setSchools(schoolList)
+      }
     }
 
     loadData()
@@ -80,6 +70,7 @@ export default function SettingsPage() {
   };
 
   return (
+    <AuthGate allowRoles={["ADMIN"]}>
     <div className="min-h-screen bg-background">
       <header className="bg-white border-b-2 border-[var(--color-border)]">
         <div className="layout-container py-4">
@@ -192,5 +183,6 @@ export default function SettingsPage() {
         onSave={(createdSchool) => handleCreateOrUpdateSchool(createdSchool)}
       />
     </div>
+    </AuthGate>
   );
 }

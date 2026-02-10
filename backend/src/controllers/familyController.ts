@@ -1,6 +1,7 @@
 import { Response } from "express";
 import { AuthRequest } from "../middleware/auth";
 import prisma from "../utils/prisma";
+import { ok, fail } from "../utils/response";
 
 export const getFamilyView = async (req: AuthRequest, res: Response) => {
 	try {
@@ -39,7 +40,7 @@ export const getFamilyView = async (req: AuthRequest, res: Response) => {
 		});
 
 		if (!family) {
-			return res.status(404).json({ error: "Family not found" });
+			return fail(res, "Family not found", 404);
 		}
 
 		const studentsData = family.students.map((student) => {
@@ -74,16 +75,16 @@ export const getFamilyView = async (req: AuthRequest, res: Response) => {
 				})),
 				recentFeedbackEvents: student.feedbackEvents.map((event) => ({
 					id: event.id,
-					type: event.type,
+					type: event.type.toLowerCase(),
 					description: event.description,
 					date: event.date,
 				})),
 			};
 		});
 
-		res.json({ students: studentsData });
+		ok(res, { students: studentsData });
 	} catch (error) {
 		console.error("Get family view error:", error);
-		res.status(500).json({ error: "Internal server error" });
+		fail(res, "Internal server error", 500);
 	}
 };

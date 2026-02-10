@@ -2,6 +2,8 @@ import { Response } from "express";
 import { AuthRequest } from "../middleware/auth";
 import prisma from "../utils/prisma";
 import { getDayRange } from "../utils/dateUtils";
+import { ok, fail } from "../utils/response";
+import { assertClassAccess } from "../utils/authz";
 
 export const createClass = async (req: AuthRequest, res: Response) => {
 	try {
@@ -9,7 +11,7 @@ export const createClass = async (req: AuthRequest, res: Response) => {
 		const teacherId = req.user!.id;
 
 		if (!name || !schoolId) {
-			return res.status(400).json({ error: "Name and schoolId are required" });
+			return fail(res, "Name and schoolId are required", 400);
 		}
 
 		const newClass = await prisma.class.create({
@@ -26,10 +28,10 @@ export const createClass = async (req: AuthRequest, res: Response) => {
 			},
 		});
 
-		res.status(201).json(newClass);
+		ok(res, newClass, 201);
 	} catch (error) {
 		console.error("Create class error:", error);
-		res.status(500).json({ error: "Internal server error" });
+		fail(res, "Internal server error", 500);
 	}
 };
 
@@ -81,7 +83,7 @@ export const getClasses = async (req: AuthRequest, res: Response) => {
 			});
 
 			if (!school) {
-				return res.status(404).json({ error: "School not found" });
+				return fail(res, "School not found", 404);
 			}
 
 			classes = await prisma.class.findMany({
@@ -94,7 +96,7 @@ export const getClasses = async (req: AuthRequest, res: Response) => {
 				include: includeOptions,
 			});
 		} else {
-			return res.status(403).json({ error: "Not authorized" });
+			return fail(res, "Not authorized", 403);
 		}
 
 		// Process classes to attach 'todayStatus' simplified field for frontend
@@ -120,16 +122,18 @@ export const getClasses = async (req: AuthRequest, res: Response) => {
 			}),
 		}));
 
-		res.json(classesWithStatus);
+		ok(res, classesWithStatus);
 	} catch (error) {
 		console.error("Get classes error:", error);
-		res.status(500).json({ error: "Internal server error" });
+		fail(res, "Internal server error", 500);
 	}
 };
 
 export const getClass = async (req: AuthRequest, res: Response) => {
 	try {
 		const { id } = req.params;
+
+		await assertClassAccess(req.user!, id as string);
 
 		const classData = await prisma.class.findUnique({
 			where: { id: id as string },
@@ -154,13 +158,13 @@ export const getClass = async (req: AuthRequest, res: Response) => {
 		});
 
 		if (!classData) {
-			return res.status(404).json({ error: "Class not found" });
+			return fail(res, "Class not found", 404);
 		}
 
-		res.json(classData);
+		ok(res, classData);
 	} catch (error) {
 		console.error("Get class error:", error);
-		res.status(500).json({ error: "Internal server error" });
+		fail(res, "Internal server error", 500);
 	}
 };
 
@@ -170,10 +174,17 @@ export const updateClassTeacher = async (req: AuthRequest, res: Response) => {
 
 		const classData = await prisma.class.findUnique({
 			where: { id: classId as string },
+			include: { school: true },
 		});
 
 		if (!classData) {
-			return res.status(400).json({ error: "Turma não encontrada" });
+			return fail(res, "Turma não encontrada", 400);
+		}
+
+		if (req.user?.role === "COORDINATOR") {
+			if (classData.school?.coordinatorId !== req.user.id) {
+				return fail(res, "Not authorized to change this class", 403);
+			}
 		}
 
 		const teacherData = await prisma.user.findUnique({
@@ -181,7 +192,7 @@ export const updateClassTeacher = async (req: AuthRequest, res: Response) => {
 		});
 
 		if (!teacherData) {
-			return res.status(400).json({ error: "Professor não encontrado" });
+			return fail(res, "Professor não encontrado", 400);
 		}
 
 		const updatedClass = await prisma.class.update({
@@ -191,9 +202,9 @@ export const updateClassTeacher = async (req: AuthRequest, res: Response) => {
 			},
 		});
 
-		res.json(updatedClass);
+		ok(res, updatedClass);
 	} catch (error) {
 		console.error("Get class error:", error);
-		res.status(500).json({ error: "Internal server error" });
+		fail(res, "Internal server error", 500);
 	}
 };

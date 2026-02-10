@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { FamilyStudent, User } from '@/lib/types';
+import { AuthGate } from '@/components/AuthGate';
 
 export default function FamilyPage() {
   const router = useRouter();
@@ -15,19 +16,10 @@ export default function FamilyPage() {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
 
-    if (!token || !userData) {
-      router.push('/login');
-      return;
+    if (token && userData) {
+      setUser(JSON.parse(userData));
+      loadData(token);
     }
-
-    const parsedUser = JSON.parse(userData);
-    if (parsedUser.role !== 'FAMILY') {
-      router.push('/dashboard');
-      return;
-    }
-
-    setUser(parsedUser);
-    loadData(token);
   }, [router]);
 
   const loadData = async (token: string) => {
@@ -49,13 +41,16 @@ export default function FamilyPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-xl text-gray-600">Carregando...</div>
-      </div>
+      <AuthGate allowRoles={['FAMILY']}>
+        <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+          <div className="text-xl text-gray-600">Carregando...</div>
+        </div>
+      </AuthGate>
     );
   }
 
   return (
+    <AuthGate allowRoles={['FAMILY']}>
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
       <header className="bg-white shadow">
@@ -148,7 +143,7 @@ export default function FamilyPage() {
                         <div className="flex-1">
                           <span
                             className={`text-sm font-medium ${
-                              event.type === 'positive' ? 'text-green-700' : 'text-orange-700'
+                            event.type === 'positive' ? 'text-green-700' : 'text-orange-700'
                             }`}
                           >
                             {event.type === 'positive' ? '✓' : '!'} {event.description}
@@ -176,5 +171,6 @@ export default function FamilyPage() {
         )}
       </main>
     </div>
+    </AuthGate>
   );
 }

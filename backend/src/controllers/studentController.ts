@@ -1,21 +1,37 @@
-import { Response } from 'express';
-import { AuthRequest } from '../middleware/auth';
-import prisma from '../utils/prisma';
-import { Prisma } from '@prisma/client';
+import { Response } from "express";
+import { AuthRequest } from "../middleware/auth";
+import prisma from "../utils/prisma";
+import { Prisma } from "@prisma/client";
+import { assertClassAccess, assertStudentAccess } from "../utils/authz";
+import { ok, fail } from "../utils/response";
+import { HttpError } from "../utils/errors";
 
 const ANIMAL_AVATARS = [
-  'Leão', 'Tigre', 'Elefante', 'Girafa', 'Zebra', 'Macaco',
-  'Urso', 'Lobo', 'Raposa', 'Coelho', 'Panda', 'Koala',
-  'Golfinho', 'Pinguim', 'Águia', 'Coruja', 'Papagaio', 'Flamingo',
+	"Leão",
+	"Tigre",
+	"Elefante",
+	"Girafa",
+	"Zebra",
+	"Macaco",
+	"Urso",
+	"Lobo",
+	"Raposa",
+	"Coelho",
+	"Panda",
+	"Koala",
+	"Golfinho",
+	"Pinguim",
+	"Águia",
+	"Coruja",
+	"Papagaio",
+	"Flamingo",
 ];
 
 export const createStudent = async (req: AuthRequest, res: Response) => {
   try {
     const { name, classId, animalAvatar, avatarColor } = req.body;
 
-    if (!name || !classId) {
-      return res.status(400).json({ error: 'Name and classId are required' });
-    }
+	await assertClassAccess(req.user!, classId);
 
     const avatar = animalAvatar || ANIMAL_AVATARS[Math.floor(Math.random() * ANIMAL_AVATARS.length)];
 
@@ -31,10 +47,13 @@ export const createStudent = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    res.status(201).json(student);
+    ok(res, student, 201);
   } catch (error) {
     console.error('Create student error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+	if (error instanceof HttpError) {
+		return fail(res, error.message, error.status, error.details);
+	}
+    fail(res, 'Internal server error', 500);
   }
 };
 
@@ -45,6 +64,9 @@ export const getStudents = async (req: AuthRequest, res: Response) => {
     const where: Prisma.StudentWhereInput = {};
     if (classId) {
       where.classId = classId as string;
+	  if (req.user?.role !== 'ADMIN') {
+		await assertClassAccess(req.user!, classId as string);
+	  }
     }
 
     const students = await prisma.student.findMany({
@@ -62,10 +84,13 @@ export const getStudents = async (req: AuthRequest, res: Response) => {
       },
     });
 
-    res.json(students);
+    ok(res, students);
   } catch (error) {
     console.error('Get students error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+	if (error instanceof HttpError) {
+		return fail(res, error.message, error.status, error.details);
+	}
+    fail(res, 'Internal server error', 500);
   }
 };
 
@@ -73,6 +98,8 @@ export const updateStudent = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
     const { name, animalAvatar, avatarColor } = req.body;
+
+	await assertStudentAccess(req.user!, id as string);
 
     const data: Prisma.StudentUpdateInput = {};
     if (name) data.name = name;
@@ -87,16 +114,21 @@ export const updateStudent = async (req: AuthRequest, res: Response) => {
       data,
     });
 
-    res.json(student);
+    ok(res, student);
   } catch (error) {
     console.error('Update student error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+	if (error instanceof HttpError) {
+		return fail(res, error.message, error.status, error.details);
+	}
+    fail(res, 'Internal server error', 500);
   }
 };
 
 export const deleteStudent = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
+
+	await assertStudentAccess(req.user!, id as string);
 
     // Use transaction to delete all related data manually to ensure no foreign key constraint errors
     // Cascade delete handling by database
@@ -105,6 +137,9 @@ export const deleteStudent = async (req: AuthRequest, res: Response) => {
     res.status(204).send();
   } catch (error) {
     console.error('Delete student error:', error);
-    res.status(500).json({ error: 'Error deleting student' });
+	if (error instanceof HttpError) {
+		return fail(res, error.message, error.status, error.details);
+	}
+    fail(res, 'Error deleting student', 500);
   }
 };
