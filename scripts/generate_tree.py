@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 import sys
 
 
@@ -44,13 +44,54 @@ def build_tree(root: Path, ignore_names=None):
 
 def write_tree_md(root: Path, out_path: Path):
     lines = build_tree(root)
+    
+    # Gerar o conteúdo novo (sem cabeçalho para comparação)
+    new_tree_content = '\n'.join(['```'] + lines + ['```'])
+
+    # Tentar ler o arquivo existente para comparar
+    if out_path.exists():
+        try:
+            existing_content = out_path.read_text(encoding='utf-8')
+            # Extrair apenas a parte da árvore (entre o primeiro ``` e o segundo ```)
+            # O formato esperado é:
+            # Cabeçalho...
+            # ```
+            # árvore...
+            # ```
+            # Rodapé...
+            
+            parts = existing_content.split('```')
+            if len(parts) >= 3:
+                existing_tree_content = '```' + parts[1] + '```'
+                if existing_tree_content == new_tree_content:
+                    print(f"No changes detected in tree structure. Skipping update for {out_path.name}.")
+                    return
+        except Exception as e:
+            print(f"Warning: Could not read existing file for comparison: {e}")
+
+    # Se chegou aqui, ou o arquivo não existe ou o conteúdo mudou
     header = [
         '# Árvore do repositório — Safari Escolar',
-        f'*Gerado em {datetime.utcnow().strftime("%Y-%m-%d %H:%M:%SZ")} (UTC)*',
+        f'*Gerado em {datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%SZ")} (UTC)*',
         '',
     ]
-    content = '\n'.join(header + ['```'] + lines + ['```', '', 'Este arquivo é gerado automaticamente pelo script `scripts/generate_tree.py` e atualizado pelo workflow `.github/workflows/update-tree.yml`.', '', 'Para atualizar localmente:', '', '```bash', 'python3 scripts/generate_tree.py', '```', ''])
-    out_path.write_text(content, encoding='utf-8')
+    
+    # Rodapé fixo
+    footer = [
+        '',
+        'Este arquivo é gerado automaticamente pelo script `scripts/generate_tree.py` e atualizado pelo workflow `.github/workflows/update-tree.yml`.',
+        '',
+        'Para atualizar localmente:',
+        '',
+        '```bash',
+        'python3 scripts/generate_tree.py',
+        '```',
+        ''
+    ]
+
+    full_content = '\n'.join(header + [new_tree_content] + footer)
+    out_path.write_text(full_content, encoding='utf-8')
+    print(f'Wrote {out_path}')
 
 
 def main():
@@ -58,7 +99,6 @@ def main():
     repo_root = script_path.parents[1]
     out_path = repo_root / 'docs' / 'tree.md'
     write_tree_md(repo_root, out_path)
-    print(f'Wrote {out_path}')
 
 
 if __name__ == '__main__':
