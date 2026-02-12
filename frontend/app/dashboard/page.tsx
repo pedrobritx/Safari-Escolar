@@ -506,10 +506,13 @@ export default function DashboardPage() {
 									<Button
 										variant="ghost"
 										onClick={() => setIsClassWallOpen(true)}
-										className="h-8 w-8 p-0 rounded-full bg-[var(--safari-stone-100)] hover:bg-white hover:text-purple-600 border border-[var(--safari-stone-200)] shadow-[var(--shadow-hardware)] hover:shadow-sm transition-all"
+										className="h-8 md:h-9 px-0 md:px-4 w-8 md:w-auto rounded-full bg-white text-[var(--safari-green)] hover:bg-[var(--safari-green-light)] hover:text-[var(--safari-green-dark)] border border-[var(--safari-green)]/30 shadow-sm hover:shadow transition-all flex items-center justify-center gap-2"
 										title="Mural da Turma"
 									>
-										<MessageCircle size={16} />
+										<MessageCircle size={18} />
+										<span className="hidden md:inline font-bold text-sm">
+											Mural da Turma
+										</span>
 									</Button>
 
 									<div className="flex items-center bg-[var(--safari-stone-100)] rounded-[var(--radius-inner)] p-1 shadow-[var(--shadow-hardware)] border border-[var(--safari-stone-200)]">
