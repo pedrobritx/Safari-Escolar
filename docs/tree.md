@@ -1,5 +1,5 @@
 # Árvore do repositório — Safari Escolar
-*Gerado em 2026-02-12 01:14:26Z (UTC)*
+*Gerado em 2026-02-12 02:14:59Z (UTC)*
 
 ```
 Safari-Escolar/
@@ -41,6 +41,7 @@ Safari-Escolar/
 │   │   └── verify_fix.ts
 │   ├── src/
 │   │   ├── controllers/
+│   │   │   ├── PostController.ts
 │   │   │   ├── attendanceController.ts
 │   │   │   ├── authController.ts
 │   │   │   ├── classController.ts
@@ -63,6 +64,7 @@ Safari-Escolar/
 │   │   │   ├── exportRoutes.ts
 │   │   │   ├── familyRoutes.ts
 │   │   │   ├── feedbackRoutes.ts
+│   │   │   ├── postRoutes.ts
 │   │   │   ├── schoolRoutes.ts
 │   │   │   ├── studentRoutes.ts
 │   │   │   └── usersRoutes.ts
@@ -114,6 +116,7 @@ Safari-Escolar/
 │   │   ├── AuthGate.tsx
 │   │   ├── AuthProvider.tsx
 │   │   ├── Calendar.tsx
+│   │   ├── ClassWallModal.tsx
 │   │   ├── ConfirmDeleteModal.tsx
 │   │   ├── CreateUpdateSchoolModal.tsx
 │   │   ├── EmojiPicker.tsx
@@ -129,7 +132,8 @@ Safari-Escolar/
 │   │       ├── Card.tsx
 │   │       ├── Input.tsx
 │   │       ├── Modal.tsx
-│   │       └── Select.tsx
+│   │       ├── Select.tsx
+│   │       └── Textarea.tsx
 │   ├── eslint.config.mjs
 │   ├── hooks/
 │   │   ├── useDashboard.ts
