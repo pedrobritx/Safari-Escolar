@@ -31,6 +31,8 @@ import { ManageClassTeachersModal } from "@/components/ManageClassTeachersModal"
 
 import { AuthGate } from "@/components/AuthGate";
 import { ClassWallModal } from "@/components/ClassWallModal";
+import RollCallModal from "@/components/RollCallModal";
+import { BulkActionsBar } from "@/components/BulkActionsBar";
 
 const DEFAULT_POSITIVE_FEEDBACKS: FeedbackItem[] = [
 	{ id: "task_ok", label: "Tarefa em Dia", icon: "📝", points: 1 },
@@ -60,6 +62,9 @@ export default function DashboardPage() {
 
 	// Estado do Modal de Mural
 	const [isClassWallOpen, setIsClassWallOpen] = useState(false);
+
+	const [isRollCallOpen, setIsRollCallOpen] = useState(false);
+	const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
 
 	// Custom Hook
 	const {
@@ -174,6 +179,101 @@ export default function DashboardPage() {
 		router.push("/login");
 	};
 
+	// --- BULK SELECTION LOGIC ---
+	const handleToggleSelect = (studentId: string) => {
+		setSelectedStudentIds((prev) =>
+			prev.includes(studentId)
+				? prev.filter((id) => id !== studentId)
+				: [...prev, studentId],
+		);
+	};
+
+	const handleClearSelection = () => {
+		setSelectedStudentIds([]);
+	};
+
+	const handleBulkMarkPresent = async () => {
+		const token = localStorage.getItem("token");
+		if (!token || !selectedClass || selectedStudentIds.length === 0) return;
+
+		try {
+			const formattedDate = formatDateForAPI(selectedDate);
+			const promises = selectedStudentIds.map((id) =>
+				api.markAttendance(token, id, "PRESENT", formattedDate),
+			);
+
+			await Promise.all(promises);
+			toast.success(
+				`${selectedStudentIds.length} alunos marcados como presentes!`,
+			);
+
+			// Optimistically update UI
+			const updatedStudents = selectedClass.students.map((s) =>
+				selectedStudentIds.includes(s.id)
+					? { ...s, todayStatus: "PRESENT" as const }
+					: s,
+			);
+			setSelectedClass({ ...selectedClass, students: updatedStudents });
+
+			refreshData();
+			handleClearSelection();
+		} catch (error) {
+			console.error("Error bulk marking present:", error);
+			toast.error("Erro ao marcar presenças.");
+		}
+	};
+
+	// Wrapper for feedback modal to handle both single and bulk
+	const handleFeedbackSubmit = async (
+		behavior: string,
+		type: "positive" | "negative",
+		comment?: string,
+	) => {
+		const token = localStorage.getItem("token");
+		if (!token) return;
+
+		const formattedDate = formatDateForAPI(selectedDate);
+
+		try {
+			if (selectedStudentIds.length > 0) {
+				// Bulk Feedback
+				const promises = selectedStudentIds.map((studentId) =>
+					api.addFeedbackEvent(
+						token,
+						studentId,
+						type,
+						behavior,
+						formattedDate,
+						comment,
+					),
+				);
+
+				await Promise.all(promises);
+				toast.success(
+					`Feedback registrado para ${selectedStudentIds.length} alunos!`,
+				);
+				handleClearSelection();
+			} else if (currentFeedbackStudent) {
+				// Single Feedback
+				await api.addFeedbackEvent(
+					token,
+					currentFeedbackStudent.id,
+					type,
+					behavior,
+					formattedDate,
+					comment,
+				);
+				toast.success("Feedback registrado!");
+			}
+
+			setFeedbackModalOpen(false);
+			refreshData();
+		} catch (error) {
+			console.error("Error submitting feedback:", error);
+			toast.error("Erro ao registrar feedback.");
+		}
+	};
+
 	const handleMarkAttendance = async (
 		studentId: string,
 		status: "PRESENT" | "ABSENT" | "LATE" | "CLEARED",
@@ -263,39 +363,7 @@ export default function DashboardPage() {
 		setFeedbackModalOpen(true);
 	};
 
-	const handleAddFeedback = async (
-		studentId: string,
-		type: "positive" | "negative",
-		description?: string,
-		comment?: string,
-	) => {
-		const token = localStorage.getItem("token");
-		if (!token) return;
-
-		const finalDescription = description;
-
-		if (!finalDescription) {
-			return;
-		}
-
-		try {
-			const formattedDate = formatDateForAPI(selectedDate);
-			await api.addFeedbackEvent(
-				token,
-				studentId,
-				type,
-				finalDescription,
-				formattedDate,
-				comment,
-			);
-			toast.success("Feedback registrado!");
-			setFeedbackModalOpen(false);
-			refreshData();
-		} catch (error) {
-			console.error("Error adding feedback:", error);
-			toast.error("Erro ao registrar feedback. Tente novamente.");
-		}
-	};
+	// Removed local handleAddFeedback in favor of unified handleFeedbackSubmit
 
 	const handleResetDay = async () => {
 		if (
@@ -384,14 +452,12 @@ export default function DashboardPage() {
 
 	return (
 		<AuthGate allowRoles={["ADMIN", "COORDINATOR", "TEACHER"]}>
-			<div className="min-h-screen bg-background">
-				{/* Header */}
-				{/* 🦁 NEW STICKY HEADER (Skeuo-Glass) */}
+			<div className="min-h-screen bg-background pb-24">
+				{/* Sticky Header */}
 				<header className="sticky top-0 z-50 bg-[var(--surface-glass)] backdrop-blur-[var(--blur-glass)] border-b border-[var(--border-glass)] shadow-[var(--shadow-glass)] transition-all mb-8">
 					<div className="layout-container py-3 space-y-3">
-						{/* Top Row: Brand + Controls */}
+						{/* Top Row */}
 						<div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-							{/* Left: Brand & Class Selector */}
 							<div className="flex items-center gap-4 w-full sm:w-auto">
 								<div className="hidden md:flex items-center gap-2 text-[var(--safari-green)] opacity-80 hover:opacity-100 transition-opacity">
 									<span className="text-xl">🦁</span>
@@ -403,6 +469,7 @@ export default function DashboardPage() {
 										onChange={(val) => {
 											const cls = classes.find((c) => c.id === val);
 											setSelectedClass(cls || null);
+											setIsRollCallOpen(false); // Close roll call on class change
 										}}
 										options={classes.map((cls) => ({
 											value: cls.id,
@@ -414,7 +481,7 @@ export default function DashboardPage() {
 							</div>
 
 							<div className="flex w-full items-center justify-between gap-2 sm:contents">
-								{/* Center: Date Display (Loud) */}
+								{/* Date Display */}
 								<div className="flex flex-col sm:flex-row items-center gap-1 bg-[var(--surface-raised)] rounded-[var(--radius-inner)] px-4 py-1.5 shadow-[var(--shadow-hardware)] border border-[var(--safari-stone-200)] flex-1 sm:flex-none justify-center sm:justify-start min-h-[42px]">
 									<span className="font-bold text-[var(--safari-green)] text-lg whitespace-nowrap leading-none">
 										{selectedDate.toLocaleDateString("pt-BR", {
@@ -422,7 +489,6 @@ export default function DashboardPage() {
 											month: "short",
 										})}
 									</span>
-									{/* Mobile Stats (Compact) */}
 									{currentDashboardData && (
 										<div className="flex sm:hidden gap-2 text-[10px] font-medium opacity-80 mt-1 sm:mt-0">
 											<span className="text-[var(--safari-green)]">
@@ -431,18 +497,21 @@ export default function DashboardPage() {
 											<span className="text-[var(--safari-orange)]">
 												{currentDashboardData.todayLate} A
 											</span>
-											<span className="text-[var(--safari-stone-400)]">
-												{currentDashboardData.totalStudents -
-													currentDashboardData.todayAttendance}{" "}
-												F
-											</span>
 										</div>
 									)}
 								</div>
 
-								{/* Right: Hardware Controls & User */}
+								{/* Controls */}
 								<div className="flex items-center gap-3">
-									{/* Hardware Control Cluster */}
+									<Button
+										variant="ghost"
+										onClick={() => setIsClassWallOpen(true)}
+										className="h-8 w-8 p-0 rounded-full bg-[var(--safari-stone-100)] hover:bg-white hover:text-purple-600 border border-[var(--safari-stone-200)] shadow-[var(--shadow-hardware)] hover:shadow-sm transition-all"
+										title="Mural da Turma"
+									>
+										<MessageCircle size={16} />
+									</Button>
+
 									<div className="flex items-center bg-[var(--safari-stone-100)] rounded-[var(--radius-inner)] p-1 shadow-[var(--shadow-hardware)] border border-[var(--safari-stone-200)]">
 										<Button
 											variant="ghost"
@@ -482,17 +551,6 @@ export default function DashboardPage() {
 
 										<Button
 											variant="ghost"
-											onClick={() => setIsClassWallOpen(true)}
-											className="h-8 w-8 p-0 rounded-full hover:bg-white hover:text-purple-600 hover:shadow-sm"
-											title="Mural da Turma"
-										>
-											<MessageCircle size={16} />
-										</Button>
-
-										<div className="w-[1px] h-4 bg-[var(--safari-stone-300)] mx-1"></div>
-
-										<Button
-											variant="ghost"
 											onClick={handleResetDay}
 											className="h-8 w-8 p-0 rounded-full hover:bg-[var(--safari-orange-light)] hover:text-[var(--safari-orange)]"
 											title="Reiniciar Dia"
@@ -501,7 +559,6 @@ export default function DashboardPage() {
 										</Button>
 									</div>
 
-									{/* User Profile */}
 									<div className="flex items-center gap-3 pl-3 border-l border-[var(--safari-stone-300)]/50">
 										<div className="text-right hidden sm:block">
 											<p className="text-xs font-bold text-[var(--text-primary)] leading-tight">
@@ -525,27 +582,23 @@ export default function DashboardPage() {
 							</div>
 						</div>
 
-						{/* Bottom Row: Attendance Status Strip */}
+						{/* Attendance Status - Keep existing */}
 						{currentDashboardData && (
 							<div className="hidden sm:flex flex-col sm:flex-row items-center gap-4 bg-[var(--surface-raised)]/50 rounded-[var(--radius-outer)] p-2 px-4 border border-[var(--safari-stone-200)]/50">
 								<span className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide min-w-fit hidden sm:inline">
 									Status do Dia:
 								</span>
 
-								{/* Progress Bar */}
 								<div className="flex-1 w-full bg-[var(--safari-stone-200)] h-2.5 rounded-full overflow-hidden shadow-inner relative group">
 									<div
 										className="bg-[var(--safari-green)] h-full transition-all duration-500 rounded-full"
 										style={{ width: `${currentDashboardData.attendanceRate}%` }}
 									></div>
-									{/* Tooltip on hover */}
 									<div className="absolute top-[-24px] left-1/2 -translate-x-1/2 bg-black/80 text-white text-[10px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
 										{currentDashboardData.attendanceRate.toFixed(1)}% Marcados
 									</div>
 								</div>
 
-								{/* Counters */}
-								{/* Counters (Desktop Only) */}
 								<div className="hidden sm:flex items-center gap-4 text-xs font-medium">
 									<div className="flex items-center gap-1.5" title="Presentes">
 										<div className="w-2 h-2 rounded-full bg-[var(--safari-green)]"></div>
@@ -576,11 +629,8 @@ export default function DashboardPage() {
 				</header>
 
 				<main className="layout-container py-8">
-					{/* Seleção de Turma */}
-
-					{/* Cartões do Dashboard e Calendário */}
 					<div className="grid-dashboard mb-8">
-						{/* Cartão de Resumo */}
+						{/* Summary Card - Keep existing */}
 						<div className="lg:col-span-1">
 							{currentDashboardData && (
 								<Card
@@ -646,7 +696,7 @@ export default function DashboardPage() {
 							)}
 						</div>
 
-						{/* Calendário */}
+						{/* Calendar */}
 						<div className="lg:col-span-2">
 							<Calendar
 								selectedDate={selectedDate}
@@ -655,74 +705,78 @@ export default function DashboardPage() {
 						</div>
 					</div>
 
-					{/* Lista de Alunos */}
 					{selectedClass && (
 						<Card>
 							<CardHeader className="bg-[var(--safari-green-light)]/50 border-b border-[var(--safari-stone-200)]">
-								<h2 className="text-xl font-bold text-[var(--safari-green)]">
-									{selectedClass.name} - Exploradores
-								</h2>
-								<div className="flex gap-2">
-									<Button
-										variant="ghost"
-										onClick={handleMarkAllPresent}
-										className="bg-white px-3 py-2 h-[42px] border border-[var(--safari-stone-200)] hover:border-[var(--safari-green)] hover:text-[var(--safari-green)] shadow-[var(--shadow-hardware)] mr-2"
-										title="Marcar Todos Presentes"
-									>
-										<CheckSquare size={18} />
-										<span className="hidden sm:inline">Marcar Todos</span>
-									</Button>
+								<div className="flex flex-col sm:flex-row justify-between items-center w-full gap-4">
+									<h2 className="text-xl font-bold text-[var(--safari-green)]">
+										{selectedClass.name} - Exploradores
+									</h2>
+									<div className="flex flex-wrap items-center justify-end gap-2 w-full sm:w-auto">
+										{/* NEW ROLL CALL BUTTON */}
+										<Button
+											variant="primary"
+											onClick={() => setIsRollCallOpen(true)}
+											className="px-3 py-2 h-[42px] mr-2 shadow-[var(--shadow-hardware)]"
+											title="Iniciar Chamada"
+										>
+											<CheckSquare size={18} className="mr-2" />
+											<span className="hidden sm:inline">Chamada</span>
+										</Button>
 
-									<Button
-										variant="ghost"
-										onClick={() => setIsClassWallOpen(true)}
-										className="bg-white px-3 py-2 h-[42px] border border-[var(--safari-stone-200)] hover:border-[var(--safari-green)] hover:text-[var(--safari-green)] shadow-[var(--shadow-hardware)] mr-2"
-										title="Mural da Turma"
-									>
-										<MessageCircle size={20} />
-										<span className="hidden sm:inline ml-2">Mural</span>
-									</Button>
+										<Button
+											variant="ghost"
+											onClick={handleMarkAllPresent}
+											className="bg-white px-3 py-2 h-[42px] border border-[var(--safari-stone-200)] hover:border-[var(--safari-green)] hover:text-[var(--safari-green)] shadow-[var(--shadow-hardware)] mr-2"
+											title="Marcar Todos Presentes"
+										>
+											<CheckSquare size={18} />
+											<span className="hidden sm:inline ml-2">Todos</span>
+										</Button>
 
-									<Button
-										variant="ghost"
-										onClick={() => {
-											setStudentFormMode("create");
-											setEditingStudentData(null);
-											setStudentFormOpen(true);
-										}}
-										className="bg-white px-3 py-2 h-[42px] border border-[var(--safari-stone-200)] hover:border-[var(--safari-green)] hover:text-[var(--safari-green)] shadow-[var(--shadow-hardware)] mr-2"
-									>
-										<Plus size={20} />
-										Adicionar Aluno
-									</Button>
-									<div className="w-[180px] mr-2">
-										<Select
-											value={sortOption}
-											onChange={(val) => setSortOption(val as any)}
-											options={[
-												{ value: "firstNameAsc", label: "Nome (A-Z)" },
-												{ value: "firstNameDesc", label: "Nome (Z-A)" },
-												{ value: "lastNameAsc", label: "Sobrenome (A-Z)" },
-												{ value: "lastNameDesc", label: "Sobrenome (Z-A)" },
-											]}
-										/>
+										<Button
+											variant="ghost"
+											onClick={() => {
+												setStudentFormMode("create");
+												setEditingStudentData(null);
+												setStudentFormOpen(true);
+											}}
+											className="bg-white px-3 py-2 h-[42px] border border-[var(--safari-stone-200)] hover:border-[var(--safari-green)] hover:text-[var(--safari-green)] shadow-[var(--shadow-hardware)] mr-2"
+										>
+											<Plus size={20} />
+											<span className="hidden sm:inline ml-2">Novo</span>
+										</Button>
+
+										<div className="w-[160px] mr-2">
+											<Select
+												value={sortOption}
+												onChange={(val) => setSortOption(val as any)}
+												options={[
+													{ value: "firstNameAsc", label: "Nome (A-Z)" },
+													{ value: "firstNameDesc", label: "Nome (Z-A)" },
+													{ value: "lastNameAsc", label: "Sobrenome (A-Z)" },
+													{ value: "lastNameDesc", label: "Sobrenome (Z-A)" },
+												]}
+											/>
+										</div>
+
+										<div className="flex border border-[var(--safari-stone-200)] rounded-[var(--radius-inner)] overflow-hidden">
+											<Button
+												variant={viewMode === "grid" ? "primary" : "ghost"}
+												onClick={() => setViewMode("grid")}
+												className={`p-2 h-[42px] w-[42px] flex items-center justify-center rounded-none ${viewMode === "grid" ? "" : "bg-white"}`}
+											>
+												<LayoutGrid size={20} />
+											</Button>
+											<Button
+												variant={viewMode === "list" ? "primary" : "ghost"}
+												onClick={() => setViewMode("list")}
+												className={`p-2 h-[42px] w-[42px] flex items-center justify-center rounded-none ${viewMode === "list" ? "" : "bg-white"}`}
+											>
+												<List size={20} />
+											</Button>
+										</div>
 									</div>
-									<Button
-										variant={viewMode === "grid" ? "primary" : "ghost"}
-										onClick={() => setViewMode("grid")}
-										className="p-2 h-[42px] w-[42px] flex items-center justify-center"
-										title="Visualização em Grade"
-									>
-										<LayoutGrid size={20} />
-									</Button>
-									<Button
-										variant={viewMode === "list" ? "primary" : "ghost"}
-										onClick={() => setViewMode("list")}
-										className="p-2 h-[42px] w-[42px] flex items-center justify-center"
-										title="Visualização em Lista"
-									>
-										<List size={20} />
-									</Button>
 								</div>
 							</CardHeader>
 
@@ -745,6 +799,10 @@ export default function DashboardPage() {
 										}}
 										onAttendanceChange={handleMarkAttendance}
 										onOpenFeedback={openFeedbackModal}
+										// Selection Props
+										isSelectMode={selectedStudentIds.length > 0}
+										isSelected={selectedStudentIds.includes(student.id)}
+										onToggleSelect={handleToggleSelect}
 									/>
 								))}
 							</div>
@@ -756,20 +814,17 @@ export default function DashboardPage() {
 					isOpen={feedbackModalOpen}
 					onClose={() => setFeedbackModalOpen(false)}
 					onSelectFeedback={(behavior, type, comment) => {
-						if (currentFeedbackStudent) {
-							handleAddFeedback(
-								currentFeedbackStudent.id,
-								type,
-								behavior,
-								comment,
-							);
-						}
+						handleFeedbackSubmit(behavior, type, comment);
 					}}
 					onEditFeedback={() => {
 						setFeedbackModalOpen(false);
 						setFeedbackEditorOpen(true);
 					}}
-					studentName={currentFeedbackStudent?.name || ""}
+					studentName={
+						selectedStudentIds.length > 0
+							? `${selectedStudentIds.length} alunos`
+							: currentFeedbackStudent?.name || ""
+					}
 					positiveFeedbacks={positiveFeedbacks}
 					negativeFeedbacks={negativeFeedbacks}
 				/>
@@ -801,27 +856,44 @@ export default function DashboardPage() {
 							setEditingStudentData(null);
 						}}
 						student={editingStudentData}
-						onUpdate={(data: Partial<Student>) => handleUpdateStudent(data)}
+						onUpdate={handleUpdateStudent}
 						onDelete={handleDeleteStudent}
-						onFeedbackChange={refreshData}
 					/>
 				)}
 
 				<ManageClassTeachersModal
-					classId={selectedClass?.id ? selectedClass.id : ""}
 					isOpen={isManageTeachersModalOpen}
 					onClose={() => setIsManageTeachersModalOpen(false)}
+					classId={selectedClass?.id || ""}
 				/>
 
+				<ClassWallModal
+					isOpen={isClassWallOpen}
+					onClose={() => setIsClassWallOpen(false)}
+					classId={selectedClass?.id || ""}
+					className={selectedClass?.name || ""}
+					currentUser={user}
+				/>
+
+				{/* NEW MODALS & COMPONENTS */}
 				{selectedClass && (
-					<ClassWallModal
-						isOpen={isClassWallOpen}
-						onClose={() => setIsClassWallOpen(false)}
-						classId={selectedClass.id}
-						className={selectedClass.name}
-						currentUser={user}
+					<RollCallModal
+						isOpen={isRollCallOpen}
+						onClose={() => setIsRollCallOpen(false)}
+						students={sortStudents(selectedClass.students)}
+						onMarkAttendance={handleMarkAttendance}
 					/>
 				)}
+
+				<BulkActionsBar
+					selectedCount={selectedStudentIds.length}
+					onClearSelection={handleClearSelection}
+					onMarkPresent={handleBulkMarkPresent}
+					onGiveFeedback={() => {
+						// Logic to open feedback modal for bulk
+						setFeedbackModalOpen(true);
+					}}
+				/>
 			</div>
 		</AuthGate>
 	);

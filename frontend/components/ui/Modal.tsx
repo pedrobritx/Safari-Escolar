@@ -9,6 +9,7 @@ interface ModalProps {
 	children: React.ReactNode;
 	maxWidth?: "sm" | "md" | "lg" | "xl" | "2xl";
 	hideCloseButton?: boolean;
+	className?: string;
 	/** @deprecated Use standard modal styling instead */
 	headerColorClass?: string;
 	/** @deprecated Modal borders no longer change by mode */
@@ -22,6 +23,7 @@ export function Modal({
 	children,
 	maxWidth = "md",
 	hideCloseButton = false,
+	className = "",
 	// Deprecated props kept for backward compatibility but ignored
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	headerColorClass,
@@ -59,7 +61,7 @@ export function Modal({
 			onClick={onClose}
 		>
 			<div
-				className={`modal-glass ${maxWidthClass} animate-in zoom-in-95 duration-200`}
+				className={`modal-glass ${maxWidthClass} ${className} animate-in zoom-in-95 duration-200`}
 				onClick={(e) => e.stopPropagation()}
 			>
 				{/* Header */}
