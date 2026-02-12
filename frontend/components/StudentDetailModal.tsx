@@ -139,43 +139,30 @@ export default function StudentDetailModal({
 	if (!isOpen || !student) return null;
 
 	return (
-		<Modal
-			isOpen={isOpen}
-			onClose={onClose}
-			headerColorClass="hidden" // Hiding default header to use Custom Green Header
-			maxWidth="md"
-			hideCloseButton={true}
-		>
+		<Modal isOpen={isOpen} onClose={onClose} title={student.name} maxWidth="md">
 			{/* Content Container with Standard Padding */}
 			<div className="p-6">
-				{/* Custom Header - Safari Green */}
-				<div className="bg-[var(--safari-green)] pt-8 pb-12 px-6 flex flex-col items-center relative shrink-0 -mx-6 -mt-6 rounded-b-[2.5rem] shadow-lg mb-6">
-					<Button
-						variant="accent"
-						onClick={onClose}
-						className="absolute top-5 right-5 p-3 rounded-[var(--radius-inner)] !border-b-4 active:!border-b-0 shadow-lg z-20"
-						aria-label="Fechar"
-					>
-						<X size={26} strokeWidth={3} />
-					</Button>
-
+				{/* Avatar Section */}
+				<div className="flex flex-col items-center mb-6">
 					<div
 						className="relative group cursor-pointer"
 						onClick={() => setShowEmojiPicker(!showEmojiPicker)}
 					>
 						<div
-							className="w-28 h-28 rounded-full border-4 border-white shadow-xl flex items-center justify-center text-6xl bg-white"
+							className="w-24 h-24 rounded-full border-4 border-white shadow-lg flex items-center justify-center text-5xl bg-white"
 							style={{ backgroundColor: avatarColor }}
 						>
 							{getAnimalAvatar(animalAvatar)}
 						</div>
-						<div className="absolute -bottom-3 -right-2 bg-white px-3 py-1 rounded-full shadow-md text-xs font-bold text-[var(--safari-green)]">
+
+						{/* Edit Badge - Adjusted for white background */}
+						<div className="absolute -bottom-2 -right-2 bg-[var(--safari-green)] text-white px-3 py-1 rounded-full shadow-md text-xs font-bold border-2 border-white">
 							Mudar
 						</div>
 					</div>
 
 					{showEmojiPicker && (
-						<div className="absolute top-full z-50 mt-2">
+						<div className="absolute top-40 z-50 mt-2">
 							<EmojiPicker
 								onSelectEmoji={(emoji) => {
 									setAnimalAvatar(emoji);
@@ -187,10 +174,6 @@ export default function StudentDetailModal({
 							/>
 						</div>
 					)}
-
-					<h2 className="text-2xl font-black text-white mt-4 text-center leading-tight tracking-wide drop-shadow-md px-8">
-						{name}
-					</h2>
 				</div>
 
 				{/* Tabs */}
