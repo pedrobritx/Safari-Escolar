@@ -8,13 +8,14 @@ import {
 	Save,
 	X,
 } from "lucide-react";
-import { Student, FeedbackEvent } from "../lib/types";
+import { Student, FeedbackEvent, Post } from "../lib/types";
 import EmojiPicker from "./EmojiPicker";
 import { api } from "../lib/api";
 import { toast } from "sonner";
 import { Modal } from "./ui/Modal";
 import { Button } from "./ui/Button";
 import { Input } from "./ui/Input";
+import { Textarea } from "./ui/Textarea";
 import { getAnimalAvatar } from "@/utils/getAnimalAvatar";
 
 interface StudentDetailModalProps {
@@ -34,11 +35,14 @@ export default function StudentDetailModal({
 	onDelete,
 	onFeedbackChange,
 }: StudentDetailModalProps) {
-	const [activeTab, setActiveTab] = useState<"feedback" | "contact">(
-		"feedback",
+	const [activeTab, setActiveTab] = useState<"timeline" | "contact">(
+		"timeline",
 	);
 	const [feedbacks, setFeedbacks] = useState<FeedbackEvent[]>([]);
-	const [loadingFeedbacks, setLoadingFeedbacks] = useState(false);
+	const [posts, setPosts] = useState<Post[]>([]);
+	const [loadingTimeline, setLoadingTimeline] = useState(false);
+	const [newMessage, setNewMessage] = useState("");
+	const [sendingMessage, setSendingMessage] = useState(false);
 
 	// Contact Form State
 	const [name, setName] = useState("");
@@ -57,22 +61,64 @@ export default function StudentDetailModal({
 			setWhatsapp(student.whatsapp || "");
 			setEmail(student.email || "");
 			setBirthday(student.birthday || "");
-			setActiveTab("feedback"); // Default tab
+			setBirthday(student.birthday || "");
+			setActiveTab("timeline"); // Default tab
 
-			// Fetch Feedbacks
-			fetchFeedbacks(student.id);
+			// Fetch Timeline
+			fetchTimeline(student.id);
 		}
 	}, [isOpen, student]);
 
-	const fetchFeedbacks = async (studentId: string) => {
-		setLoadingFeedbacks(true);
+	const fetchTimeline = async (studentId: string) => {
+		setLoadingTimeline(true);
 		try {
-			const data = await api.get<FeedbackEvent[]>(`/feedback/${studentId}`);
-			setFeedbacks(data);
+			const token = localStorage.getItem("token");
+			if (!token) return;
+
+			const [feedbacksData, postsData] = await Promise.all([
+				api.get<FeedbackEvent[]>(`/feedback/${studentId}`),
+				api.getStudentPosts(token, studentId),
+			]);
+
+			setFeedbacks(feedbacksData);
+			setPosts(postsData);
 		} catch {
-			toast.error("Erro ao carregar histórico de feedback");
+			toast.error("Erro ao carregar histórico");
 		} finally {
-			setLoadingFeedbacks(false);
+			setLoadingTimeline(false);
+		}
+	};
+
+	const handleSendMessage = async (e: React.FormEvent) => {
+		e.preventDefault();
+		if (!newMessage.trim() || !student) return;
+
+		setSendingMessage(true);
+		try {
+			const token = localStorage.getItem("token");
+			if (!token) return;
+
+			const newPost = await api.createPost(token, newMessage, student.id);
+			setPosts([newPost, ...posts]);
+			setNewMessage("");
+			toast.success("Mensagem enviada!");
+		} catch (error) {
+			toast.error("Erro ao enviar mensagem");
+		} finally {
+			setSendingMessage(false);
+		}
+	};
+
+	const handleDeletePost = async (postId: string) => {
+		const token = localStorage.getItem("token");
+		if (!token) return;
+
+		try {
+			await api.deletePost(token, postId);
+			setPosts(posts.filter((p) => p.id !== postId));
+			toast.success("Post removido!");
+		} catch (error) {
+			toast.error("Erro ao remover post");
 		}
 	};
 
@@ -90,17 +136,9 @@ export default function StudentDetailModal({
 	};
 
 	const handleDeleteFeedback = (feedbackId: string) => {
-		toast("Tem certeza que deseja apagar este feedback?", {
-			action: {
-				label: "Apagar",
-				onClick: () => executeDeleteFeedback(feedbackId),
-			},
-			cancel: {
-				label: "Cancelar",
-				onClick: () => {},
-			},
-			duration: 5000,
-		});
+		if (window.confirm("Tem certeza que deseja apagar este feedback?")) {
+			executeDeleteFeedback(feedbackId);
+		}
 	};
 
 	const executeDeleteFeedback = async (feedbackId: string) => {
@@ -179,12 +217,12 @@ export default function StudentDetailModal({
 				{/* Tabs */}
 				<div className="flex gap-4 relative z-10 shrink-0 px-2 mb-4">
 					<button
-						onClick={() => setActiveTab("feedback")}
+						onClick={() => setActiveTab("timeline")}
 						className={`tab ${
-							activeTab === "feedback" ? "tab-neutral" : "tab-inactive"
+							activeTab === "timeline" ? "tab-neutral" : "tab-inactive"
 						}`}
 					>
-						Feedback
+						Diário
 					</button>
 					<button
 						onClick={() => setActiveTab("contact")}
@@ -192,76 +230,177 @@ export default function StudentDetailModal({
 							activeTab === "contact" ? "tab-neutral" : "tab-inactive"
 						}`}
 					>
-						Contato
+						Perfil
 					</button>
 				</div>
 
 				{/* Content Area */}
 				<div className="min-h-[300px]">
-					{activeTab === "feedback" && (
-						<div className="space-y-4">
-							{loadingFeedbacks ? (
+					{activeTab === "timeline" && (
+						<div className="space-y-6">
+							{/* New Message Input */}
+							<form onSubmit={handleSendMessage} className="relative">
+								<Textarea
+									placeholder={`Escrever mensagem para ${student.name}...`}
+									value={newMessage}
+									onChange={(e) => setNewMessage(e.target.value)}
+									className="pr-12 min-h-[80px] resize-none"
+								/>
+								<Button
+									type="submit"
+									variant="primary"
+									disabled={sendingMessage || !newMessage.trim()}
+									className="absolute bottom-3 right-3 h-8 w-8 !p-0 rounded-full"
+								>
+									<MessageSquare size={16} />
+								</Button>
+							</form>
+
+							{/* Timeline */}
+							{loadingTimeline ? (
 								<div className="text-center py-10 text-gray-400">
 									Carregando...
 								</div>
-							) : feedbacks.length === 0 ? (
+							) : feedbacks.length === 0 && posts.length === 0 ? (
 								<div className="text-center py-10 text-gray-400 flex flex-col items-center gap-2">
 									<MessageSquare size={40} className="opacity-20" />
-									<p>Nenhum feedback registrado.</p>
+									<p>Nenhum registro no diário.</p>
 								</div>
 							) : (
-								feedbacks.map((event) => (
-									<div key={event.id} className="list-card">
-										<div className="flex items-center gap-3">
-											<div
-												className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${event.type === "positive" ? "bg-[var(--safari-green-light)]" : "bg-orange-100"}`}
-											>
-												{event.description.includes("Tarefa")
-													? "📝"
-													: event.description.includes("Equipe")
-														? "🧩"
-														: event.description.includes("Ajudando")
-															? "🤝"
-															: event.description.includes("Participando")
-																? "🙋"
-																: event.description.includes("Esforçando")
-																	? "💪"
-																	: "📋"}
-											</div>
-											<div>
-												<h4 className="font-bold text-[var(--text-primary)] leading-tight">
-													{event.description}
-												</h4>
-												<span className="text-xs text-[var(--text-muted)] font-medium">
-													{new Date(event.date).toLocaleDateString("pt-BR", {
-														day: "numeric",
-														month: "short",
-														year: "numeric",
-													})}
-												</span>
-											</div>
-										</div>
-										<div className="flex gap-2 items-center">
-											<div
-												className={`font-black text-white rounded-[var(--radius-inner)] h-9 w-12 flex items-center justify-center ${event.type === "positive" ? "bg-[var(--safari-green)]" : "bg-[var(--safari-orange)]"}`}
-											>
-												{event.type === "positive" ? "+1" : "-1"}
-											</div>
-											<Button
-												variant="accent"
-												onClick={(e) => {
-													e.stopPropagation();
-													e.preventDefault();
-													handleDeleteFeedback(event.id);
-												}}
-												className="!p-0 h-9 w-12"
-												title="Apagar"
-											>
-												<Trash2 size={20} strokeWidth={3} />
-											</Button>
-										</div>
-									</div>
-								))
+								<div className="space-y-4">
+									{[...feedbacks, ...posts]
+										.sort((a, b) => {
+											const dateA = new Date(
+												"createdAt" in a ? a.createdAt : a.date,
+											).getTime();
+											const dateB = new Date(
+												"createdAt" in b ? b.createdAt : b.date,
+											).getTime();
+											return dateB - dateA;
+										})
+										.map((item) => {
+											// Check if it's a FeedbackEvent (has 'type' and 'description')
+											if ("type" in item && "description" in item) {
+												const event = item as FeedbackEvent;
+												// ... render feedback card ...
+												return (
+													<div key={event.id} className="list-card relative">
+														<div className="flex items-start gap-3">
+															<div
+																className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center text-xl ${
+																	event.type === "positive"
+																		? "bg-[var(--safari-green-light)]"
+																		: "bg-orange-100"
+																}`}
+															>
+																{event.description.includes("Tarefa")
+																	? "📝"
+																	: event.description.includes("Equipe")
+																		? "🧩"
+																		: event.description.includes("Ajudando")
+																			? "🤝"
+																			: event.description.includes(
+																						"Participando",
+																				  )
+																				? "🙋"
+																				: event.description.includes(
+																							"Esforçando",
+																					  )
+																					? "💪"
+																					: "📋"}
+															</div>
+															<div className="flex-1">
+																<div className="flex justify-between items-start">
+																	<div>
+																		<h4 className="font-bold text-[var(--text-primary)] leading-tight">
+																			{event.description}
+																		</h4>
+																		<span className="text-xs text-[var(--text-muted)] font-medium block mt-1">
+																			{new Date(event.date).toLocaleDateString(
+																				"pt-BR",
+																				{
+																					day: "numeric",
+																					month: "long",
+																					hour: "2-digit",
+																					minute: "2-digit",
+																				},
+																			)}
+																		</span>
+																	</div>
+																	<div
+																		className={`font-black text-white rounded-[var(--radius-inner)] h-6 px-2 text-xs flex items-center justify-center ${
+																			event.type === "positive"
+																				? "bg-[var(--safari-green)]"
+																				: "bg-[var(--safari-orange)]"
+																		}`}
+																	>
+																		{event.type === "positive" ? "+1" : "-1"}
+																	</div>
+																</div>
+																{event.comment && (
+																	<div className="mt-2 bg-[var(--surface-sunken)] p-2 rounded-lg text-sm text-[var(--text-secondary)]">
+																		&quot;{event.comment}&quot;
+																	</div>
+																)}
+															</div>
+															<Button
+																variant="ghost"
+																onClick={(e: React.MouseEvent) => {
+																	e.stopPropagation();
+																	handleDeleteFeedback(event.id);
+																}}
+																className="text-[var(--text-muted)] hover:text-red-500 !p-1 h-auto"
+															>
+																<Trash2 size={16} />
+															</Button>
+														</div>
+													</div>
+												);
+											} else {
+												// It's a Post
+												const post = item as Post;
+												return (
+													<div
+														key={post.id}
+														className="bg-white border-2 border-[var(--safari-sand-200)] rounded-[var(--radius-outer)] p-4 shadow-sm"
+													>
+														<div className="flex justify-between items-start mb-2">
+															<div className="flex items-center gap-2">
+																<div className="w-8 h-8 rounded-full bg-[var(--safari-blue-light)] flex items-center justify-center text-[var(--safari-blue)] font-bold">
+																	P
+																</div>
+																<div>
+																	<span className="text-sm font-bold block text-[var(--text-primary)]">
+																		Professor(a)
+																	</span>
+																	<span className="text-xs text-[var(--text-muted)]">
+																		{new Date(
+																			post.createdAt,
+																		).toLocaleDateString("pt-BR", {
+																			day: "numeric",
+																			month: "long",
+																			hour: "2-digit",
+																			minute: "2-digit",
+																		})}
+																	</span>
+																</div>
+															</div>
+															<Button
+																variant="ghost"
+																onClick={() => handleDeletePost(post.id)}
+																className="text-[var(--text-muted)] hover:text-red-500 !p-1 h-auto"
+															>
+																<Trash2 size={16} />
+															</Button>
+														</div>
+														<p className="text-[var(--text-primary)]">
+															{post.content}
+														</p>
+													</div>
+												);
+											}
+										})}
+								</div>
 							)}
 						</div>
 					)}

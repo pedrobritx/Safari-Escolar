@@ -39,6 +39,7 @@ model User {
   // Relations based on role
   coordinatorSchool School?      @relation("CoordinatorSchool")
   teacherClasses    Class[]      @relation("TeacherClasses")
+  posts             Post[]
   family            Family?
 }
 
@@ -64,6 +65,7 @@ model Class {
   updatedAt DateTime @updatedAt
 
   students  Student[]
+  posts     Post[]
 }
 
 model Student {
@@ -83,6 +85,7 @@ model Student {
 
   attendances      Attendance[]
   feedbackEvents   FeedbackEvent[]
+  diaryPosts       Post[]
 }
 
 model Family {
@@ -114,6 +117,19 @@ model FeedbackEvent {
   student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
   type        FeedbackEventType
   description String
+  comment     String?  // Optional comment from teacher
   date        DateTime @default(now())
   createdAt   DateTime @default(now())
+}
+
+model Post {
+  id        String   @id @default(uuid())
+  content   String
+  classId   String
+  class     Class    @relation(fields: [classId], references: [id])
+  studentId String?  // Optional: If null, it's a Class Post. If set, it's a Student Diary Post.
+  student   Student? @relation(fields: [studentId], references: [id])
+  teacherId String
+  teacher   User     @relation(fields: [teacherId], references: [id])
+  createdAt DateTime @default(now())
 }

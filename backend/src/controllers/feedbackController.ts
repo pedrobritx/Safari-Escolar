@@ -27,6 +27,7 @@ export const createFeedbackEvent = async (req: AuthRequest, res: Response) => {
 				studentId,
 				type: type.toUpperCase() as any,
 				description: description.trim(),
+				comment: req.body.comment?.trim(),
 				date: eventDate,
 			},
 			include: {

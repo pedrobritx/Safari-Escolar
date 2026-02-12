@@ -15,6 +15,7 @@ import familyRoutes from "./routes/familyRoutes";
 import exportRoutes from "./routes/exportRoutes";
 import usersRoutes from "./routes/usersRoutes";
 import schoolRoutes from "./routes/schoolRoutes";
+import postRoutes from "./routes/postRoutes";
 import { notFoundHandler, errorHandler } from "./middleware/errorHandlers";
 import prisma from "./utils/prisma";
 
@@ -37,8 +38,9 @@ const validateEnv = () => {
 
 validateEnv();
 
-const allowedOrigins =
-	process.env.CORS_ORIGINS?.split(",").map((o) => o.trim()) || ["*"];
+const allowedOrigins = process.env.CORS_ORIGINS?.split(",").map((o) =>
+	o.trim(),
+) || ["*"];
 
 const corsOptions: CorsOptions = {
 	origin: allowedOrigins.includes("*") ? true : allowedOrigins,
@@ -77,6 +79,7 @@ app.use("/api/family", familyRoutes);
 app.use("/api/export", exportRoutes);
 app.use("/api/users", usersRoutes);
 app.use("/api/schools", schoolRoutes);
+app.use("/api/posts", postRoutes);
 
 // Health check
 app.get("/api/health", (req, res) => {

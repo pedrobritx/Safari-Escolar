@@ -6,7 +6,7 @@ import {
 } from "@/lib/types";
 import { withRetry } from "./retry";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 /**
  * Checks response for auth errors and emits session expired event if 401
@@ -168,6 +168,7 @@ export const api = {
 		type: "positive" | "negative",
 		description: string,
 		date?: string,
+		comment?: string,
 	) {
 		return handleResponse(
 			fetch(`${API_URL}/api/feedback`, {
@@ -176,7 +177,7 @@ export const api = {
 					"Content-Type": "application/json",
 					Authorization: `Bearer ${token}`,
 				},
-				body: JSON.stringify({ studentId, type, description, date }),
+				body: JSON.stringify({ studentId, type, description, date, comment }),
 			}),
 		);
 	},
@@ -328,6 +329,56 @@ export const api = {
 			fetch(url, {
 				method: "DELETE",
 				headers: { Authorization: `Bearer ${token}` },
+			}),
+		);
+	},
+
+	// Posts (Class Wall & Student Diary)
+	async createPost(
+		token: string,
+		data: { content: string; classId: string; studentId?: string },
+	) {
+		return handleResponse(
+			fetch(`${API_URL}/api/posts`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+				body: JSON.stringify(data),
+			}),
+		);
+	},
+
+	async getClassPosts(token: string, classId: string) {
+		return handleResponse(
+			fetch(`${API_URL}/api/posts/class/${classId}`, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+				cache: "no-store",
+			}),
+		);
+	},
+
+	async getStudentPosts(token: string, studentId: string) {
+		return handleResponse(
+			fetch(`${API_URL}/api/posts/student/${studentId}`, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+				cache: "no-store",
+			}),
+		);
+	},
+
+	async deletePost(token: string, postId: string) {
+		return handleResponse(
+			fetch(`${API_URL}/api/posts/${postId}`, {
+				method: "DELETE",
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
 			}),
 		);
 	},

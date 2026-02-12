@@ -1,79 +1,97 @@
 export interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: 'ADMIN' | 'COORDINATOR' | 'TEACHER' | 'FAMILY';
+	id: string;
+	email: string;
+	name: string;
+	role: "ADMIN" | "COORDINATOR" | "TEACHER" | "FAMILY";
 }
 
 export interface LoginResponse {
-  token: string;
-  user: User;
+	token: string;
+	user: User;
 }
 
 export interface Class {
-  id: string;
-  name: string;
-  students: Student[];
+	id: string;
+	name: string;
+	students: Student[];
 }
 
 export interface Student {
-  id: string;
-  name: string;
-  animalAvatar: string;
-  avatarColor?: string;
-  whatsapp?: string;
-  email?: string;
-  birthday?: string;
-  attendances?: Attendance[];
-  todayStatus?: 'PRESENT' | 'ABSENT' | 'LATE' | null;
-  todayScore?: number;
-  feedbackEvents?: FeedbackEvent[];
+	id: string;
+	name: string;
+	animalAvatar: string;
+	avatarColor?: string;
+	whatsapp?: string;
+	email?: string;
+	birthday?: string;
+	attendances?: Attendance[];
+	todayStatus?: "PRESENT" | "ABSENT" | "LATE" | null;
+	todayScore?: number;
+	feedbackEvents?: FeedbackEvent[];
 }
 
 export interface School {
-  id: string;
-  name: string;
-  coordinatorId: string;
+	id: string;
+	name: string;
+	coordinatorId: string;
 }
 
 export interface Attendance {
-  id?: string;
-  date: string;
-  status: 'PRESENT' | 'ABSENT' | 'LATE';
+	id?: string;
+	date: string;
+	status: "PRESENT" | "ABSENT" | "LATE";
 }
 
 export interface FeedbackEvent {
-  id: string;
-  type: 'positive' | 'negative';
-  description: string;
-  date: string;
+	id: string;
+	type: "positive" | "negative";
+	description: string;
+	comment?: string;
+	date: string;
+}
+
+export interface Post {
+	id: string;
+	content: string;
+	classId: string;
+	studentId?: string | null;
+	teacherId: string;
+	teacher: {
+		id: string;
+		name: string;
+	};
+	student?: {
+		id: string;
+		name: string;
+	};
+	createdAt: string;
 }
 
 export interface DashboardData {
-  classId: string;
-  className: string;
-  totalStudents: number;
-  todayAttendance: number;
-  todayLate: number;
-  attendanceRate: number;
-  todayPositiveEvents: number;
-  todayNegativeEvents: number;
+	classId: string;
+	className: string;
+	totalStudents: number;
+	todayAttendance: number;
+	todayLate: number;
+	attendanceRate: number;
+	todayPositiveEvents: number;
+	todayNegativeEvents: number;
 }
 
 export interface FamilyStudent {
-  id: string;
-  name: string;
-  animalAvatar: string;
-  className: string;
-  teacherName: string;
-  attendanceRate: number;
-  positiveEvents: number;
-  negativeEvents: number;
-  recentAttendances: Attendance[];
-  recentFeedbackEvents: FeedbackEvent[];
+	id: string;
+	name: string;
+	animalAvatar: string;
+	className: string;
+	teacherName: string;
+	attendanceRate: number;
+	positiveEvents: number;
+	negativeEvents: number;
+	recentAttendances: Attendance[];
+	recentFeedbackEvents: FeedbackEvent[];
 }
 
-export type UserRole = Omit<User, 'role'>
+export type UserRole = Omit<User, "role">;
 
 export interface ClassDataWithTeacher {
 	id: string;
@@ -82,9 +100,9 @@ export interface ClassDataWithTeacher {
 	teacherId: string;
 	school: School;
 	teacher: UserRole;
-  students: Student[];
+	students: Student[];
 }
 
 export interface SchoolWithCoordinator extends School {
-	coordinator: UserRole
+	coordinator: UserRole;
 }
