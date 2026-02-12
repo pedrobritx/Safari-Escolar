@@ -506,7 +506,7 @@ export default function DashboardPage() {
 									<Button
 										variant="ghost"
 										onClick={() => setIsClassWallOpen(true)}
-										className="h-8 md:h-9 px-0 md:px-4 w-8 md:w-auto rounded-full bg-white text-[var(--safari-green)] hover:bg-[var(--safari-green-light)] hover:text-[var(--safari-green-dark)] border border-[var(--safari-green)]/30 shadow-sm hover:shadow transition-all flex items-center justify-center gap-2"
+										className="h-[42px] px-0 md:px-4 w-[42px] md:w-auto rounded-full bg-white text-[var(--safari-green)] hover:bg-[var(--safari-green-light)] hover:text-[var(--safari-green-dark)] border border-[var(--safari-green)]/30 shadow-sm hover:shadow transition-all flex items-center justify-center gap-2"
 										title="Mural da Turma"
 									>
 										<MessageCircle size={18} />
@@ -515,10 +515,10 @@ export default function DashboardPage() {
 										</span>
 									</Button>
 
-									<div className="flex items-center bg-[var(--safari-stone-100)] rounded-[var(--radius-inner)] p-1 shadow-[var(--shadow-hardware)] border border-[var(--safari-stone-200)]">
+									<div className="flex items-center bg-[var(--safari-stone-100)] rounded-[var(--radius-inner)] p-1 h-[42px] shadow-[var(--shadow-hardware)] border border-[var(--safari-stone-200)]">
 										<Button
 											variant="ghost"
-											className="h-8 w-8 p-0 rounded-full hover:bg-white hover:text-[var(--safari-green)] hover:shadow-sm"
+											className="h-[34px] w-[34px] p-0 rounded-full hover:bg-white hover:text-[var(--safari-green)] hover:shadow-sm"
 											title="Exportar CSV"
 											onClick={async () => {
 												const token = localStorage.getItem("token");
@@ -543,7 +543,7 @@ export default function DashboardPage() {
 													<Button
 														variant="ghost"
 														onClick={() => setIsManageTeachersModalOpen(true)}
-														className="h-8 w-8 p-0 rounded-full hover:bg-white hover:text-[var(--text-primary)] hover:shadow-sm"
+														className="h-[34px] w-[34px] p-0 rounded-full hover:bg-white hover:text-[var(--text-primary)] hover:shadow-sm"
 														title="Professores"
 													>
 														<GraduationCap size={16} />
@@ -555,7 +555,7 @@ export default function DashboardPage() {
 										<Button
 											variant="ghost"
 											onClick={handleResetDay}
-											className="h-8 w-8 p-0 rounded-full hover:bg-[var(--safari-orange-light)] hover:text-[var(--safari-orange)]"
+											className="h-[34px] w-[34px] p-0 rounded-full hover:bg-[var(--safari-orange-light)] hover:text-[var(--safari-orange)]"
 											title="Reiniciar Dia"
 										>
 											<Trash size={16} />
@@ -574,9 +574,9 @@ export default function DashboardPage() {
 										<Button
 											onClick={handleLogout}
 											variant="ghost"
-											className="h-8 w-8 p-0"
+											className="h-[42px] w-[42px] p-0"
 										>
-											<div className="w-8 h-8 rounded-full bg-[var(--safari-stone-200)] flex items-center justify-center border border-[var(--safari-stone-300)] hover:border-[var(--safari-orange)] transition-colors">
+											<div className="w-[34px] h-[34px] rounded-full bg-[var(--safari-stone-200)] flex items-center justify-center border border-[var(--safari-stone-300)] hover:border-[var(--safari-orange)] transition-colors">
 												<span className="text-xs">🚪</span>
 											</div>
 										</Button>
@@ -861,6 +861,7 @@ export default function DashboardPage() {
 						student={editingStudentData}
 						onUpdate={handleUpdateStudent}
 						onDelete={handleDeleteStudent}
+						classId={selectedClass?.id || ""}
 					/>
 				)}
 

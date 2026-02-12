@@ -25,6 +25,7 @@ interface StudentDetailModalProps {
 	onUpdate: (data: Partial<Student>) => void;
 	onDelete?: () => void;
 	onFeedbackChange?: () => void; // New callback for sync
+	classId: string;
 }
 
 export default function StudentDetailModal({
@@ -34,6 +35,7 @@ export default function StudentDetailModal({
 	onUpdate,
 	onDelete,
 	onFeedbackChange,
+	classId,
 }: StudentDetailModalProps) {
 	const [activeTab, setActiveTab] = useState<"timeline" | "contact">(
 		"timeline",
@@ -91,14 +93,18 @@ export default function StudentDetailModal({
 
 	const handleSendMessage = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (!newMessage.trim() || !student) return;
+		if (!newMessage.trim() || !student || !classId) return;
 
 		setSendingMessage(true);
 		try {
 			const token = localStorage.getItem("token");
 			if (!token) return;
 
-			const newPost = await api.createPost(token, newMessage, student.id);
+			const newPost = await api.createPost(token, {
+				content: newMessage,
+				classId,
+				studentId: student.id,
+			});
 			setPosts([newPost, ...posts]);
 			setNewMessage("");
 			toast.success("Mensagem enviada!");
