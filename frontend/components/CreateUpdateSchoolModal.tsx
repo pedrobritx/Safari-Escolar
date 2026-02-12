@@ -26,11 +26,11 @@ export function CreateUpdateSchoolModal({isOpen, onClose, mode, school, onSave}:
       const token = localStorage.getItem('token');
 
       if (!token) return;
-      
+
       const coordinators = await api.getCoordinators(token)
       setCoordinators(coordinators)
     }
-    
+
     loadData()
   },[])
 
@@ -46,7 +46,7 @@ export function CreateUpdateSchoolModal({isOpen, onClose, mode, school, onSave}:
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const token = localStorage.getItem('token');
 
     if (!token) return;

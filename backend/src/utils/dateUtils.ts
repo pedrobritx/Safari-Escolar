@@ -1,12 +1,4 @@
-/**
- * Date utilities for Safari Escolar backend
- * Centralizes date parsing logic to prevent timezone issues and code duplication
- */
 
-/**
- * Parse a YYYY-MM-DD date string to a UTC Date at midnight.
- * Falls back to today's date if invalid.
- */
 export function parseDateString(dateStr: string): Date {
 	const parts = dateStr.split("-");
 	if (parts.length !== 3) {
@@ -25,9 +17,6 @@ export function parseDateString(dateStr: string): Date {
 	return date;
 }
 
-/**
- * Normalize a given date string or Date to UTC midnight.
- */
 export function normalizeDateToUTC(dateInput?: string | Date): Date {
 	if (dateInput instanceof Date) {
 		return new Date(Date.UTC(dateInput.getUTCFullYear(), dateInput.getUTCMonth(), dateInput.getUTCDate(), 0, 0, 0, 0));
@@ -41,10 +30,6 @@ export function normalizeDateToUTC(dateInput?: string | Date): Date {
 	return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0));
 }
 
-/**
- * Get the UTC start and end of a day for database queries.
- * If no date string is provided, uses current date (UTC day).
- */
 export function getDayRange(dateStr?: string): { start: Date; end: Date } {
 	const start = normalizeDateToUTC(dateStr);
 	const end = new Date(start);

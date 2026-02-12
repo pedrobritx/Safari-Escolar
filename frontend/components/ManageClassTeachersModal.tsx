@@ -89,7 +89,6 @@ export function ManageClassTeachersModal({
 					)}
 				</ul>
 
-				{/* Adicionar professor */}
 				<div className="mb-8">
 					<h3 className="mb-2 text-sm font-bold text-[var(--safari-green)]">
 						Novo Professor
@@ -105,7 +104,6 @@ export function ManageClassTeachersModal({
 					/>
 				</div>
 
-				{/* Ações */}
 				<div className="flex justify-end gap-3 pt-2 border-t border-[var(--safari-stone-200)]">
 					<Button variant="ghost" onClick={onClose}>
 						Cancelar

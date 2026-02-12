@@ -10,7 +10,6 @@ export const markAttendance = async (req: AuthRequest, res: Response) => {
 	try {
 		const { studentId, status, date } = req.body;
 
-		// Verify student exists before marking attendance
 		const student = await prisma.student.findUnique({
 			where: { id: studentId },
 		});
@@ -33,7 +32,7 @@ export const markAttendance = async (req: AuthRequest, res: Response) => {
 					},
 				})
 				.catch((e) => {
-					// Ignore specific error if record not found, otherwise rethrow
+
 					if (e.code !== "P2025") throw e;
 				});
 			return ok(res, { message: "Attendance cleared" });
@@ -86,7 +85,6 @@ export const getTodayAttendance = async (req: AuthRequest, res: Response) => {
 			},
 		});
 
-		// Validating types with current schema
 		const studentsWithAttendance = students.map((s) => ({
 			...s,
 			todayStatus: s.attendances[0]?.status || null,

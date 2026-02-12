@@ -125,7 +125,7 @@ export default function SettingsPage() {
                 <Plus size={20} />
                 Adicionar Escola
               </Button>
-              <Button 
+              <Button
                 variant={viewMode === 'grid' ? 'primary' : 'ghost'}
                 onClick={() => setViewMode('grid')}
                 className="p-2"
@@ -133,7 +133,7 @@ export default function SettingsPage() {
               >
               <LayoutGrid size={20} />
               </Button>
-              <Button 
+              <Button
                 variant={viewMode === 'list' ? 'primary' : 'ghost'}
                 onClick={() => setViewMode('list')}
                 className="p-2"

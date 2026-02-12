@@ -10,19 +10,19 @@ export default function Error({
 	reset: () => void;
 }) {
 	useEffect(() => {
-		// Log the error to an error reporting service
+
 		console.error(error);
 	}, [error]);
 
 	return (
-		// 1. Background uses default body background (Khaki Base)
+
 		<div className="flex h-screen w-full flex-col items-center justify-center p-4">
-			{/* 2. Card container using .card (Base Flat Surface) */}
+
 			<div className="card w-full max-w-md text-center">
-				{/* Icon Container */}
+
 				<div className="mx-auto mt-6 mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[var(--safari-orange-light)]">
 					<svg
-						className="h-8 w-8 text-[var(--safari-orange)]" /* Use Orange for errors */
+						className="h-8 w-8 text-[var(--safari-orange)]"
 						fill="none"
 						viewBox="0 0 24 24"
 						strokeWidth="1.5"
@@ -49,13 +49,13 @@ export default function Error({
 					<div className="flex justify-center gap-3">
 						<button
 							onClick={() => window.location.reload()}
-							className="btn btn-ghost" /* Use Ghost Button */
+							className="btn btn-ghost"
 						>
 							Recarregar Página
 						</button>
 						<button
 							onClick={() => reset()}
-							className="btn btn-accent" /* Use Accent (Orange) for retry/attention */
+							className="btn btn-accent"
 						>
 							Tentar Novamente
 						</button>

@@ -8,7 +8,7 @@ import {
 interface CalendarProps {
 	selectedDate: Date;
 	onDateChange: (date: Date) => void;
-	// Future: dayStatuses?: { [date: string]: 'complete' | 'partial' | 'empty' }
+
 }
 
 const Calendar: React.FC<CalendarProps> = ({ selectedDate, onDateChange }) => {
@@ -75,9 +75,8 @@ const Calendar: React.FC<CalendarProps> = ({ selectedDate, onDateChange }) => {
 		onDateChange(today);
 	};
 
-	// Mock data generator for visual verification (Since backend doesn't provide this yet)
 	const getDayStatus = (day: number) => {
-		// Mock logic: Weekends empty, some random days complete/partial
+
 		const date = new Date(
 			currentMonth.getFullYear(),
 			currentMonth.getMonth(),
@@ -86,21 +85,18 @@ const Calendar: React.FC<CalendarProps> = ({ selectedDate, onDateChange }) => {
 		const dayOfWeek = date.getDay();
 		if (dayOfWeek === 0 || dayOfWeek === 6) return "empty";
 
-		// Deterministic randomish based on day
 		if (day % 4 === 0) return "partial";
-		if (day % 3 === 0) return "missing"; // Gray/No data
+		if (day % 3 === 0) return "missing";
 		return "complete";
 	};
 
 	const renderDays = () => {
 		const days = [];
 
-		// Células vazias para dias antes do início do mês
 		for (let i = 0; i < firstDayOfMonth; i++) {
 			days.push(<div key={`empty-${i}`} className="h-10 md:h-12"></div>);
 		}
 
-		// Dias do mês
 		for (let i = 1; i <= daysInMonth; i++) {
 			const dateToCheck = new Date(
 				currentMonth.getFullYear(),
@@ -126,7 +122,6 @@ const Calendar: React.FC<CalendarProps> = ({ selectedDate, onDateChange }) => {
 				>
 					<span>{i}</span>
 
-					{/* Status Dot */}
 					<div className="flex gap-0.5 mt-1">
 						{!isSelected && status === "complete" && (
 							<div className="w-1.5 h-1.5 rounded-full bg-[var(--safari-green)]/60"></div>

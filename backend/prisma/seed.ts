@@ -21,7 +21,6 @@ const ANIMAL_AVATARS = [
 async function main() {
 	console.log("Starting seed...");
 
-	// Clear existing data
 	await prisma.feedbackEvent.deleteMany();
 	await prisma.attendance.deleteMany();
 	await prisma.student.deleteMany();
@@ -32,7 +31,6 @@ async function main() {
 
 	const hashedPassword = await bcrypt.hash("password123", 10);
 
-	// 1. Create Admin
 	await prisma.user.create({
 		data: {
 			email: "admin@safariescolar.com",
@@ -43,7 +41,6 @@ async function main() {
 	});
 	console.log("Created admin");
 
-	// 2. Create Coordinator
 	const coordinator = await prisma.user.create({
 		data: {
 			email: "coordenador@escola.com",
@@ -54,7 +51,6 @@ async function main() {
 	});
 	console.log("Created coordinator");
 
-	// 3. Create School
 	const school = await prisma.school.create({
 		data: {
 			name: "Escola Municipal Safari",
@@ -63,7 +59,6 @@ async function main() {
 	});
 	console.log("Created school");
 
-	// 4. Create 2 Teachers
 	const teacher1 = await prisma.user.create({
 		data: {
 			email: "joao.professor@escola.com",
@@ -83,7 +78,6 @@ async function main() {
 	});
 	console.log("Created 2 teachers");
 
-	// 5. Create 2 Classes
 	const class1 = await prisma.class.create({
 		data: {
 			name: "Turma A - 1º Ano",
@@ -101,7 +95,6 @@ async function main() {
 	});
 	console.log("Created 2 classes");
 
-	// 6. Create 4 Families
 	const family1User = await prisma.user.create({
 		data: {
 			email: "familia.silva@email.com",
@@ -151,9 +144,8 @@ async function main() {
 	});
 	console.log("Created 4 families");
 
-	// 7. Create 12 Students (6 per class)
 	const students = [
-		// Class 1 students
+
 		{
 			name: "Pedro Silva",
 			animalAvatar: ANIMAL_AVATARS[0],
@@ -190,7 +182,7 @@ async function main() {
 			classId: class1.id,
 			familyId: family3.id,
 		},
-		// Class 2 students
+
 		{
 			name: "Rafael Costa",
 			animalAvatar: ANIMAL_AVATARS[6],
@@ -236,7 +228,6 @@ async function main() {
 	}
 	console.log("Created 12 students");
 
-	// 8. Create some sample attendance for today
 	const today = new Date();
 	today.setHours(0, 0, 0, 0);
 
@@ -245,13 +236,12 @@ async function main() {
 			data: {
 				studentId: createdStudents[i].id,
 				date: today,
-				status: i % 3 === 0 ? "ABSENT" : i % 3 === 1 ? "LATE" : "PRESENT", // Mix of status
+				status: i % 3 === 0 ? "ABSENT" : i % 3 === 1 ? "LATE" : "PRESENT",
 			},
 		});
 	}
 	console.log("Created sample attendance");
 
-	// 9. Create some sample behavior events
 	await prisma.feedbackEvent.create({
 		data: {
 			studentId: createdStudents[0].id,

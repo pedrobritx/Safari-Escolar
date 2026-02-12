@@ -8,9 +8,6 @@ import { withRetry } from "./retry";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
-/**
- * Checks response for auth errors and emits session expired event if 401
- */
 function handleAuthResponse(response: Response): Response {
 	if (response.status === 401) {
 		authEvents.emitSessionExpired();
@@ -18,9 +15,6 @@ function handleAuthResponse(response: Response): Response {
 	return response;
 }
 
-/**
- * Helper to handle API responses and throw errors if not OK
- */
 async function handleResponse<T = any>(
 	responsePromise: Promise<Response>,
 ): Promise<T> {
@@ -36,7 +30,6 @@ async function handleResponse<T = any>(
 		throw err;
 	}
 
-	// Handle 204 No Content
 	if (response.status === 204) {
 		return true as unknown as T;
 	}
@@ -333,7 +326,6 @@ export const api = {
 		);
 	},
 
-	// Posts (Class Wall & Student Diary)
 	async createPost(
 		token: string,
 		data: { content: string; classId: string; studentId?: string },

@@ -10,7 +10,6 @@ export const createFeedbackEvent = async (req: AuthRequest, res: Response) => {
 	try {
 		const { studentId, type, description, date } = req.body;
 
-		// Enhanced validation
 		if (!studentId || typeof studentId !== "string") {
 			return res.status(400).json({
 				success: false,
@@ -87,7 +86,6 @@ export const deleteFeedbackEvent = async (req: AuthRequest, res: Response) => {
 			userEmail: user?.email,
 		});
 
-		// Check if feedback exists before deleting
 		const existingFeedback = await prisma.feedbackEvent.findUnique({
 			where: { id },
 			include: { student: true },
@@ -104,7 +102,6 @@ export const deleteFeedbackEvent = async (req: AuthRequest, res: Response) => {
 
 		await assertStudentAccess(req.user!, existingFeedback.studentId);
 
-		// Perform deletion
 		await prisma.feedbackEvent.delete({
 			where: { id },
 		});

@@ -18,7 +18,7 @@ export const SchoolCard: React.FC<SchoolCardProps> = ({
 		<div
 			className={
 				viewMode === "list"
-					? "list-card" /* Use .list-card class for consistency */
+					? "list-card"
 					: `card-interactive p-4 flex flex-col items-center text-center relative group`
 			}
 		>

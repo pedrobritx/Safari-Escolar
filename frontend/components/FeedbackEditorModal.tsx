@@ -78,7 +78,6 @@ export default function FeedbackEditorModal({
 	const [editScore, setEditScore] = useState(1);
 	const [isCreating, setIsCreating] = useState(false);
 
-	// Helper to safely manipulate behaviors
 	const currentList =
 		activeTab === "positive" ? positiveFeedbacks : negativeFeedbacks;
 
@@ -144,10 +143,10 @@ export default function FeedbackEditorModal({
 			title="Editar Feedback"
 			maxWidth="lg"
 		>
-			{/* Navigation & Tabs */}
+
 			<div className="p-2 bg-[var(--surface-raised)]">
 				<div className="segmented-control">
-					{/* Back Button */}
+
 					<button
 						onClick={() => {
 							if (editingId) {
@@ -163,7 +162,6 @@ export default function FeedbackEditorModal({
 						<ArrowLeft size={20} strokeWidth={2.5} />
 					</button>
 
-					{/* Tabs */}
 					<button
 						onClick={() => {
 							setActiveTab("positive");
@@ -191,10 +189,9 @@ export default function FeedbackEditorModal({
 				</div>
 			</div>
 
-			{/* Content */}
 			<div className="modal-body">
 				{!editingId ? (
-					/* LIST MODE */
+
 					<>
 						<div className="space-y-3 mb-6">
 							{currentList.map((item) => (
@@ -260,7 +257,7 @@ export default function FeedbackEditorModal({
 						)}
 					</>
 				) : (
-					/* FORM MODE (In-Place) */
+
 					<div className="animate-in fade-in slide-in-from-right-4 duration-200">
 						<div className="bg-white p-6 rounded-[var(--radius-outer)] shadow-sm border border-[var(--safari-stone-200)]">
 							<h4 className="font-black text-[var(--text-primary)] mb-6 uppercase tracking-wide text-center border-b border-[var(--safari-stone-200)] pb-2">
@@ -268,7 +265,7 @@ export default function FeedbackEditorModal({
 							</h4>
 
 							<div className="flex flex-col gap-6">
-								{/* Icon Grid */}
+
 								<div>
 									<label className="block text-xs font-bold text-gray-400 mb-2 uppercase">
 										Ícone
@@ -286,7 +283,6 @@ export default function FeedbackEditorModal({
 									</div>
 								</div>
 
-								{/* Inputs */}
 								<div className="space-y-4">
 									<Input
 										label="Nome"
@@ -326,7 +322,6 @@ export default function FeedbackEditorModal({
 									</div>
 								</div>
 
-								{/* Actions */}
 								<div className="flex gap-3 pt-4 border-t mt-2">
 									<Button
 										variant="ghost"

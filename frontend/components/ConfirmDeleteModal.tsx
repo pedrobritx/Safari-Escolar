@@ -37,18 +37,16 @@ export function ConfirmDeleteModal({
     }
 	}
 
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Overlay */}
+
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
       />
 
-      {/* Modal */}
       <div className="relative bg-white rounded-xl shadow-xl w-full max-w-md p-6 animate-scaleIn">
-        {/* Header */}
+
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-800">
             Confirmar Exclusão
@@ -61,7 +59,6 @@ export function ConfirmDeleteModal({
           </button>
         </div>
 
-        {/* Conteúdo */}
         <div className="text-sm text-gray-600 mb-6">
           Tem certeza que deseja excluir{" "}
           <span className="font-semibold text-gray-900">
@@ -74,7 +71,6 @@ export function ConfirmDeleteModal({
           </span>
         </div>
 
-        {/* Ações */}
         <div className="flex justify-end gap-3">
           <Button
             variant="ghost"

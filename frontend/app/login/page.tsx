@@ -21,13 +21,11 @@ export default function LoginPage() {
 		try {
 			const data = await api.login(email, password);
 
-			// Store in localStorage
 			localStorage.setItem("token", data.token);
 			localStorage.setItem("user", JSON.stringify(data.user));
 
 			toast.success("Login realizado com sucesso!");
 
-			// Redirect based on role
 			if (data.user.role === "FAMILY") {
 				router.push("/family");
 			} else {
@@ -46,7 +44,7 @@ export default function LoginPage() {
 
 	return (
 		<div className="min-h-screen bg-background flex items-center justify-center p-4">
-			{/* Glass Card Container */}
+
 			<div className="bg-[var(--surface-glass)] backdrop-blur-[var(--blur-glass)] rounded-[var(--radius-outer)] border border-[var(--border-glass)] shadow-[var(--shadow-glass)] p-8 w-full max-w-md transition-all">
 				<div className="flex justify-center mb-6">
 					<div className="p-4 rounded-[var(--radius-inner)] bg-[var(--safari-green-light)] shadow-[var(--shadow-hardware)]">

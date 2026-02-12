@@ -60,13 +60,11 @@ export default function DashboardPage() {
 	const [isManageTeachersModalOpen, setIsManageTeachersModalOpen] =
 		useState(false);
 
-	// Estado do Modal de Mural
 	const [isClassWallOpen, setIsClassWallOpen] = useState(false);
 
 	const [isRollCallOpen, setIsRollCallOpen] = useState(false);
 	const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
 
-	// Custom Hook
 	const {
 		dashboardData,
 		classes,
@@ -80,14 +78,12 @@ export default function DashboardPage() {
 		setDashboardData,
 	} = useDashboard(user);
 
-	// Estado do Modal de Comportamento
 	const [feedbackModalOpen, setFeedbackModalOpen] = useState(false);
 	const [currentFeedbackStudent, setCurrentFeedbackStudent] = useState<{
 		id: string;
 		name: string;
 	} | null>(null);
 
-	// Estado do Editor de Feedback
 	const [feedbackEditorOpen, setFeedbackEditorOpen] = useState(false);
 	const [positiveFeedbacks, setPositiveFeedbacks] = useState<FeedbackItem[]>(
 		DEFAULT_POSITIVE_FEEDBACKS,
@@ -96,7 +92,6 @@ export default function DashboardPage() {
 		DEFAULT_NEGATIVE_FEEDBACKS,
 	);
 
-	// Estado do Formulário de Aluno
 	const [studentFormOpen, setStudentFormOpen] = useState(false);
 	const [studentFormMode, setStudentFormMode] = useState<"create" | "edit">(
 		"create",
@@ -106,7 +101,7 @@ export default function DashboardPage() {
 	);
 
 	useEffect(() => {
-		// Carregar comportamentos personalizados do armazenamento local se disponível
+
 		const savedPositive = localStorage.getItem("safari_positive_feedbacks");
 		const savedNegative = localStorage.getItem("safari_negative_feedbacks");
 
@@ -140,7 +135,6 @@ export default function DashboardPage() {
 		}
 	}, []);
 
-	//Updates class summary when dahboard has any update
 	useEffect(() => {
 		const currentClassDashboard = dashboardData.find(
 			(dashboard) => dashboard.classId === selectedClass?.id,
@@ -179,7 +173,6 @@ export default function DashboardPage() {
 		router.push("/login");
 	};
 
-	// --- BULK SELECTION LOGIC ---
 	const handleToggleSelect = (studentId: string) => {
 		setSelectedStudentIds((prev) =>
 			prev.includes(studentId)
@@ -207,7 +200,6 @@ export default function DashboardPage() {
 				`${selectedStudentIds.length} alunos marcados como presentes!`,
 			);
 
-			// Optimistically update UI
 			const updatedStudents = selectedClass.students.map((s) =>
 				selectedStudentIds.includes(s.id)
 					? { ...s, todayStatus: "PRESENT" as const }
@@ -223,7 +215,6 @@ export default function DashboardPage() {
 		}
 	};
 
-	// Wrapper for feedback modal to handle both single and bulk
 	const handleFeedbackSubmit = async (
 		behavior: string,
 		type: "positive" | "negative",
@@ -236,7 +227,7 @@ export default function DashboardPage() {
 
 		try {
 			if (selectedStudentIds.length > 0) {
-				// Bulk Feedback
+
 				const promises = selectedStudentIds.map((studentId) =>
 					api.addFeedbackEvent(
 						token,
@@ -254,7 +245,7 @@ export default function DashboardPage() {
 				);
 				handleClearSelection();
 			} else if (currentFeedbackStudent) {
-				// Single Feedback
+
 				await api.addFeedbackEvent(
 					token,
 					currentFeedbackStudent.id,
@@ -281,15 +272,12 @@ export default function DashboardPage() {
 		const token = localStorage.getItem("token");
 		if (!token) return;
 
-		// Save previous state for rollback
 		const previousClass = selectedClass;
 		const previousClasses = classes;
 
-		// Direct assignment, no toggling
 		const newStatus = status === "CLEARED" ? null : status;
 		const apiStatus = status;
 
-		// Optimistic Update: Update UI immediately
 		if (selectedClass) {
 			const updatedStudents = selectedClass.students.map((s) =>
 				s.id === studentId ? { ...s, todayStatus: newStatus } : s,
@@ -298,7 +286,6 @@ export default function DashboardPage() {
 			const updatedClass = { ...selectedClass, students: updatedStudents };
 			setSelectedClass(updatedClass);
 
-			// Update classes list as well ensure consistency if switching views
 			setClasses((prev) =>
 				prev.map((c) => (c.id === selectedClass.id ? updatedClass : c)),
 			);
@@ -308,15 +295,13 @@ export default function DashboardPage() {
 			const formattedDate = formatDateForAPI(selectedDate);
 			await api.markAttendance(token, studentId, apiStatus, formattedDate);
 
-			// Show success feedback
 			toast.success("Presença marcada!");
 
-			// Fetch only dashboard data to update counts without reloading student list (avoiding race conditions)
 			const dashboard = await api.getDashboard(token, formattedDate);
 			setDashboardData(dashboard);
 		} catch (error) {
 			console.error("Error marking attendance:", error);
-			// Rollback to previous state
+
 			setSelectedClass(previousClass);
 			setClasses(previousClasses);
 			toast.error("Erro ao marcar presença. Tente novamente.");
@@ -362,8 +347,6 @@ export default function DashboardPage() {
 		setCurrentFeedbackStudent({ id: studentId, name: studentName });
 		setFeedbackModalOpen(true);
 	};
-
-	// Removed local handleAddFeedback in favor of unified handleFeedbackSubmit
 
 	const handleResetDay = async () => {
 		if (
@@ -453,10 +436,10 @@ export default function DashboardPage() {
 	return (
 		<AuthGate allowRoles={["ADMIN", "COORDINATOR", "TEACHER"]}>
 			<div className="min-h-screen bg-background pb-24">
-				{/* Sticky Header */}
+
 				<header className="sticky top-0 z-50 bg-[var(--surface-glass)] backdrop-blur-[var(--blur-glass)] border-b border-[var(--border-glass)] shadow-[var(--shadow-glass)] transition-all mb-8">
 					<div className="layout-container py-3 space-y-3">
-						{/* Top Row */}
+
 						<div className="flex flex-col sm:flex-row items-center justify-between gap-4">
 							<div className="flex items-center gap-4 w-full sm:w-auto">
 								<div className="hidden md:flex items-center gap-2 text-[var(--safari-green)] opacity-80 hover:opacity-100 transition-opacity">
@@ -469,7 +452,7 @@ export default function DashboardPage() {
 										onChange={(val) => {
 											const cls = classes.find((c) => c.id === val);
 											setSelectedClass(cls || null);
-											setIsRollCallOpen(false); // Close roll call on class change
+											setIsRollCallOpen(false);
 										}}
 										options={classes.map((cls) => ({
 											value: cls.id,
@@ -481,7 +464,7 @@ export default function DashboardPage() {
 							</div>
 
 							<div className="flex w-full items-center justify-between gap-2 sm:contents">
-								{/* Date Display */}
+
 								<div className="flex flex-col sm:flex-row items-center gap-1 bg-[var(--surface-raised)] rounded-[var(--radius-inner)] px-4 py-1.5 shadow-[var(--shadow-hardware)] border border-[var(--safari-stone-200)] flex-1 sm:flex-none justify-center sm:justify-start min-h-[42px]">
 									<span className="font-bold text-[var(--safari-green)] text-lg whitespace-nowrap leading-none">
 										{selectedDate.toLocaleDateString("pt-BR", {
@@ -501,7 +484,6 @@ export default function DashboardPage() {
 									)}
 								</div>
 
-								{/* Controls */}
 								<div className="flex items-center gap-3">
 									<Button
 										variant="ghost"
@@ -585,7 +567,6 @@ export default function DashboardPage() {
 							</div>
 						</div>
 
-						{/* Attendance Status - Keep existing */}
 						{currentDashboardData && (
 							<div className="hidden sm:flex flex-col sm:flex-row items-center gap-4 bg-[var(--surface-raised)]/50 rounded-[var(--radius-outer)] p-2 px-4 border border-[var(--safari-stone-200)]/50">
 								<span className="text-xs font-bold text-[var(--text-muted)] uppercase tracking-wide min-w-fit hidden sm:inline">
@@ -633,7 +614,7 @@ export default function DashboardPage() {
 
 				<main className="layout-container py-8">
 					<div className="grid-dashboard mb-8">
-						{/* Summary Card - Keep existing */}
+
 						<div className="lg:col-span-1">
 							{currentDashboardData && (
 								<Card
@@ -699,7 +680,6 @@ export default function DashboardPage() {
 							)}
 						</div>
 
-						{/* Calendar */}
 						<div className="lg:col-span-2">
 							<Calendar
 								selectedDate={selectedDate}
@@ -716,7 +696,7 @@ export default function DashboardPage() {
 										{selectedClass.name} - Exploradores
 									</h2>
 									<div className="flex flex-wrap items-center justify-end gap-2 w-full sm:w-auto">
-										{/* NEW ROLL CALL BUTTON */}
+
 										<Button
 											variant="primary"
 											onClick={() => setIsRollCallOpen(true)}
@@ -802,7 +782,7 @@ export default function DashboardPage() {
 										}}
 										onAttendanceChange={handleMarkAttendance}
 										onOpenFeedback={openFeedbackModal}
-										// Selection Props
+
 										isSelectMode={selectedStudentIds.length > 0}
 										isSelected={selectedStudentIds.includes(student.id)}
 										onToggleSelect={handleToggleSelect}
@@ -879,7 +859,6 @@ export default function DashboardPage() {
 					currentUser={user}
 				/>
 
-				{/* NEW MODALS & COMPONENTS */}
 				{selectedClass && (
 					<RollCallModal
 						isOpen={isRollCallOpen}
@@ -894,7 +873,7 @@ export default function DashboardPage() {
 					onClearSelection={handleClearSelection}
 					onMarkPresent={handleBulkMarkPresent}
 					onGiveFeedback={() => {
-						// Logic to open feedback modal for bulk
+
 						setFeedbackModalOpen(true);
 					}}
 				/>

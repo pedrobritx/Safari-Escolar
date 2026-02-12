@@ -1,14 +1,11 @@
 @import "tailwindcss";
 
 :root {
-	/* 🎨 PALETTE (Skeuo-Minimal) - Strict Discipline */
 
-	/* Surfaces (Khaki & White) */
 	--safari-khaki: #f0ead6;
 	--safari-khaki-light: #f7f5ec;
 	--safari-khaki-dark: #d4cfa3;
 
-	/* Text & Neutrals (Stone) */
 	--safari-stone-50: #fafaf9;
 	--safari-stone-100: #f5f5f4;
 	--safari-stone-200: #e7e5e4;
@@ -16,44 +13,32 @@
 	--safari-stone-600: #57534e;
 	--safari-stone-900: #1c1917;
 
-	/* Primary Actions & Success (Leaf Green only) */
 	--safari-green: #4d7c0f;
 	--safari-green-light: #ecfccb;
 	--safari-green-dark: #3f6212;
 
-	/* Information, Links, Secondary (Aqua) */
 	--safari-aqua: #06b6d4;
 	--safari-aqua-light: #cffafe;
 	--safari-aqua-dark: #0891b2;
 
-	/* Destructive, Attention (Sunset Orange) */
 	--safari-orange: #ea580c;
 	--safari-orange-light: #ffedd5;
 	--safari-orange-dark: #c2410c;
 
-	/* 🏗️ SEMANTIC LAYER SYSTEM */
-
-	/* Layer 1: Base (Flat) */
 	--surface-base: var(--safari-khaki);
 	--surface-raised: var(--safari-khaki-light);
 
-	/* Layer 2: Glass (Overlays/Focus) */
-	/* Pure glass aesthetic for modals and sticky headers */
 	--surface-glass: rgba(255, 255, 255, 0.7);
 	--blur-glass: 20px;
 	--border-glass: rgba(255, 255, 255, 0.5);
 
-	/* Layer 3: Hardware (Controls) */
 	--control-surface: #ffffff;
 	--control-surface-off: var(--safari-stone-100);
 
-	/* Text Mapping */
 	--text-primary: var(--safari-stone-900);
 	--text-muted: var(--safari-stone-600);
 	--text-on-color: #ffffff;
 
-	/* Shadows & Depth */
-	/* Tactile controls with bevel/press feel */
 	--shadow-hardware:
 		0 1px 0 rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.08),
 		inset 0 1px 0.5px rgba(255, 255, 255, 0.7);
@@ -61,44 +46,34 @@
 	--shadow-hardware-active:
 		inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 255, 255, 0.5);
 
-	/* Glass glow + blur only for modals */
 	--shadow-glass:
 		0 8px 32px rgba(77, 124, 15, 0.15), 0 2px 8px rgba(0, 0, 0, 0.05),
 		inset 0 0 0 1px var(--border-glass);
 
-	/* Flat content tiles with quiet border */
 	--shadow-float: 0 2px 4px -2px rgba(0, 0, 0, 0.05);
 
-	/* Corner System */
-	--radius-outer: 12px; /* Containers, Sections (Sharper) */
-	--radius-inner: 9999px; /* Controls, Buttons (Rounder/Pill) */
-	--radius-input: 16px; /* Inputs (Slightly rounded) */
+	--radius-outer: 12px;
+	--radius-inner: 9999px;
+	--radius-input: 16px;
 
-	/* 🌊 LIQUID-GLASS INTERACTION SYSTEM */
-
-	/* Glow Colors (semantic variants) */
 	--liquid-glow-leaf: rgba(77, 124, 15, 0.3);
 	--liquid-glow-aqua: rgba(6, 182, 212, 0.3);
 	--liquid-glow-orange: rgba(234, 88, 12, 0.3);
 
-	/* Liquid Control Shadows */
 	--shadow-liquid-bloom:
 		0 0 0 3px var(--liquid-glow, var(--liquid-glow-leaf)),
 		0 4px 16px var(--liquid-glow, var(--liquid-glow-leaf));
 	--shadow-liquid-press:
 		inset 0 2px 6px rgba(0, 0, 0, 0.12), 0 1px 0 rgba(255, 255, 255, 0.4);
 
-	/* Timing (synchronized feel) */
 	--timing-hover: 180ms ease-out;
 	--timing-press: 80ms ease-in;
 	--timing-release: 140ms cubic-bezier(0.34, 1.56, 0.64, 1);
 
-	/* Yellow tokens (for LATE status - avoiding Tailwind defaults) */
 	--safari-yellow: #eab308;
 	--safari-yellow-light: #fef9c3;
 	--safari-yellow-dark: #a16207;
 
-	/* Mappings for Tailwind compatibility */
 	--background: var(--surface-base);
 	--foreground: var(--text-primary);
 }
@@ -122,11 +97,9 @@
 	--color-stone-600: var(--safari-stone-600);
 	--color-stone-900: var(--safari-stone-900);
 
-	/* Semantic Surfaces */
 	--color-surface-glass: var(--surface-glass);
 	--color-surface-raised: var(--surface-raised);
 
-	/* Radii */
 	--radius-outer: var(--radius-outer);
 	--radius-inner: var(--radius-inner);
 
@@ -141,28 +114,22 @@ body {
 	-webkit-font-smoothing: antialiased;
 }
 
-/* =========================================
-   🦁 SAFARI ESCOLAR - DESIGN SYSTEM (Skeuo-Glass)
-   =========================================
-*/
-
 @layer components {
-	/* --- LAYOUT WRAPPERS --- */
+
 	.layout-container {
 		@apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
 	}
 
 	.section-container {
-		@apply mb-10; /* Chunky spacing */
+		@apply mb-10;
 	}
 
 	.grid-dashboard {
-		@apply grid grid-cols-1 lg:grid-cols-3 gap-8; /* 24-32px gap */
+		@apply grid grid-cols-1 lg:grid-cols-3 gap-8;
 	}
 
-	/* --- LAYER 1: BASE SURFACES (Flat, Calm) --- */
 	.card {
-		@apply bg-white/60 border border-[var(--safari-stone-300)]/30 rounded-[var(--radius-outer)] 
+		@apply bg-white/60 border border-[var(--safari-stone-300)]/30 rounded-[var(--radius-outer)]
 		       shadow-[var(--shadow-float)] backdrop-blur-[2px];
 	}
 
@@ -172,24 +139,15 @@ body {
 	}
 
 	.card-body {
-		@apply p-6; /* 24px inner spacing */
+		@apply p-6;
 	}
 
-	/* --- LAYER 2: GLASS SURFACES --- */
-	/* Modals, Floating Panels, Topbars */
 	.card-glass {
-		@apply bg-[var(--surface-glass)] backdrop-blur-[var(--blur-glass)] 
+		@apply bg-[var(--surface-glass)] backdrop-blur-[var(--blur-glass)]
 		       rounded-[var(--radius-inner)] border border-[var(--border-glass)]
 		       shadow-[var(--shadow-glass)];
 	}
 
-	/* --- LAYER 3: HARDWARE CONTROLS (Skeuo) --- */
-	/* 
-       Micro-texture noise is simulated via a subtle gradient 
-       and hardware shadow stack. 
-    */
-
-	/* Interactive Card (Hardware-like behavior) */
 	.card-interactive {
 		@apply bg-white rounded-[var(--radius-outer)] border border-[var(--safari-stone-200)]
 		       shadow-[var(--shadow-hardware)]
@@ -198,19 +156,15 @@ body {
 	}
 
 	.card-interactive:hover {
-		@apply scale-[1.01] shadow-lg brightness-[1.01]; /* Lens warp illusion */
+		@apply scale-[1.01] shadow-lg brightness-[1.01];
 	}
 
 	.card-interactive:active {
 		@apply scale-[0.99] shadow-[var(--shadow-hardware-press)] brightness-95;
 	}
 
-	/* ============================================
-	   🌊 LIQUID-CONTROL BASE CLASS
-	   The shared interaction physics for all clickable controls.
-	   ============================================ */
 	.liquid-control {
-		--liquid-glow: var(--liquid-glow-leaf); /* Default glow color */
+		--liquid-glow: var(--liquid-glow-leaf);
 		position: relative;
 		transition:
 			transform var(--timing-hover),
@@ -218,7 +172,6 @@ body {
 			filter var(--timing-hover);
 	}
 
-	/* Hover: Ambient bloom glow */
 	.liquid-control::before {
 		content: "";
 		position: absolute;
@@ -236,7 +189,6 @@ body {
 		opacity: 1;
 	}
 
-	/* Hover: Lens highlight sheen */
 	.liquid-control::after {
 		content: "";
 		position: absolute;
@@ -260,7 +212,6 @@ body {
 		filter: brightness(1.05) saturate(1.08);
 	}
 
-	/* Press: Compress + shadow inversion */
 	.liquid-control:active {
 		transform: translateY(1px) scale(0.98);
 		box-shadow: var(--shadow-liquid-press);
@@ -269,7 +220,6 @@ body {
 			box-shadow var(--timing-press);
 	}
 
-	/* Focus: Visible ring for accessibility */
 	.liquid-control:focus-visible {
 		outline: none;
 		box-shadow:
@@ -277,7 +227,6 @@ body {
 			var(--shadow-hardware);
 	}
 
-	/* Reduced motion: Disable transforms, keep visual affordance */
 	@media (prefers-reduced-motion: reduce) {
 		.liquid-control,
 		.liquid-control:active {
@@ -288,7 +237,6 @@ body {
 		}
 	}
 
-	/* Glow color variants */
 	.liquid-control--aqua {
 		--liquid-glow: var(--liquid-glow-aqua);
 	}
@@ -299,16 +247,12 @@ body {
 		--liquid-glow: var(--liquid-glow-leaf);
 	}
 
-	/* ============================================
-	   BUTTONS (inherits liquid-control)
-	   ============================================ */
 	.btn {
-		@apply font-bold rounded-[var(--radius-inner)] px-5 py-2.5 
+		@apply font-bold rounded-[var(--radius-inner)] px-5 py-2.5
 		       shadow-[var(--shadow-hardware)] border border-transparent
 		       flex items-center justify-center gap-2 cursor-pointer select-none;
 	}
 
-	/* Icon Button: Square/round variant */
 	.icon-btn {
 		@apply flex items-center justify-center rounded-full
 		       bg-[var(--control-surface)] border border-[var(--safari-stone-200)]
@@ -321,7 +265,6 @@ body {
 		@apply bg-white border-[var(--safari-green)] text-[var(--safari-green)];
 	}
 
-	/* Chip / Status Pill */
 	.chip {
 		@apply inline-flex items-center justify-center gap-1.5 px-3 py-1.5
 		       rounded-[var(--radius-inner)] font-bold text-sm
@@ -347,7 +290,6 @@ body {
 		@apply bg-[var(--control-surface-off)] text-[var(--text-muted)] border-[var(--safari-stone-200)];
 	}
 
-	/* Calendar Day Pill */
 	.calendar-day {
 		@apply flex flex-col items-center justify-center rounded-[var(--radius-inner)]
 		       bg-[var(--control-surface)] border border-[var(--safari-stone-200)]
@@ -372,7 +314,7 @@ body {
 
 	.btn-primary {
 		--liquid-glow: var(--liquid-glow-leaf);
-		@apply bg-[var(--safari-green)] text-white 
+		@apply bg-[var(--safari-green)] text-white
 		       border-t border-white/20 border-b border-black/10;
 	}
 
@@ -390,7 +332,6 @@ body {
 		@apply brightness-110 saturate-110;
 	}
 
-	/* Backward Compatibility / Semantic Aliases */
 	.btn-anger {
 		--liquid-glow: var(--liquid-glow-orange);
 		@apply bg-[var(--safari-orange)] text-white
@@ -426,7 +367,6 @@ body {
 		@apply shadow-[var(--shadow-hardware-press)] bg-[var(--safari-stone-200)];
 	}
 
-	/* INPUTS (Hardware Wells) */
 	.input-field,
 	.select-field {
 		@apply w-full px-4 py-3 rounded-[var(--radius-inner)]
@@ -443,7 +383,6 @@ body {
 		       bg-no-repeat bg-[length:0.7em] bg-[right_1rem_center] appearance-none;
 	}
 
-	/* TABS (Segmented Controls) */
 	.tab {
 		@apply flex-1 py-2 px-4 rounded-[var(--radius-inner)] font-bold text-sm tracking-wide
 		       transition-all cursor-pointer text-center select-none
@@ -454,7 +393,6 @@ body {
 		@apply text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--safari-stone-100)];
 	}
 
-	/* Active tabs look like pressed/engaged hardware or lit glass */
 	.tab-positive {
 		@apply bg-[var(--safari-green)] text-white shadow-[var(--shadow-hardware)]
 		       border-t border-white/20;
@@ -469,15 +407,13 @@ body {
 		@apply bg-[var(--safari-stone-600)] text-white shadow-[var(--shadow-hardware)];
 	}
 
-	/* Control Bars (Toolbars) */
 	.control-bar {
 		@apply flex items-center gap-3 p-1.5 rounded-[calc(var(--radius-inner)+4px)]
 		       bg-[var(--safari-stone-200)]/50 border border-[var(--safari-stone-200)];
 	}
 
-	/* Score Badges */
 	.score-badge {
-		@apply absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center 
+		@apply absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center
 		       text-white font-bold text-sm
 		       border-2 border-white shadow-md z-10;
 	}
@@ -490,7 +426,6 @@ body {
 		@apply bg-[var(--safari-orange)];
 	}
 
-	/* LIST ITEMS */
 	.list-card {
 		@apply flex items-center justify-between p-3 px-4 rounded-[var(--radius-outer)]
 		       bg-white border border-[var(--safari-stone-200)]
@@ -502,12 +437,6 @@ body {
 		@apply border-[var(--safari-orange)] bg-orange-50;
 	}
 
-	/* ============================================
-	   🪟 MODAL GLASS SYSTEM
-	   Unified modal styling for Skeuo-Glass design
-	   ============================================ */
-
-	/* Overlay: Darkened backdrop with blur + vignette */
 	.modal-overlay {
 		position: fixed;
 		inset: 0;
@@ -525,7 +454,6 @@ body {
 		-webkit-backdrop-filter: blur(6px);
 	}
 
-	/* Glass Surface: Translucent khaki with ambient glow */
 	.modal-glass {
 		@apply bg-[var(--surface-base)] rounded-[var(--radius-outer)] w-full
 			   overflow-hidden border border-[var(--border-glass)];
@@ -535,7 +463,6 @@ body {
 			inset 0 1px 0 rgba(255, 255, 255, 0.5);
 	}
 
-	/* Header: Fixed height, title left, actions right */
 	.modal-header {
 		@apply px-6 py-4 flex justify-between items-center gap-4
 			   bg-[var(--safari-green-light)]/40 border-b border-[var(--safari-stone-200)];
@@ -549,7 +476,6 @@ body {
 		@apply text-sm text-[var(--text-muted)] font-medium;
 	}
 
-	/* Body: Scrollable content area */
 	.modal-body {
 		@apply p-6 overflow-y-auto bg-[var(--safari-khaki)];
 		max-height: 70vh;
@@ -578,29 +504,21 @@ body {
 		@apply p-0;
 	}
 
-	/* Footer: Sticky actions area */
 	.modal-footer {
 		@apply px-6 py-4 flex justify-end gap-3
 			   bg-[var(--surface-raised)] border-t border-[var(--safari-stone-200)];
 	}
 
-	/* Close button: Add 'liquid-control icon-btn' classes in component */
 	.modal-close {
 		@apply flex-shrink-0;
 		--liquid-glow: var(--liquid-glow-aqua);
 	}
-
-	/* ============================================
-	   📑 SEGMENTED CONTROL (Tabs)
-	   Unified tab styling with semantic glow colors
-	   ============================================ */
 
 	.segmented-control {
 		@apply flex gap-2 p-1.5 rounded-[calc(var(--radius-inner)+4px)]
 			   bg-[var(--safari-stone-200)]/50 border border-[var(--safari-stone-200)];
 	}
 
-	/* Add 'liquid-control' class in component for interaction physics */
 	.segmented-tab {
 		@apply flex-1 py-2 px-4 rounded-[var(--radius-inner)]
 			   font-bold text-sm tracking-wide text-center select-none
@@ -627,15 +545,9 @@ body {
 		@apply bg-[var(--safari-orange)];
 	}
 
-	/* ============================================
-	   🎯 FEEDBACK TILES
-	   Interactive feedback selection tiles
-	   ============================================ */
-
-	/* Add 'liquid-control' class in component for interaction physics */
 	.feedback-tile {
-		@apply flex flex-col items-center justify-center p-4 gap-2 
-			   rounded-[var(--radius-outer)] bg-white 
+		@apply flex flex-col items-center justify-center p-4 gap-2
+			   rounded-[var(--radius-outer)] bg-white
 			   border border-[var(--safari-stone-200)]
 			   shadow-[var(--shadow-hardware)] cursor-pointer select-none
 			   transition-all duration-200 ease-out;
@@ -690,11 +602,6 @@ body {
 		@apply text-[var(--safari-orange)];
 	}
 
-	/* ============================================
-	   📋 FEEDBACK ROW (Edit Modal)
-	   Consistent list item pattern
-	   ============================================ */
-
 	.feedback-row {
 		@apply flex items-center gap-4 p-3 px-4 rounded-[var(--radius-outer)]
 			   bg-white border border-[var(--safari-stone-200)]
@@ -724,7 +631,6 @@ body {
 		@apply flex gap-2 ml-2;
 	}
 
-	/* Quiet icon action buttons - add 'liquid-control' class in component */
 	.feedback-action-btn {
 		@apply flex items-center justify-center rounded-full
 			   w-9 h-9 cursor-pointer select-none
@@ -753,7 +659,6 @@ body {
 		@apply bg-[var(--safari-stone-300)] text-white border-[var(--safari-stone-300)];
 	}
 
-	/* Add new feedback button - add 'liquid-control' class in component */
 	.feedback-add-btn {
 		@apply w-full py-3 px-4 rounded-[var(--radius-inner)]
 			   border-2 border-dashed border-[var(--safari-stone-300)]

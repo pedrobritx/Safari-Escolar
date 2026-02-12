@@ -40,7 +40,7 @@ export default function FeedbackModal({
 
 	useEffect(() => {
 		if (isOpen) {
-			setTimeout(() => setActiveTab("positive"), 0); // Reset to positive when opening
+			setTimeout(() => setActiveTab("positive"), 0);
 			setComment("");
 		}
 	}, [isOpen]);
@@ -61,7 +61,7 @@ export default function FeedbackModal({
 			maxWidth="lg"
 		>
 			<div className="space-y-4">
-				{/* Segmented Tabs */}
+
 				<div className="p-2 bg-[var(--surface-raised)]">
 					<div className="segmented-control">
 						<button
@@ -91,7 +91,6 @@ export default function FeedbackModal({
 					</div>
 				</div>
 
-				{/* Comentário Opcional */}
 				<div className="px-4">
 					<textarea
 						className="w-full bg-[var(--surface-raised)] border border-[var(--safari-stone-200)] rounded-[var(--radius-inner)] p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--safari-green)] resize-none"
@@ -102,7 +101,6 @@ export default function FeedbackModal({
 					/>
 				</div>
 
-				{/* Content - Feedback Tiles Grid */}
 				<div className="modal-body pt-0">
 					<div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
 						{currentFeedbacks.map((item) => (

@@ -3,7 +3,7 @@ import prisma from "../utils/prisma";
 async function debug() {
 	try {
 		const now = new Date();
-		// Use the logic from classController
+
 		const targetDateStart = new Date(
 			Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0),
 		);
@@ -58,7 +58,6 @@ async function debug() {
 			}
 		});
 
-		// Also check raw events for verify
 		const allEvents = await prisma.feedbackEvent.findMany({
 			take: 5,
 			orderBy: { date: "desc" },

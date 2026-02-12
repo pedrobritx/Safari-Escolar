@@ -60,7 +60,6 @@ const authLimiter = rateLimit({
 	legacyHeaders: false,
 });
 
-// Middleware
 app.use(helmet());
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -68,7 +67,6 @@ app.use(morgan("combined"));
 app.use("/api/auth", authLimiter);
 app.use("/api", apiLimiter);
 
-// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/classes", classRoutes);
 app.use("/api/students", studentRoutes);
@@ -81,17 +79,14 @@ app.use("/api/users", usersRoutes);
 app.use("/api/schools", schoolRoutes);
 app.use("/api/posts", postRoutes);
 
-// Health check
 app.get("/api/health", (req, res) => {
 	res.json({ status: "ok" });
 });
 
-// Root route
 app.get("/", (req, res) => {
 	res.json({ message: "Safari Escolar API is running 🚀" });
 });
 
-// 404 + error handlers
 app.use(notFoundHandler);
 app.use(errorHandler);
 
@@ -99,7 +94,6 @@ const server = app.listen(PORT, () => {
 	console.log(`✅ Server running on port ${PORT}`);
 });
 
-// Graceful Shutdown
 const shutdown = () => {
 	console.log("🛑 Received kill signal, shutting down gracefully");
 	server.close(() => {

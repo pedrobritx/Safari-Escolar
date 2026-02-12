@@ -52,7 +52,7 @@ export default function FamilyPage() {
   return (
     <AuthGate allowRoles={['FAMILY']}>
     <div className="min-h-screen bg-gray-100">
-      {/* Header */}
+
       <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
@@ -76,7 +76,7 @@ export default function FamilyPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {students.map((student) => (
             <div key={student.id} className="bg-white rounded-lg shadow overflow-hidden">
-              {/* Student Header */}
+
               <div className="bg-gradient-to-r from-blue-500 to-purple-500 px-6 py-4">
                 <div className="flex items-center space-x-3">
                   <span className="text-4xl">{student.animalAvatar}</span>
@@ -88,7 +88,6 @@ export default function FamilyPage() {
                 </div>
               </div>
 
-              {/* Student Stats */}
               <div className="px-6 py-4 border-b border-gray-200">
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div>
@@ -106,7 +105,6 @@ export default function FamilyPage() {
                 </div>
               </div>
 
-              {/* Recent Attendance */}
               <div className="px-6 py-4 border-b border-gray-200">
                 <h4 className="font-semibold text-gray-900 mb-2">Presença Recente</h4>
                 <div className="flex flex-wrap gap-2">
@@ -126,7 +124,6 @@ export default function FamilyPage() {
                 </div>
               </div>
 
-              {/* Recent Behavior Events */}
               <div className="px-6 py-4">
                 <h4 className="font-semibold text-gray-900 mb-2">Feedbacks Recentes</h4>
                 <div className="space-y-2">

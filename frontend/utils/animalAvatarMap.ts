@@ -64,4 +64,3 @@ export const animalAvatarMap: Record<string, string> = {
   Cabra: '🐐',
   Camelo: '🐪',
 };
-

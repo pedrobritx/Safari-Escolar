@@ -24,7 +24,7 @@ export function AuthGate({ children, allowRoles }: AuthGateProps) {
 		const user = JSON.parse(userRaw);
 
 		if (allowRoles && !allowRoles.includes(user.role)) {
-			// Redirect based on role
+
 			if (user.role === "FAMILY") {
 				router.replace("/family");
 			} else {

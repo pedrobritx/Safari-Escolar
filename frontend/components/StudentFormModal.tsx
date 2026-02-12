@@ -29,7 +29,7 @@ export default function StudentFormModal({
 	mode,
 }: StudentFormModalProps) {
 	const [name, setName] = useState("");
-	const [animalAvatar, setAnimalAvatar] = useState("Leão"); // Default
+	const [animalAvatar, setAnimalAvatar] = useState("Leão");
 	const [avatarColor, setAvatarColor] = useState("#FFFFFF");
 	const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 	const [nameError, setNameError] = useState("");
@@ -43,7 +43,7 @@ export default function StudentFormModal({
 					setAnimalAvatar(initialData.animalAvatar || "Leão");
 					setAvatarColor(initialData.avatarColor || "#FFFFFF");
 				} else {
-					// Reset for create
+
 					setName("");
 					setAnimalAvatar("Leão");
 					setAvatarColor("#FFFFFF");
@@ -99,7 +99,7 @@ export default function StudentFormModal({
 			maxWidth="md"
 		>
 			<form onSubmit={handleSubmit} className="p-6 space-y-6">
-				{/* Avatar Section */}
+
 				<div className="flex flex-col items-center gap-2">
 					<span className="text-sm font-bold text-[var(--text-muted)]">
 						Avatar
@@ -115,7 +115,6 @@ export default function StudentFormModal({
 							{getAnimalAvatar(animalAvatar)}
 						</button>
 
-						{/* Avatar change button overlay */}
 						<button
 							type="button"
 							onClick={() => setShowEmojiPicker(!showEmojiPicker)}
@@ -141,7 +140,6 @@ export default function StudentFormModal({
 					)}
 				</div>
 
-				{/* Name Input */}
 				<Input
 					label="Nome Completo"
 					value={name}
@@ -153,7 +151,6 @@ export default function StudentFormModal({
 					error={touched && nameError ? nameError : undefined}
 				/>
 
-				{/* Actions - Footer style */}
 				<div className="flex gap-3 pt-4 border-t border-[var(--safari-stone-200)]">
 					{mode === "edit" && onDelete && (
 						<Button

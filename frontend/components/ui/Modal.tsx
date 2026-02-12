@@ -10,9 +10,9 @@ interface ModalProps {
 	maxWidth?: "sm" | "md" | "lg" | "xl" | "2xl";
 	hideCloseButton?: boolean;
 	className?: string;
-	/** @deprecated Use standard modal styling instead */
+
 	headerColorClass?: string;
-	/** @deprecated Modal borders no longer change by mode */
+
 	borderColorClass?: string;
 }
 
@@ -24,16 +24,15 @@ export function Modal({
 	maxWidth = "md",
 	hideCloseButton = false,
 	className = "",
-	// Deprecated props kept for backward compatibility but ignored
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 	headerColorClass,
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 	borderColorClass,
 }: ModalProps) {
 	const [mounted, setMounted] = useState(false);
 
 	useEffect(() => {
-		// eslint-disable-next-line react-hooks/set-state-in-effect
+
 		setMounted(true);
 		if (isOpen) {
 			document.body.style.overflow = "hidden";
@@ -64,7 +63,7 @@ export function Modal({
 				className={`modal-glass ${maxWidthClass} ${className} animate-in zoom-in-95 duration-200`}
 				onClick={(e) => e.stopPropagation()}
 			>
-				{/* Header */}
+
 				<div className="modal-header">
 					{title && <h2 className="modal-header-title">{title}</h2>}
 					{!hideCloseButton && (
@@ -78,7 +77,6 @@ export function Modal({
 					)}
 				</div>
 
-				{/* Content */}
 				<div className="max-h-[80vh] overflow-y-auto">{children}</div>
 			</div>
 		</div>

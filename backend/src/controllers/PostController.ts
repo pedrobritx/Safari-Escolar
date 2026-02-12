@@ -4,7 +4,6 @@ import prisma from "../utils/prisma";
 import { ok, fail } from "../utils/response";
 import { HttpError } from "../utils/errors";
 
-// Create a new post (Class or Student Diary)
 export const createPost = async (req: AuthRequest, res: Response) => {
 	try {
 		const { content, classId, studentId } = req.body;
@@ -17,7 +16,6 @@ export const createPost = async (req: AuthRequest, res: Response) => {
 			});
 		}
 
-		// Verify teacher has access to the class
 		const hasAccess = await prisma.class.findFirst({
 			where: {
 				id: classId,
@@ -37,7 +35,7 @@ export const createPost = async (req: AuthRequest, res: Response) => {
 			data: {
 				content,
 				classId,
-				studentId: studentId || null, // Optional
+				studentId: studentId || null,
 				teacherId,
 			},
 			include: {
@@ -64,7 +62,6 @@ export const createPost = async (req: AuthRequest, res: Response) => {
 	}
 };
 
-// Get posts for a specific class (Class Wall)
 export const getClassPosts = async (req: AuthRequest, res: Response) => {
 	try {
 		const { classId } = req.params as { classId: string };
@@ -72,7 +69,7 @@ export const getClassPosts = async (req: AuthRequest, res: Response) => {
 		const posts = await prisma.post.findMany({
 			where: {
 				classId,
-				studentId: null, // Only class-wide posts
+				studentId: null,
 			},
 			orderBy: {
 				createdAt: "desc",
@@ -94,10 +91,6 @@ export const getClassPosts = async (req: AuthRequest, res: Response) => {
 	}
 };
 
-// Get posts for a specific student (Student Diary - includes Class Posts too?)
-// Requirements say: "Student Diary: Posts/feedbacks visible only to the specific student... Class Wall: Posts visible to all"
-// "Timeline" view might want to show BOTH or just student specific.
-// For now, let's fetch Student Specific posts.
 export const getStudentPosts = async (req: AuthRequest, res: Response) => {
 	try {
 		const { studentId } = req.params as { studentId: string };
@@ -126,7 +119,6 @@ export const getStudentPosts = async (req: AuthRequest, res: Response) => {
 	}
 };
 
-// Delete a post
 export const deletePost = async (req: AuthRequest, res: Response) => {
 	try {
 		const { id } = req.params as { id: string };
@@ -141,7 +133,6 @@ export const deletePost = async (req: AuthRequest, res: Response) => {
 			return fail(res, "Post not found", 404);
 		}
 
-		// Only the author or Admin/Coordinator can delete
 		if (
 			post.teacherId !== userId &&
 			userRole !== "ADMIN" &&

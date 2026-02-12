@@ -3,20 +3,18 @@ from pathlib import Path
 from datetime import datetime, timezone
 import sys
 
-
 def should_ignore(path: Path, ignore_names):
     for part in path.parts:
         if part in ignore_names:
             return True
     return False
 
-
 def build_tree(root: Path, ignore_names=None):
     if ignore_names is None:
         ignore_names = {
-            '.git', '.github', 'node_modules', '__pycache__', '.venv', 'venv', 'env', '.env', 
+            '.git', '.github', 'node_modules', '__pycache__', '.venv', 'venv', 'env', '.env',
             '.pytest_cache', '.vscode', '.idea', '.DS_Store',
-            'dist', 'build', 'out', 'coverage', '.next', '.nuxt', 
+            'dist', 'build', 'out', 'coverage', '.next', '.nuxt',
             'migrations', 'LC_MESSAGES', 'site-packages'
         }
 
@@ -41,25 +39,15 @@ def build_tree(root: Path, ignore_names=None):
     _walk(root)
     return lines
 
-
 def write_tree_md(root: Path, out_path: Path):
     lines = build_tree(root)
-    
-    # Gerar o conteúdo novo (sem cabeçalho para comparação)
+
     new_tree_content = '\n'.join(['```'] + lines + ['```'])
 
-    # Tentar ler o arquivo existente para comparar
     if out_path.exists():
         try:
             existing_content = out_path.read_text(encoding='utf-8')
-            # Extrair apenas a parte da árvore (entre o primeiro ``` e o segundo ```)
-            # O formato esperado é:
-            # Cabeçalho...
-            # ```
-            # árvore...
-            # ```
-            # Rodapé...
-            
+
             parts = existing_content.split('```')
             if len(parts) >= 3:
                 existing_tree_content = '```' + parts[1] + '```'
@@ -69,14 +57,12 @@ def write_tree_md(root: Path, out_path: Path):
         except Exception as e:
             print(f"Warning: Could not read existing file for comparison: {e}")
 
-    # Se chegou aqui, ou o arquivo não existe ou o conteúdo mudou
     header = [
         '# Árvore do repositório — Safari Escolar',
         f'*Gerado em {datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%SZ")} (UTC)*',
         '',
     ]
-    
-    # Rodapé fixo
+
     footer = [
         '',
         'Este arquivo é gerado automaticamente pelo script `scripts/generate_tree.py` e atualizado pelo workflow `.github/workflows/update-tree.yml`.',
@@ -93,13 +79,11 @@ def write_tree_md(root: Path, out_path: Path):
     out_path.write_text(full_content, encoding='utf-8')
     print(f'Wrote {out_path}')
 
-
 def main():
     script_path = Path(__file__).resolve()
     repo_root = script_path.parents[1]
     out_path = repo_root / 'docs' / 'tree.md'
     write_tree_md(repo_root, out_path)
-
 
 if __name__ == '__main__':
     try:

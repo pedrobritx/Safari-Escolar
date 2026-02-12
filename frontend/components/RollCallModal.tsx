@@ -40,7 +40,7 @@ export default function RollCallModal({
 		if (autoAdvance && currentIndex < students.length - 1) {
 			setTimeout(() => {
 				setCurrentIndex((prev) => prev + 1);
-			}, 300); // Small delay for visual feedback
+			}, 300);
 		} else if (autoAdvance && currentIndex === students.length - 1) {
 			setTimeout(() => {
 				onClose();
@@ -57,7 +57,7 @@ export default function RollCallModal({
 			className="overflow-hidden"
 		>
 			<div className="flex flex-col h-[500px]">
-				{/* Progress Bar */}
+
 				<div className="h-2 w-full bg-[var(--safari-stone-200)]">
 					<div
 						className="h-full bg-[var(--safari-green)] transition-all duration-300"

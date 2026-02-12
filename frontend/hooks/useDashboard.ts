@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { formatDateForAPI } from "@/utils/dateUtils";
 import { api } from "@/lib/api";
-import { DashboardData, Class, User } from "@/lib/types"; // Assuming types are here or need to be moved
+import { DashboardData, Class, User } from "@/lib/types";
 import { toast } from "sonner";
 
 export function useDashboard(user: User | null) {
@@ -65,7 +65,7 @@ export function useDashboard(user: User | null) {
 		selectedDate,
 		setSelectedDate,
 		refreshData,
-		setClasses, // Exposed for optimistic updates if needed
+		setClasses,
 		setDashboardData,
 	};
 }

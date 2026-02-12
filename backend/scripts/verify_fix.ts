@@ -6,14 +6,12 @@ async function verify() {
 	try {
 		console.log("🔍 Starting verification...");
 
-		// 1. Get a student
 		const student = await prisma.student.findFirst();
 		if (!student) {
 			throw new Error("❌ No students found in DB. Seed might have failed.");
 		}
 		console.log(`✅ Found student: ${student.name} (${student.id})`);
 
-		// 2. Try to mark attendance using Prisma directly (simulating controller logic)
 		const date = new Date();
 		date.setHours(0, 0, 0, 0);
 

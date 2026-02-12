@@ -99,13 +99,11 @@ export const getClasses = async (req: AuthRequest, res: Response) => {
 			return fail(res, "Not authorized", 403);
 		}
 
-		// Process classes to attach 'todayStatus' simplified field for frontend
 		const classesWithStatus = classes.map((cls) => ({
 			...cls,
 			students: cls.students.map((student) => {
-				const attendance = student.attendances[0]; // Should be only 1 or 0 due to date filter
+				const attendance = student.attendances[0];
 
-				// Calculate todayScore from fetched feedbackEvents
 				const positives = student.feedbackEvents.filter(
 					(e) => e.type === "POSITIVE",
 				).length;

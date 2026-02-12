@@ -62,7 +62,7 @@ export function ClassWallModal({
 
 			setNewPostContent("");
 			toast.success("Postagem criada com sucesso!");
-			loadPosts(); // Refresh list
+			loadPosts();
 		} catch (error) {
 			console.error("Failed to create post:", error);
 			toast.error("Erro ao criar postagem.");
@@ -109,7 +109,7 @@ export function ClassWallModal({
 			maxWidth="2xl"
 		>
 			<div className="space-y-6 p-4">
-				{/* Create Post Area */}
+
 				{canPost && (
 					<div className="glass-card p-4 space-y-4">
 						<textarea
@@ -132,7 +132,6 @@ export function ClassWallModal({
 					</div>
 				)}
 
-				{/* Posts List */}
 				<div className="space-y-4">
 					<h3 className="text-lg font-semibold text-gray-700 flex items-center gap-2">
 						<MessageCircle size={20} />

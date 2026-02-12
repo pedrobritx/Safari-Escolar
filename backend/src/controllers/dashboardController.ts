@@ -51,7 +51,6 @@ export const getDashboard = async (req: AuthRequest, res: Response) => {
 		const dashboardData = classes.map((cls) => {
 			const totalStudents = cls.students.length;
 
-			// Since we filtered in DB, just counting the array length is sufficient for today's events/attendance
 			const todayAttendance = cls.students.filter((student) =>
 				student.attendances.some(
 					(att) => att.status === "PRESENT" || att.status === "LATE",
@@ -112,7 +111,6 @@ export const resetDay = async (req: AuthRequest, res: Response) => {
 			date as string,
 		);
 
-		// Find classes for this teacher or coordinator (or strict to specific classId if provided)
 		const whereClass: any = {
 			OR: [
 				{ teacherId: userId },
@@ -139,7 +137,6 @@ export const resetDay = async (req: AuthRequest, res: Response) => {
 			return res.json({ message: "No classes found to reset" });
 		}
 
-		// Delete attendance
 		const deleteAttendance = await prisma.attendance.deleteMany({
 			where: {
 				date: {
@@ -152,7 +149,6 @@ export const resetDay = async (req: AuthRequest, res: Response) => {
 			},
 		});
 
-		// Delete behavior/feedback
 		const deleteFeedback = await prisma.feedbackEvent.deleteMany({
 			where: {
 				date: {

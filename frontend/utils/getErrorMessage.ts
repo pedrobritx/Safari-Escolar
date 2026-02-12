@@ -3,7 +3,7 @@ export function getErrorMessage(error: unknown): string {
     return error.message;
   }
 
-  console.error(error) 
-   
+  console.error(error)
+
   return "Erro inesperado";
 }

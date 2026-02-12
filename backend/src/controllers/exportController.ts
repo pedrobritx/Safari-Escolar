@@ -2,9 +2,6 @@ import { Response } from "express";
 import { AuthRequest } from "../middleware/auth";
 import prisma from "../utils/prisma";
 
-/**
- * Escape CSV field - wrap in quotes if contains comma, quote, or newline
- */
 function escapeCSV(value: string | number | null | undefined): string {
 	if (value === null || value === undefined) return "";
 	const str = String(value);
@@ -14,9 +11,6 @@ function escapeCSV(value: string | number | null | undefined): string {
 	return str;
 }
 
-/**
- * Export student roster with summary statistics
- */
 export const exportStudents = async (req: AuthRequest, res: Response) => {
 	try {
 		const userId = req.user!.id;
@@ -38,7 +32,6 @@ export const exportStudents = async (req: AuthRequest, res: Response) => {
 			},
 		});
 
-		// CSV Header
 		const headers = [
 			"Nome",
 			"Turma",
@@ -97,16 +90,13 @@ export const exportStudents = async (req: AuthRequest, res: Response) => {
 
 		res.setHeader("Content-Type", "text/csv; charset=utf-8");
 		res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
-		res.send("\uFEFF" + csv); // BOM for Excel UTF-8 compatibility
+		res.send("\uFEFF" + csv);
 	} catch (error) {
 		console.error("Export students error:", error);
 		res.status(500).json({ success: false, error: "Failed to export students" });
 	}
 };
 
-/**
- * Export detailed history (attendance + feedback by date)
- */
 export const exportHistory = async (req: AuthRequest, res: Response) => {
 	try {
 		const userId = req.user!.id;
@@ -132,13 +122,12 @@ export const exportHistory = async (req: AuthRequest, res: Response) => {
 			},
 		});
 
-		// CSV Header
 		const headers = ["Data", "Aluno", "Turma", "Tipo", "Valor"];
 		const rows: string[] = [headers.join(",")];
 
 		for (const cls of classes) {
 			for (const student of cls.students) {
-				// Add attendance records
+
 				for (const att of student.attendances) {
 					const dateStr = att.date.toISOString().split("T")[0];
 					const statusMap: Record<string, string> = {
@@ -156,7 +145,6 @@ export const exportHistory = async (req: AuthRequest, res: Response) => {
 					rows.push(row.join(","));
 				}
 
-				// Add feedback records
 				for (const fb of student.feedbackEvents) {
 					const dateStr = fb.date.toISOString().split("T")[0];
 					const typeLabel =
@@ -180,7 +168,7 @@ export const exportHistory = async (req: AuthRequest, res: Response) => {
 
 		res.setHeader("Content-Type", "text/csv; charset=utf-8");
 		res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
-		res.send("\uFEFF" + csv); // BOM for Excel UTF-8 compatibility
+		res.send("\uFEFF" + csv);
 	} catch (error) {
 		console.error("Export history error:", error);
 		res.status(500).json({ success: false, error: "Failed to export history" });

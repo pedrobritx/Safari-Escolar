@@ -1,6 +1,3 @@
-/**
- * Global auth events for handling session expiry across the app
- */
 
 type AuthEventListener = () => void;
 

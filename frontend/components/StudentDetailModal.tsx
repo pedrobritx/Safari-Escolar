@@ -24,7 +24,7 @@ interface StudentDetailModalProps {
 	student: Student | null;
 	onUpdate: (data: Partial<Student>) => void;
 	onDelete?: () => void;
-	onFeedbackChange?: () => void; // New callback for sync
+	onFeedbackChange?: () => void;
 	classId: string;
 }
 
@@ -46,7 +46,6 @@ export default function StudentDetailModal({
 	const [newMessage, setNewMessage] = useState("");
 	const [sendingMessage, setSendingMessage] = useState(false);
 
-	// Contact Form State
 	const [name, setName] = useState("");
 	const [animalAvatar, setAnimalAvatar] = useState("Leão");
 	const [avatarColor, setAvatarColor] = useState("#FFFFFF");
@@ -64,9 +63,8 @@ export default function StudentDetailModal({
 			setEmail(student.email || "");
 			setBirthday(student.birthday || "");
 			setBirthday(student.birthday || "");
-			setActiveTab("timeline"); // Default tab
+			setActiveTab("timeline");
 
-			// Fetch Timeline
 			fetchTimeline(student.id);
 		}
 	}, [isOpen, student]);
@@ -164,7 +162,6 @@ export default function StudentDetailModal({
 			setFeedbacks((prev) => prev.filter((f) => f.id !== feedbackId));
 			toast.success("Feedback removido!");
 
-			// Notify parent to refresh data (sync card badge)
 			if (onFeedbackChange) {
 				onFeedbackChange();
 			}
@@ -184,9 +181,9 @@ export default function StudentDetailModal({
 
 	return (
 		<Modal isOpen={isOpen} onClose={onClose} title={student.name} maxWidth="md">
-			{/* Content Container with Standard Padding */}
+
 			<div className="p-6">
-				{/* Avatar Section */}
+
 				<div className="flex flex-col items-center mb-6">
 					<div
 						className="relative group cursor-pointer"
@@ -199,7 +196,6 @@ export default function StudentDetailModal({
 							{getAnimalAvatar(animalAvatar)}
 						</div>
 
-						{/* Edit Badge - Adjusted for white background */}
 						<div className="absolute -bottom-2 -right-2 bg-[var(--safari-green)] text-white px-3 py-1 rounded-full shadow-md text-xs font-bold border-2 border-white">
 							Mudar
 						</div>
@@ -220,7 +216,6 @@ export default function StudentDetailModal({
 					)}
 				</div>
 
-				{/* Tabs */}
 				<div className="flex gap-4 relative z-10 shrink-0 px-2 mb-4">
 					<button
 						onClick={() => setActiveTab("timeline")}
@@ -240,11 +235,10 @@ export default function StudentDetailModal({
 					</button>
 				</div>
 
-				{/* Content Area */}
 				<div className="min-h-[300px]">
 					{activeTab === "timeline" && (
 						<div className="space-y-6">
-							{/* New Message Input */}
+
 							<form onSubmit={handleSendMessage} className="relative">
 								<Textarea
 									placeholder={`Escrever mensagem para ${student.name}...`}
@@ -262,7 +256,6 @@ export default function StudentDetailModal({
 								</Button>
 							</form>
 
-							{/* Timeline */}
 							{loadingTimeline ? (
 								<div className="text-center py-10 text-gray-400">
 									Carregando...
@@ -285,10 +278,10 @@ export default function StudentDetailModal({
 											return dateB - dateA;
 										})
 										.map((item) => {
-											// Check if it's a FeedbackEvent (has 'type' and 'description')
+
 											if ("type" in item && "description" in item) {
 												const event = item as FeedbackEvent;
-												// ... render feedback card ...
+
 												return (
 													<div key={event.id} className="list-card relative">
 														<div className="flex items-start gap-3">
@@ -363,7 +356,7 @@ export default function StudentDetailModal({
 													</div>
 												);
 											} else {
-												// It's a Post
+
 												const post = item as Post;
 												return (
 													<div

@@ -65,7 +65,7 @@ export const StudentCard: React.FC<StudentCardProps> = ({
 
 	const handleStatusCycle = (e: React.MouseEvent) => {
 		e.stopPropagation();
-		if (isSelectMode) return; // Disable status cycle in select mode if needed
+		if (isSelectMode) return;
 
 		const current = student.todayStatus;
 		let next: "PRESENT" | "LATE" | "ABSENT" | "CLEARED";
@@ -73,7 +73,7 @@ export const StudentCard: React.FC<StudentCardProps> = ({
 		if (!current) next = "PRESENT";
 		else if (current === "PRESENT") next = "LATE";
 		else if (current === "LATE") next = "ABSENT";
-		else next = "CLEARED"; // ABSENT -> CLEARED
+		else next = "CLEARED";
 
 		onAttendanceChange(student.id, next);
 	};
@@ -97,7 +97,7 @@ export const StudentCard: React.FC<StudentCardProps> = ({
 				${isSelected ? "ring-2 ring-[var(--safari-green)] bg-[var(--safari-green-light)]/20" : ""}
 			`}
 		>
-			{/* Selection Indicator */}
+
 			{isSelectMode && (
 				<div
 					className={`absolute top-2 right-2 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
@@ -132,7 +132,6 @@ export const StudentCard: React.FC<StudentCardProps> = ({
 							{getAnimalAvatar(student.animalAvatar)}
 						</div>
 
-						{/* Edit Overlay - Only show if NOT in select mode */}
 						{!isSelectMode && (
 							<button
 								onClick={(e) => {
@@ -147,7 +146,6 @@ export const StudentCard: React.FC<StudentCardProps> = ({
 							</button>
 						)}
 
-						{/* Pontuação Badge */}
 						{(student.todayScore || 0) !== 0 && (
 							<div
 								className={`score-badge ${

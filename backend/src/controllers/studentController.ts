@@ -71,7 +71,7 @@ export const getStudents = async (req: AuthRequest, res: Response) => {
 
     const students = await prisma.student.findMany({
       where,
-      orderBy: { name: 'asc' }, // Default sort
+      orderBy: { name: 'asc' },
       include: {
         class: true,
         family: {
@@ -130,8 +130,6 @@ export const deleteStudent = async (req: AuthRequest, res: Response) => {
 
 	await assertStudentAccess(req.user!, id as string);
 
-    // Use transaction to delete all related data manually to ensure no foreign key constraint errors
-    // Cascade delete handling by database
     await prisma.student.delete({ where: { id: id as string } });
 
     res.status(204).send();
