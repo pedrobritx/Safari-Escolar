@@ -1,5 +1,5 @@
 # Árvore do repositório — Safari Escolar
-*Gerado em 2026-02-12 02:14:59Z (UTC)*
+*Gerado em 2026-02-12 02:48:33Z (UTC)*
 
 ```
 Safari-Escolar/
@@ -115,6 +115,7 @@ Safari-Escolar/
 │   ├── components/
 │   │   ├── AuthGate.tsx
 │   │   ├── AuthProvider.tsx
+│   │   ├── BulkActionsBar.tsx
 │   │   ├── Calendar.tsx
 │   │   ├── ClassWallModal.tsx
 │   │   ├── ConfirmDeleteModal.tsx
@@ -123,6 +124,7 @@ Safari-Escolar/
 │   │   ├── FeedbackEditorModal.tsx
 │   │   ├── FeedbackModal.tsx
 │   │   ├── ManageClassTeachersModal.tsx
+│   │   ├── RollCallModal.tsx
 │   │   ├── SchoolCard.tsx
 │   │   ├── StudentCard.tsx
 │   │   ├── StudentDetailModal.tsx
