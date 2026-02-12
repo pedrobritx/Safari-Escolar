@@ -1,8 +1,8 @@
 # Árvore do repositório — Safari Escolar
-*Gerado em 2026-02-12 03:22:13Z (UTC)*
+*Gerado em 2026-02-12 03:24:56Z (UTC)*
 
 ```
-Safari Escolar/
+Safari-Escolar/
 ├── .env.example
 ├── .gitignore
 ├── LICENSE.md
@@ -12,7 +12,6 @@ Safari Escolar/
 │   │   ├── accounts/
 │   │   ├── attendance/
 │   │   ├── audit/
-│   │   ├── calendar/
 │   │   ├── classrooms/
 │   │   ├── config/
 │   │   ├── core/
@@ -97,13 +96,10 @@ Safari Escolar/
 │   └── tree.md
 ├── dummy_file_2.txt
 ├── frontend/
-│   ├── .env.example
-│   ├── .env.local
 │   ├── .gitignore
 │   ├── README.md
 │   ├── app/
 │   │   ├── dashboard/
-│   │   │   ├── logs/
 │   │   │   └── page.tsx
 │   │   ├── error.tsx
 │   │   ├── family/
@@ -150,7 +146,6 @@ Safari Escolar/
 │   │   ├── authEvents.ts
 │   │   ├── retry.ts
 │   │   └── types.ts
-│   ├── next-env.d.ts
 │   ├── next.config.ts
 │   ├── package-lock.json
 │   ├── package.json
@@ -162,15 +157,11 @@ Safari Escolar/
 │   │   ├── vercel.svg
 │   │   └── window.svg
 │   ├── tsconfig.json
-│   ├── tsconfig.tsbuildinfo
 │   └── utils/
 │       ├── animalAvatarMap.ts
 │       ├── dateUtils.ts
 │       ├── getAnimalAvatar.ts
 │       └── getErrorMessage.ts
-├── packages/
-│   ├── shared/
-│   └── ui/
 └── scripts/
     └── generate_tree.py
 ```
