@@ -24,6 +24,14 @@ export const getFamilyView = async (req: AuthRequest, res: Response) => {
 								teacher: {
 									select: { name: true },
 								},
+								posts: {
+									where: { studentId: null },
+									orderBy: { createdAt: "desc" },
+									take: 50,
+									include: {
+										teacher: { select: { name: true } },
+									},
+								},
 							},
 						},
 						attendances: {
@@ -32,7 +40,14 @@ export const getFamilyView = async (req: AuthRequest, res: Response) => {
 						},
 						feedbackEvents: {
 							orderBy: { date: "desc" },
-							take: 20,
+							take: 100, // Increased to provide better history
+						},
+						diaryPosts: {
+							orderBy: { createdAt: "desc" },
+							take: 50,
+							include: {
+								teacher: { select: { name: true } },
+							},
 						},
 					},
 				},
@@ -77,8 +92,16 @@ export const getFamilyView = async (req: AuthRequest, res: Response) => {
 					id: event.id,
 					type: event.type.toLowerCase(),
 					description: event.description,
+					comment: event.comment,
 					date: event.date,
 				})),
+				recentPosts: [
+					...student.diaryPosts.map((post) => ({ ...post, type: "DIARY" })),
+					...student.class.posts.map((post) => ({ ...post, type: "MURAL" })),
+				].sort(
+					(a, b) =>
+						new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+				),
 			};
 		});
 

@@ -65,6 +65,7 @@ export interface Post {
 		name: string;
 	};
 	createdAt: string;
+	type?: "MURAL" | "DIARY";
 }
 
 export interface DashboardData {
@@ -89,6 +90,7 @@ export interface FamilyStudent {
 	negativeEvents: number;
 	recentAttendances: Attendance[];
 	recentFeedbackEvents: FeedbackEvent[];
+	recentPosts: Post[];
 }
 
 export type UserRole = Omit<User, "role">;
