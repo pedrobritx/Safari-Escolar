@@ -9,6 +9,13 @@ export const createPost = async (req: AuthRequest, res: Response) => {
 		const { content, classId, studentId } = req.body;
 		const teacherId = req.user!.id;
 
+		console.log("[CreatePost] Request body:", {
+			content,
+			classId,
+			studentId,
+			teacherId,
+		});
+
 		if (!content || !classId) {
 			return res.status(400).json({
 				success: false,
@@ -28,6 +35,7 @@ export const createPost = async (req: AuthRequest, res: Response) => {
 			req.user!.role !== "ADMIN" &&
 			req.user!.role !== "COORDINATOR"
 		) {
+			console.warn("[CreatePost] Access denied for user:", teacherId);
 			return fail(res, "You do not have permission to post to this class", 403);
 		}
 
@@ -57,8 +65,8 @@ export const createPost = async (req: AuthRequest, res: Response) => {
 
 		ok(res, post);
 	} catch (error) {
-		console.error("Create post error:", error);
-		fail(res, "Failed to create post", 500);
+		console.error("Create post error details:", error);
+		fail(res, "Failed to create post", 500, error);
 	}
 };
 

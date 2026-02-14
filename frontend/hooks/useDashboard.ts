@@ -28,7 +28,9 @@ export function useDashboard(user: User | null) {
 						const updatedClass = classesData.find(
 							(c: Class) => c.id === prev.id,
 						);
-						return updatedClass || prev;
+						return (
+							updatedClass || (classesData.length > 0 ? classesData[0] : null)
+						);
 					} else if (classesData.length > 0) {
 						return classesData[0];
 					}
