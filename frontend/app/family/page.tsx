@@ -35,8 +35,14 @@ export default function FamilyPage() {
 			try {
 				const response = await api.getFamilyView(token);
 				setStudents(response.students);
-			} catch (err) {
+			} catch (err: any) {
 				console.error("Erro ao carregar dados da família:", err);
+				if (err.status === 401 || err.message === "Invalid token") {
+					localStorage.removeItem("token");
+					localStorage.removeItem("userRole");
+					router.push("/login");
+					return;
+				}
 				setError("Falha ao carregar dados. Tente novamente.");
 			} finally {
 				setLoading(false);
@@ -200,6 +206,65 @@ export default function FamilyPage() {
 											<span className="text-lg font-black text-orange-700">
 												{student.negativeEvents}
 											</span>
+										</div>
+									</div>
+
+									{/* Attendance Visual History */}
+									<div className="px-6 pb-2 mt-4">
+										<h3 className="text-[10px] uppercase text-gray-400 font-bold tracking-wider mb-2">
+											Histórico de Frequência (30 dias)
+										</h3>
+										<div className="flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
+											{student.recentAttendances.length > 0 ? (
+												student.recentAttendances.map((att, index) => (
+													<div
+														key={index}
+														className="flex flex-col items-center min-w-[3rem]"
+													>
+														<div
+															className={`w-8 h-8 rounded-full flex items-center justify-center text-white mb-1 shadow-sm ${
+																att.status === "PRESENT"
+																	? "bg-green-500"
+																	: att.status === "ABSENT"
+																		? "bg-red-500"
+																		: "bg-yellow-500"
+															}`}
+															title={
+																att.status === "PRESENT"
+																	? "Presente"
+																	: att.status === "ABSENT"
+																		? "Ausente"
+																		: "Atrasado"
+															}
+														>
+															{att.status === "PRESENT" && (
+																<CheckCircle2 size={16} />
+															)}
+															{att.status === "ABSENT" && (
+																<AlertCircle size={16} />
+															)}
+															{att.status === "LATE" && <Clock size={16} />}
+														</div>
+														<span className="text-[10px] font-medium text-gray-500 uppercase">
+															{new Date(att.date)
+																.toLocaleDateString("pt-BR", {
+																	weekday: "short",
+																})
+																.replace(".", "")}
+														</span>
+														<span className="text-[9px] text-gray-400">
+															{new Date(att.date).toLocaleDateString("pt-BR", {
+																day: "2-digit",
+																month: "2-digit",
+															})}
+														</span>
+													</div>
+												))
+											) : (
+												<span className="text-sm text-gray-400 italic">
+													Sem dados recentes
+												</span>
+											)}
 										</div>
 									</div>
 								</div>

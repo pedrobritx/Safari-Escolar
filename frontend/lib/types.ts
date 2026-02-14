@@ -83,6 +83,7 @@ export interface FamilyStudent {
 	id: string;
 	name: string;
 	animalAvatar: string;
+	avatarColor?: string;
 	className: string;
 	teacherName: string;
 	attendanceRate: number;
