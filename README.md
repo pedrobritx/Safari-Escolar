@@ -1,10 +1,31 @@
 # Safari Escolar 🔍
 
+![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![License](https://img.shields.io/badge/license-ISC-green.svg)
+![Build](https://img.shields.io/badge/build-passing-brightgreen.svg)
+![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)
+![Stack](https://img.shields.io/badge/stack-Next.js%20%7C%20Express%20%7C%20PostgreSQL-orange.svg)
+
 ## Visão Geral
 
 **Safari Escolar** é um web app de gestão de sala de aula criado para **auxiliar professores e professoras do ensino público** no acompanhamento de frequência, comportamento, atividades e comunicação com famílias. O projeto foi desenvolvido com foco em impacto real, simplicidade operacional e demonstração ponta a ponta.
 
 O aplicativo parte de um princípio simples: **menos burocracia, mais tempo para ensinar**.
+
+---
+
+## 🔗 Links Importantes
+
+| Recurso                         | Link                                                                                                                      |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| 🎨 **Design (Figma)**           | [Abrir no Figma](https://www.figma.com/design/nrcqz3VMH3NWTLkxaj4VBE/Safari-Escolar?node-id=45-1108&t=K2ybSwwcFdFdC0V9-1) |
+| 🎬 **Pitch (YouTube)**          | [Assistir no YouTube](https://www.youtube.com/watch?v=5kgcHhcqI0A)                                                        |
+| 📖 **Arquitetura**              | [docs/ARCH.md](docs/ARCH.md)                                                                                              |
+| 📡 **Referência da API**        | [docs/API.md](docs/API.md)                                                                                                |
+| 🧪 **Testes**                   | [docs/TESTING.md](docs/TESTING.md)                                                                                        |
+| 📘 **Tutorial**                 | [docs/TUTORIAL.md](docs/TUTORIAL.md)                                                                                      |
+| 🔑 **Credenciais**              | [docs/CREDENTIALS.md](docs/CREDENTIALS.md)                                                                                |
+| ⚠️ **Restrições / Constraints** | [docs/CONSTRAINTS.md](docs/CONSTRAINTS.md)                                                                                |
 
 ---
 
@@ -107,15 +128,14 @@ O objetivo não é punição, mas **engajamento e feedback visual rápido**.
 
 ## Tecnologias
 
-> O projeto não impõe stack específica. A escolha prioriza rapidez, clareza e viabilidade de MVP.
-
-Exemplos possíveis:
-
-- Frontend: React / Vue / Svelte
-- Backend: Node.js / Django / Firebase
-- Banco de dados: PostgreSQL / SQLite / Firestore
-- Design: Figma
-- Deploy: Vercel / Render / Railway
+| Camada             | Tecnologia                                                                                                       |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| **Frontend**       | Next.js (App Router) · React · TypeScript · Tailwind CSS                                                         |
+| **Backend**        | Node.js · Express · TypeScript                                                                                   |
+| **Banco de Dados** | PostgreSQL · Prisma ORM                                                                                          |
+| **Testes**         | Vitest · Supertest                                                                                               |
+| **Design**         | [Figma](https://www.figma.com/design/nrcqz3VMH3NWTLkxaj4VBE/Safari-Escolar?node-id=45-1108&t=K2ybSwwcFdFdC0V9-1) |
+| **Infra / Deploy** | Docker Compose · Vercel / Render                                                                                 |
 
 ---
 
@@ -196,19 +216,20 @@ O foco do MVP é **demonstração funcional**. Caso o backend não esteja ativo,
 ```text
 /safari-escolar
 │
-├── frontend/
-├── backend/
-├── apps/               # protótipos legados (não usados no fluxo atual)
-├── packages/           # placeholders para libs compartilhadas futuras
+├── frontend/              # Next.js (App Router) + Tailwind CSS
+├── backend/               # Express + Prisma + PostgreSQL
+├── apps/                  # protótipos legados (não usados no fluxo atual)
+├── packages/              # placeholders para libs compartilhadas futuras
 ├── docs/
-│   ├── API.md
-│   ├── ARCH.md
-│   ├── CONSTRAINTS.md
-│   ├── CREDENTIALS.md
-│   ├── TESTING.md
-│   ├── tree.md
-│   └── TUTORIAL.md
+│   ├── API.md             # Referência completa da API REST
+│   ├── ARCH.md            # Arquitetura do sistema
+│   ├── CONSTRAINTS.md     # Restrições e decisões técnicas
+│   ├── CREDENTIALS.md     # Credenciais de demonstração
+│   ├── TESTING.md         # Estratégia e guia de testes
+│   ├── tree.md            # Árvore de arquivos do projeto
+│   └── TUTORIAL.md        # Tutorial de uso passo a passo
 │
+├── docker-compose.yml     # Setup do PostgreSQL via Docker
 ├── README.md
 └── .env.example
 ```
