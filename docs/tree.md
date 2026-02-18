@@ -1,5 +1,5 @@
 # Árvore do repositório — Safari Escolar
-*Gerado em 2026-02-14 16:48:23Z (UTC)*
+*Gerado em 2026-02-18 20:41:27Z (UTC)*
 
 ```
 Safari-Escolar/
@@ -104,20 +104,24 @@ Safari-Escolar/
 │   ├── .gitignore
 │   ├── README.md
 │   ├── app/
+│   │   ├── apple-icon.png
 │   │   ├── dashboard/
 │   │   │   └── page.tsx
 │   │   ├── error.tsx
 │   │   ├── family/
 │   │   │   └── page.tsx
-│   │   ├── favicon.ico
 │   │   ├── globals.css
+│   │   ├── icon.png
 │   │   ├── layout.tsx
 │   │   ├── login/
 │   │   │   └── page.tsx
+│   │   ├── manifest.ts
+│   │   ├── opengraph-image.png
 │   │   ├── page.tsx
 │   │   ├── providers.tsx
-│   │   └── settings/
-│   │       └── page.tsx
+│   │   ├── settings/
+│   │   │   └── page.tsx
+│   │   └── twitter-image.png
 │   ├── components/
 │   │   ├── AuthGate.tsx
 │   │   ├── AuthProvider.tsx
