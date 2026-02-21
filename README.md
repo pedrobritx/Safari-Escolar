@@ -18,7 +18,7 @@ O aplicativo parte de um princípio simples: **menos burocracia, mais tempo para
 
 | Recurso                         | Link                                                                                                                      |
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| 🎨 **Design (Figma)**           | [Abrir no Figma](https://www.figma.com/design/nrcqz3VMH3NWTLkxaj4VBE/Safari-Escolar?node-id=45-1108&t=K2ybSwwcFdFdC0V9-1) |
+| 🎨 **Design**                   | [Abrir no Figma](https://www.figma.com/design/nrcqz3VMH3NWTLkxaj4VBE/Safari-Escolar?node-id=45-1108&t=K2ybSwwcFdFdC0V9-1) |
 | 🎬 **Pitch**                    | [Assistir no YouTube](https://youtu.be/oGku731v414)                                                                       |
 | 🎬 **MVP**                      | [Assistir no YouTube](https://youtu.be/5XBDHoxh2Xo)                                                                       |
 | 📖 **Arquitetura**              | [docs/ARCH.md](docs/ARCH.md)                                                                                              |
